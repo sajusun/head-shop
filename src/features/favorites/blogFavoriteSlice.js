@@ -1,9 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const getInitialFavorites = () => {
+  try {
+    const saved = localStorage.getItem('blogFavorites');
+    return saved ? JSON.parse(saved) : [];
+  } catch (err) {
+    return [];
+  }
+};
+
 const blogFavoriteSlice = createSlice({
   name: 'blogFavorites',
   initialState: {
-    items: JSON.parse(localStorage.getItem('blogFavorites')) || [],
+    items: getInitialFavorites(),
   },
   reducers: {
     toggleBlogFavorite: (state, action) => {
