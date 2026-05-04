@@ -3,6 +3,7 @@ import authReducer from '../features/auth/authSlice';
 import productReducer from '../features/products/productSlice';
 import cartReducer from '../features/cart/cartSlice';
 import favoriteReducer from '../features/favorites/favoriteSlice';
+import blogFavoriteReducer from '../features/favorites/blogFavoriteSlice';
 import reviewReducer from '../features/reviews/reviewSlice';
 
 export const store = configureStore({
@@ -11,6 +12,7 @@ export const store = configureStore({
     products: productReducer,
     cart: cartReducer,
     favorites: favoriteReducer,
+    blogFavorites: blogFavoriteReducer,
     reviews: reviewReducer,
   },
 });
