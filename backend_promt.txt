@@ -1,0 +1,92 @@
+# BACKEND SYSTEM BLUEPRINT - HERD SHOP ECOMMERCE
+
+This document provides a comprehensive prompt and technical specification for building the backend for the HERD SHOP eCommerce application. 
+
+## 1. PROJECT OBJECTIVE
+Build a high-performance, secure REST API that supports a premium React-based eCommerce frontend. The backend must handle user authentication, product management (with offer prices), order processing, and reviews.
+
+## 2. RECOMMENDED STACK
+- **Language**: PHP (Laravel 10+) or Node.js (Express/NestJS)
+- **Database**: PostgreSQL or MySQL
+- **Auth**: JWT (JSON Web Tokens)
+- **Payment Gateway**: Chapa / Stripe
+- **File Storage**: AWS S3 or Cloudinary (for product images)
+
+## 3. DATABASE SCHEMA (ENTITY RELATIONSHIPS)
+
+### A. Users Table
+- `id` (UUID)
+- `name` (String)
+- `email` (String, unique)
+- `password` (Hashed)
+- `avatar` (String, nullable)
+- `role` (Enum: 'user', 'admin')
+- `email_verified_at` (Timestamp)
+
+### B. Products Table
+- `id` (UUID)
+- `name` (String)
+- `slug` (String, unique)
+- `price` (Decimal, 10,2)
+- `offerPrice` (Decimal, 10,2, nullable)
+- `description` (Text)
+- `category` (String)
+- `image` (String)
+- `rating` (Float, default: 0)
+- `reviews_count` (Integer, default: 0)
+- `stock` (Integer, default: 0)
+- `is_featured` (Boolean)
+- `is_top_rated` (Boolean)
+
+### C. Reviews Table
+- `id` (UUID)
+- `product_id` (Foreign Key)
+- `user_id` (Foreign Key)
+- `user_name` (String)
+- `rating` (Integer, 1-5)
+- `comment` (Text)
+- `date` (Timestamp)
+
+### D. Orders Table
+- `id` (UUID)
+- `user_id` (Foreign Key)
+- `total_amount` (Decimal)
+- `status` (Enum: 'Pending', 'In Transit', 'Delivered', 'Cancelled')
+- `payment_status` (Enum: 'Unpaid', 'Paid')
+- `shipping_address` (JSON: {street, city, zip})
+- `items` (JSON Array: [{product_id, quantity, price_at_purchase}])
+
+### E. Blog Posts (Journal) Table
+- `id` (UUID)
+- `title` (String)
+- `slug` (String, unique)
+- `excerpt` (Text) - Short summary for listing
+- `content` (Rich Text/HTML)
+- `featured_image` (String)
+- `author_name` (String)
+- `category` (String)
+- `tags` (JSON Array)
+- `published_at` (Timestamp)
+- `read_time` (Integer) - Estimated minutes
+
+## 4. API SPECIFICATIONS & RESPONSE FORMATS
+...
+### BLOG ENDPOINTS
+- `GET /api/blogs`: List all blog posts
+- `GET /api/blogs/{slug}`: Single blog post details
+
+## 5. SPECIAL BUSINESS LOGIC REQUIREMENTS
+...
+5. **Blog Search**: Implement keyword search across blog titles and content.
+
+## 6. PAYMENT INTEGRATION (CHAPA/STRIPE)
+...
+- Implement a `POST /api/payments/initialize` endpoint.
+- Redirect user to the payment URL.
+- Handle `POST /api/payments/webhook` to verify transaction status and update Order status to 'Paid'.
+
+## 7. SECURITY CONSIDERATIONS
+- Implement CORS for your specific frontend domain.
+- Use Middleware to protect `/orders`, `/profile`, and `/admin/*` routes.
+- Sanitize all text inputs to prevent XSS.
+- Rate limiting on Auth and Search endpoints.

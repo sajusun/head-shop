@@ -1,0 +1,321 @@
+You are a senior React architect and frontend engineer.
+
+Goal: Analyze THIS EXISTING React project repository end-to-end and produce an optimized, production-ready version of it (without needing backend API endpoints). You must base decisions on the actual codebase you see in the workspace, not generic assumptions.
+
+Deliverables:
+1) A concrete refactor/upgrade plan tailored to the repo.
+2) The actual code changes across the repo to implement the plan.
+3) A short MIGRATION.md describing what changed and how to run it.
+4) Keep the app behavior the same unless explicitly improved; avoid breaking changes.
+
+Hard constraints:
+- Do NOT invent API endpoints or backend contracts.
+- Use the existing UI/flows and improve architecture, DX, performance, and reliability.
+- Prefer minimal, surgical changes; but do make meaningful improvements where it clearly helps.
+- If the repo already uses a tool/library, reuse it unless there is a clear benefit to migrate.
+- Do not add heavy dependencies unless justified.
+- No placeholder code: every addition must compile and run.
+
+============================================================
+1) Repo Analysis (MANDATORY)
+============================================================
+First, deeply analyze:
+- Package manager and scripts (package.json)
+- Build tool (Vite/CRA/Next) and configuration
+- Routing strategy (React Router / Next router / custom)
+- State strategy (Context / Redux / Zustand / React Query)
+- API layer patterns (fetch/Axios/React Query), error handling
+- Auth handling (if any): storage, guards, redirects
+- Folder structure and feature boundaries
+- Styling system (Tailwind/CSS Modules/styled-components/MUI/etc.)
+- Forms and validation patterns
+- Reusable UI components vs page-specific components
+- Performance bottlenecks: unnecessary rerenders, large bundles, blocking work
+- TypeScript usage level, strictness, and any runtime typing gaps
+- Testing: unit/integration/e2e coverage, test utilities
+- Lint/format: ESLint, Prettier, Stylelint, Husky, lint-staged
+- Accessibility: semantics, keyboard navigation, aria, contrast
+- i18n (if any), timezones, number/date formatting
+
+Output an “Architecture Snapshot” summary that lists:
+- Detected stack + versions
+- Current strengths
+- Top 10 issues by impact (bugs, DX, perf, security, maintainability)
+
+============================================================
+2) Target Tech Stack (choose based on repo reality)
+============================================================
+You must recommend and justify an optimized stack, but it should be an evolution of what exists:
+
+- Framework/Build:
+  - If Vite React: keep Vite unless the repo clearly needs SSR/SEO -> then propose Next.js migration plan (only if justified).
+  - If Next.js: keep Next and modernize (App Router vs Pages Router depending on repo).
+
+- Type Safety:
+  - Prefer TypeScript. If repo is JS, propose an incremental TS migration (start with shared types + new code in TS).
+
+- Data Fetching:
+  - Prefer TanStack Query for server state, caching, retries, request dedupe (only if it fits the repo).
+  - If already using Redux Toolkit for server state, propose splitting server-state into React Query and keeping Redux for client state.
+
+- State Management:
+  - Keep global state minimal. Use:
+    - React Query for server state
+    - Zustand/Redux Toolkit only for app-wide client state
+    - Context only for low-frequency globals (theme, auth session info, feature flags)
+
+- Forms:
+  - Prefer React Hook Form
+  - Validation with Zod (syncs well with TS)
+
+- Styling:
+  - Keep existing styling system; only propose migration if current approach causes real issues.
+
+============================================================
+3) Scalable Folder Structure (refactor to feature boundaries)
+============================================================
+Refactor to a scalable structure aligned with the current framework:
+
+src/
+  app/                  # app bootstrap, providers, router setup, global styles
+  routes/               # route definitions (or pages/ for Next)
+  features/             # feature modules (domain-based)
+    <feature>/
+      api/              # feature API calls + query keys
+      components/       # feature UI parts
+      hooks/            # feature hooks
+      types/            # feature types
+      utils/            # feature utilities
+      index.ts
+  shared/
+    components/         # reusable components (Button, Modal, etc.)
+    hooks/
+    lib/                # axios client, queryClient, storage helpers, etc.
+    styles/
+    types/
+    utils/
+  assets/
+  tests/                # shared test utilities/mocks
+
+Rules:
+- No “god” utils. Put utilities near the feature that uses them unless truly shared.
+- Barrel exports only where they reduce import noise without hiding dependencies.
+- Enforce absolute imports (path aliases) if repo supports it.
+
+============================================================
+4) Routing & Layout Strategy
+============================================================
+Based on the existing routing, implement:
+- Public routes
+- Protected routes (if auth exists)
+- Layout system:
+  - Auth layout
+  - App/Dashboard layout
+  - Error/NotFound layout
+
+Include:
+- Route-level code splitting (lazy loading) where it improves bundle size.
+- Central route config with typed params (TS).
+
+============================================================
+5) Error Handling & UX Standards (production-grade)
+============================================================
+Implement consistent UX patterns:
+- Loading: skeletons/spinners with per-page and per-section fallbacks
+- Empty states: actionable messages
+- Error states:
+  - Global error boundary
+  - Route-level error handling
+  - API error mapping (network vs validation vs server)
+- Notifications:
+  - Toast system with success/error/warning/info
+  - Ensure no duplicate toasts for repeated failures
+
+============================================================
+5.1) Blog / CMS Feature (ADMIN posts, USERS read) (MANDATORY if repo has any blog pages)
+============================================================
+If the repo contains any blog-related pages/routes/components (e.g., `/blog`, `Blog`, `Post`, `Article`, `News`):
+- Treat “Blog/CMS” as a first-class feature module under `src/features/blog/`.
+- Requirements:
+  - Public reading:
+    - Blog list page (search, category/tag filter if present in UI)
+    - Blog details page (slug/id route)
+    - SEO basics (document title/meta; if Next, use `generateMetadata`)
+  - Admin authoring (only if the current app already contains admin/adminStuff UI or role concept):
+    - Admin blog list (manage posts)
+    - Create post (rich text strategy based on repo: markdown or editor)
+    - Edit post
+    - Publish/unpublish or draft (if the app implies this workflow)
+    - Upload/attach cover image (only if repo already uses uploads; otherwise keep as URL field)
+  - Role gating:
+    - Users can only read public posts
+    - Admin routes/components must be protected behind an auth/role guard if auth exists
+- Data model (frontend types) MUST be derived from existing UI usage:
+  - Typical shape: `id`, `title`, `slug`, `excerpt`, `content`, `coverImage`, `author`, `status`, `createdAt`, `updatedAt`, `tags`, `category`
+  - Do not invent fields not needed by the UI.
+- Offline/Online mode compatibility:
+  - Implement blog data sources (`features/blog/api/blog.dataSource.ts`) with:
+    - `listPosts()`, `getPost(slugOrId)`, and if admin exists: `createPost()`, `updatePost()`, `deletePost()`, `setStatus()`
+  - Ensure mock and API modes return identical response shapes and types.
+- UX:
+  - Skeleton list/detail loading
+  - Friendly empty states (no posts yet)
+  - Inline form validation for admin editor
+
+============================================================
+6) API Integration Strategy (even without endpoint knowledge)
+============================================================
+You must standardize the API layer based on what the repo already does:
+- Create a single HTTP client wrapper:
+  - baseURL from env
+  - timeout
+  - request/response interceptors
+  - typed error object normalization
+- If using React Query:
+  - one QueryClient provider
+  - sane defaults: retry policy, staleTime, cacheTime (justify choices)
+  - query key factory per feature
+
+Offline/Online switch (MANDATORY requirement):
+- Add env flags (Vite naming if Vite: `VITE_*`; Next: `NEXT_PUBLIC_*`):
+  - `VITE_IS_API` (or `NEXT_PUBLIC_IS_API`) boolean: `true|false`
+  - `VITE_API_BASE_URL` (or `NEXT_PUBLIC_API_BASE_URL`) string
+- Behavior:
+  - If `IS_API=false`: the app MUST always use dummy/mock data (no network calls).
+  - If `IS_API=true`: the app MUST use real API calls with `API_BASE_URL`.
+  - Response shape MUST remain identical between mock and real API modes.
+- Implementation rules:
+  - Create a single “data source” abstraction per feature (e.g. `features/<feature>/api/<feature>.dataSource.ts`) that exposes the same functions regardless of mode.
+  - Mock implementations must live alongside the feature (`features/<feature>/api/mocks`) and return the same types.
+  - Switching modes must not require code changes—env only.
+  - Add a small runtime env validator (zod-based if available) and fail fast with a clear error when `IS_API=true` but `API_BASE_URL` is missing.
+
+If the app currently uses mocked/static data, keep it but refactor it into the structure above (do not delete useful fixtures).
+
+============================================================
+7) Performance Optimization Checklist (must implement relevant items)
+============================================================
+After measuring code hotspots in the repo, apply:
+- Route-level code splitting
+- Component memoization only where it matters
+- Avoid prop drilling for frequently changing values
+- Stabilize callbacks/values when they cause rerenders
+- Virtualize long lists if present (react-window or equivalent only if needed)
+- Optimize images/assets (modern formats, lazy loading)
+- Remove dead code, unused deps, and oversized libraries (replace if high impact)
+- Bundle analysis config (optional) + document how to run it
+
+============================================================
+8) Security & Reliability
+============================================================
+Even without backend details:
+- Centralize storage access (localStorage/sessionStorage) behind safe helpers
+- Avoid XSS sinks (dangerouslySetInnerHTML); if present, sanitize and justify
+- Normalize and validate any untrusted inputs (URL params, persisted state)
+- Add runtime guards for critical paths (e.g., zod parsing) where appropriate
+
+============================================================
+9) Testing Strategy (match repo maturity)
+============================================================
+Choose the lightest stack that fits the repo:
+- Unit/integration: Vitest or Jest (use what exists)
+- React Testing Library for component tests
+- MSW for API mocking if the app makes network calls
+- E2E: Playwright or Cypress only if repo already has it or the app warrants it
+
+Add:
+- Tests for the most critical flows (login/protected route if any, core feature pages)
+- A minimal test utility layer (renderWithProviders, router wrapper, query client wrapper)
+
+============================================================
+10) Tooling & Standards (must deliver)
+============================================================
+Implement or improve:
+- ESLint (strict but practical) + consistent rules
+- Prettier
+- TypeScript strictness improvements (incremental if needed)
+- Husky + lint-staged (only if repo uses git hooks; otherwise optional)
+- EditorConfig (optional)
+- Environment variable validation (zod-based) where env usage exists
+
+Coding standards:
+- Feature-first modules, clear naming, no deep relative imports
+- No any-types unless justified; prefer unknown + parsing
+- Prefer pure functions for utils; keep side effects in service/lib layer
+
+============================================================
+11) Output Format (MANDATORY)
+============================================================
+When you finish:
+- Apply all changes in the repo (not just suggestions).
+- Create/Update:
+  - MIGRATION.md: what changed + how to run/build/test
+  - README.md: update scripts and dev workflow if needed
+- Provide a concise final report:
+  - Files changed (grouped)
+  - Key improvements implemented
+  - Any remaining risks / follow-ups
+
+============================================================
+12) Execution Order (follow this)
+============================================================
+1) Read and summarize current repo architecture.
+2) Identify top issues + choose the minimal impactful refactor plan.
+3) Implement foundations (providers, routing, api lib, shared components).
+4) Refactor features incrementally (one feature at a time).
+5) Add tests for critical flows.
+6) Validate build + tests + lint (fix failures caused by your changes).
+
+Language preference:
+- Explanations can be in Bangla + English mix, but code must follow repo conventions.
+
+============================================================
+13) Final Quality Gates (must pass before you stop)
+============================================================
+Before finishing, you MUST:
+- `npm run build` (or the repo’s equivalent) passes
+- `npm run lint` passes (or improve lint config and make it pass)
+- tests pass if present (`npm test` / `npm run test` / `vitest`)
+- no TypeScript errors (if TS is used or introduced)
+- no broken routes / blank pages in both modes:
+  - `IS_API=false` (mock mode)
+  - `IS_API=true` (real API mode) — if API is unreachable, handle gracefully (show offline banner) but do not crash
+
+============================================================
+14) Response Contract Rules (CRITICAL for mock vs API parity)
+============================================================
+To ensure “response same rakhte lagbe”:
+- Define shared “DTO” types per feature in `features/<feature>/types/`.
+- If real API responses differ, create an explicit adapter:
+  - `features/<feature>/api/<feature>.adapter.ts`
+  - Map API -> DTO in one place (no scattered mapping in components).
+- Mock data MUST be authored directly in DTO shape (so mock = canonical contract).
+- Normalize errors into one shape everywhere:
+  - `{ message: string; status?: number; fields?: Record<string,string[]> }`
+  - 401/403 -> auth/permission UX
+  - 422 -> show per-field errors (forms)
+  - 500+ -> generic “try again” + retry option
+
+============================================================
+15) Env Setup Examples (copy-ready)
+============================================================
+Provide examples in the repo docs:
+- `.env.example` (or framework equivalent) must include:
+  - `VITE_IS_API=false`
+  - `VITE_API_BASE_URL=http://localhost:8000` (only used when `VITE_IS_API=true`)
+  - (or `NEXT_PUBLIC_IS_API`, `NEXT_PUBLIC_API_BASE_URL` for Next)
+- Add a small `src/shared/lib/env.ts` that:
+  - parses booleans safely (`"true"|"false"`)
+  - validates required vars for API mode
+  - exports typed `env` object used across the app
+
+============================================================
+16) Optional but High-Value Improvements (apply only if repo needs it)
+============================================================
+Only implement items that match the repo’s needs (based on analysis):
+- Feature flags (keep simple): allow toggling blog/admin modules without code edits
+- Offline banner + retry button when API mode fails
+- Pagination/infinite scroll for blog list if list is large
+- Content rendering safety: if using HTML, sanitize; if markdown, use safe renderer
+- Basic analytics hooks (only if repo already has analytics)
+- CI workflow updates (only if repo already has GitHub Actions or similar)
