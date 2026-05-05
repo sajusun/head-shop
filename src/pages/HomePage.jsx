@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts } from '../features/products/productSlice';
 import ProductCard from '../components/ProductCard';
@@ -11,21 +11,50 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const { items: products, loading } = useSelector(state => state.products);
   const scrollRef = useRef(null);
+  const topRatedRef = useRef(null);
+  const autoScrollDir = useRef(1); // 1 = forward, -1 = reverse
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  const featuredProducts = products.slice(0, 8); // Showing more for the slider
+  // Auto-scroll for Top Rated — bounce forward/reverse every 10s
+  useEffect(() => {
+    const el = topRatedRef.current;
+    if (!el) return;
 
-  const scroll = (direction) => {
-    if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollTo = direction === 'left' 
-        ? scrollLeft - clientWidth 
+    const interval = setInterval(() => {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      const maxScroll = scrollWidth - clientWidth;
+
+      if (scrollLeft >= maxScroll - 10) {
+        autoScrollDir.current = -1; // reached end → go back
+      } else if (scrollLeft <= 10) {
+        autoScrollDir.current = 1;  // reached start → go forward
+      }
+
+      el.scrollTo({
+        left: scrollLeft + autoScrollDir.current * clientWidth,
+        behavior: 'smooth',
+      });
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const featuredProducts = products.slice(0, 8);
+  const topRatedProducts = products
+    .filter(p => p.rating >= 4)
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 20);
+
+  const scroll = (ref, direction) => {
+    if (ref.current) {
+      const { scrollLeft, clientWidth } = ref.current;
+      const scrollTo = direction === 'left'
+        ? scrollLeft - clientWidth
         : scrollLeft + clientWidth;
-      
-      scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+      ref.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
     }
   };
 
@@ -83,29 +112,54 @@ const HomePage = () => {
         <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl -z-0"></div>
       </section>
 
-      {/* Top Rated Products */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center text-center mb-16">
-          <span className="text-accent font-black uppercase tracking-widest text-xs mb-4">Customer Favorites</span>
-          <h2 className="text-4xl lg:text-5xl font-black text-text mb-4">Top Rated Collection</h2>
-          <p className="text-gray-500 max-w-xl">Our community's most loved pieces, chosen for their exceptional quality and design.</p>
+      {/* Top Rated Products — Auto Slider */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative group/toprated">
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <span className="text-accent font-black uppercase tracking-widest text-xs mb-2 block">Customer Favorites</span>
+            <h2 className="text-4xl lg:text-5xl font-black text-text mb-1">Top Rated Collection</h2>
+            <p className="text-gray-500">Our community's most loved pieces, chosen for their exceptional quality and design.</p>
+          </div>
+          <Link to="/products" className="text-primary font-bold flex items-center gap-2 hover:underline shrink-0 ml-4">
+            View All <ArrowRight size={18} />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {products
-            .filter(p => p.rating >= 4.8)
-            .slice(0, 4)
-            .map((product, i) => (
-              <motion.div 
-                key={product.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))
-          }
+        <div className="relative">
+          {/* Left Button */}
+          <button
+            onClick={() => scroll(topRatedRef, 'left')}
+            className="absolute -left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 flex items-center justify-center text-text hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl z-10 opacity-0 group-hover/toprated:opacity-100 hidden lg:flex"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          {/* Right Button */}
+          <button
+            onClick={() => scroll(topRatedRef, 'right')}
+            className="absolute -right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 flex items-center justify-center text-text hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl z-10 opacity-0 group-hover/toprated:opacity-100 hidden lg:flex"
+          >
+            <ChevronRight size={24} />
+          </button>
+
+          {loading ? (
+            <div className="flex gap-8 overflow-hidden pb-4">
+              {[1, 2, 3, 4].map(n => (
+                <div key={n} className="min-w-[300px] aspect-square bg-gray-100 animate-pulse rounded-2xl"></div>
+              ))}
+            </div>
+          ) : (
+            <div
+              ref={topRatedRef}
+              className="flex gap-8 overflow-x-auto pb-8 snap-x snap-mandatory"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {topRatedProducts.map(product => (
+                <div key={product.id} className="min-w-[280px] sm:min-w-[320px] snap-start">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -159,13 +213,13 @@ const HomePage = () => {
         <div className="relative">
           {/* Slider Buttons */}
           <button 
-            onClick={() => scroll('left')}
+            onClick={() => scroll(scrollRef, 'left')}
             className="absolute -left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 flex items-center justify-center text-text hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl z-10 opacity-0 group-hover:opacity-100 hidden lg:flex"
           >
             <ChevronLeft size={24} />
           </button>
           <button 
-            onClick={() => scroll('right')}
+            onClick={() => scroll(scrollRef, 'right')}
             className="absolute -right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 flex items-center justify-center text-text hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl z-10 opacity-0 group-hover:opacity-100 hidden lg:flex"
           >
             <ChevronRight size={24} />
