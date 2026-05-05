@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
@@ -54,19 +54,22 @@ const BlogDetailsPage = () => {
   const blogFavoritesState = useSelector(state => state.blogFavorites);
   const blogFavorites = blogFavoritesState?.items || [];
   
+  const post = blogPosts.find(p => p.slug === slug) || blogPosts[0];
+  const isFavorite = blogFavorites.some(item => item && item.id === post?.id);
+
   const [showShare, setShowShare] = useState(false);
   const [copied, setCopied] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState(mockComments);
-
-  const post = blogPosts.find(p => p.slug === slug) || blogPosts[0];
-  const isFavorite = blogFavorites.some(item => item && item.id === post?.id);
+  const [likeCount, setLikeCount] = useState(post?.id === 'blog-1' ? 128 : 47);
+  const [likeAnimating, setLikeAnimating] = useState(false);
 
   const handleFavorite = () => {
     if (!user) {
       navigate('/login');
       return;
     }
+    const wasLiked = isFavorite;
     dispatch(toggleBlogFavorite({
       id: post.id,
       title: post.title,
@@ -74,6 +77,9 @@ const BlogDetailsPage = () => {
       slug: post.slug,
       date: post.date
     }));
+    setLikeCount(prev => wasLiked ? prev - 1 : prev + 1);
+    setLikeAnimating(true);
+    setTimeout(() => setLikeAnimating(false), 400);
   };
 
   const handleCommentSubmit = (e) => {
@@ -169,11 +175,38 @@ const BlogDetailsPage = () => {
                 )}
               </div>
 
-              <button 
+              <button
                 onClick={handleFavorite}
-                className={`p-3 rounded-2xl transition-all ${isFavorite ? 'bg-red-50 text-red-500' : 'bg-gray-50 text-gray-400 hover:text-red-500'}`}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all duration-200 ${
+                  isFavorite
+                    ? 'bg-red-50 text-red-500 shadow-sm shadow-red-100'
+                    : 'bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50'
+                }`}
               >
-                <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+                <span
+                  style={{
+                    display: 'inline-block',
+                    transform: likeAnimating ? 'scale(1.4)' : 'scale(1)',
+                    transition: 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)'
+                  }}
+                >
+                  <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
+                </span>
+                <span
+                  style={{
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    minWidth: '1.5rem',
+                    display: 'inline-block',
+                    transform: likeAnimating ? 'translateY(-2px)' : 'translateY(0)',
+                    transition: 'transform 0.25s ease',
+                    lineHeight: 1
+                  }}
+                >
+                  {likeCount >= 1000
+                    ? `${(likeCount / 1000).toFixed(1)}k`
+                    : likeCount}
+                </span>
               </button>
             </div>
           </div>
@@ -189,6 +222,64 @@ const BlogDetailsPage = () => {
           className="prose prose-xl prose-primary max-w-none mb-24"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
+
+        {/* ── LinkedIn-style Reaction Bar ── */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '18px 28px',
+            marginBottom: '40px',
+            borderRadius: '24px',
+            background: 'linear-gradient(135deg, #fff5f5 0%, #fff0f3 100%)',
+            border: '1px solid #fde8ec',
+            boxShadow: '0 2px 16px 0 rgba(239,68,68,0.06)'
+          }}
+        >
+          {/* Left: emoji stack + count */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Reaction emoji pills */}
+            <div style={{ display: 'flex', gap: '-4px' }}>
+              {['❤️', '👏', '💡'].map((emoji, i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: '30px',
+                    height: '30px',
+                    borderRadius: '50%',
+                    background: '#fff',
+                    border: '2px solid #fde8ec',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '14px',
+                    marginLeft: i === 0 ? 0 : '-8px',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+                    position: 'relative',
+                    zIndex: 3 - i
+                  }}
+                >
+                  {emoji}
+                </span>
+              ))}
+            </div>
+            <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#374151' }}>
+              {likeCount.toLocaleString()}
+            </span>
+            <span style={{ fontSize: '0.85rem', color: '#9ca3af', fontWeight: 600 }}>
+              {likeCount === 1 ? 'person loved this' : 'people loved this'}
+            </span>
+          </div>
+
+          {/* Right: comment count */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <MessageSquare size={16} style={{ color: '#9ca3af' }} />
+            <span style={{ fontSize: '0.85rem', color: '#9ca3af', fontWeight: 600 }}>
+              {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
+            </span>
+          </div>
+        </div>
 
         {/* Comments Section */}
         <div className="border-t border-gray-100 pt-16">
