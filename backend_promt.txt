@@ -1,92 +1,52 @@
-# BACKEND SYSTEM BLUEPRINT - HERD SHOP ECOMMERCE
+# HERD SHOP - BACKEND DEVELOPMENT GUIDE & MASTER PROMPT
 
-This document provides a comprehensive prompt and technical specification for building the backend for the HERD SHOP eCommerce application. 
+## 1. PROJECT OVERVIEW
+HERD SHOP is a premium eCommerce platform built with React 19, Vite, and Tailwind CSS. The frontend is already structured with features like Product Listing, Cart, Checkout, Blog (Journal), and User Profiles.
 
-## 1. PROJECT OBJECTIVE
-Build a high-performance, secure REST API that supports a premium React-based eCommerce frontend. The backend must handle user authentication, product management (with offer prices), order processing, and reviews.
-
-## 2. RECOMMENDED STACK
-- **Language**: PHP (Laravel 10+) or Node.js (Express/NestJS)
-- **Database**: PostgreSQL or MySQL
-- **Auth**: JWT (JSON Web Tokens)
-- **Payment Gateway**: Chapa / Stripe
-- **File Storage**: AWS S3 or Cloudinary (for product images)
+## 2. BACKEND ARCHITECTURE (RECOMMENDED)
+- **Runtime**: Node.js
+- **Framework**: Express.js (or NestJS for better scaling)
+- **Database**: MongoDB (Flexible for products/blog) or PostgreSQL (Relational for orders/inventory).
+- **Authentication**: JWT (JSON Web Tokens) with HttpOnly Cookies.
+- **File Storage**: Cloudinary or AWS S3 for product/blog images.
+- **Payment**: SSLCommerz / Stripe / Chapa (as per region).
 
 ## 3. DATABASE SCHEMA (ENTITY RELATIONSHIPS)
+- **Users**: id, name, email, password, role (admin/user), address, phone.
+- **Products**: id, name, slug, description, price, offerPrice, category, stock, images[], ratings, reviewsCount.
+- **Orders**: id, userId, items[{productId, quantity, price}], totalAmount, status (Pending/Shipped/Delivered), paymentStatus, shippingAddress.
+- **Blogs**: id, title, slug, excerpt, content (HTML/JSON), featuredImage, author, tags, createdAt.
+- **Comments**: id, blogId, userId, content, createdAt.
 
-### A. Users Table
-- `id` (UUID)
-- `name` (String)
-- `email` (String, unique)
-- `password` (Hashed)
-- `avatar` (String, nullable)
-- `role` (Enum: 'user', 'admin')
-- `email_verified_at` (Timestamp)
+## 4. MASTER PROMPT FOR BACKEND GENERATION
+> "Build a production-ready Node.js/Express backend for an eCommerce site called HERD SHOP. The frontend uses React 19 and Redux Toolkit.
+> 
+> **Requirements:**
+> 1. **Auth System**: Signup, Login, Profile Management using JWT.
+> 2. **Product API**: CRUD for products, filter by category/price, search functionality.
+> 3. **Order System**: Checkout flow, order history for users, order management for admins.
+> 4. **Blog System**: API for listing posts, single post details, and comments.
+> 5. **Admin Protected Routes**: Only admins can add/edit products and blogs.
+> 6. **Middleware**: Error handling, Auth guards, and CORS.
+> 7. **Validation**: Use Joi or Zod for request validation.
+> 8. **Database**: Use Mongoose (MongoDB) with clean models.
+> 
+> Provide a modular folder structure (controllers, models, routes, middlewares, config)."
 
-### B. Products Table
-- `id` (UUID)
-- `name` (String)
-- `slug` (String, unique)
-- `price` (Decimal, 10,2)
-- `offerPrice` (Decimal, 10,2, nullable)
-- `description` (Text)
-- `category` (String)
-- `image` (String)
-- `rating` (Float, default: 0)
-- `reviews_count` (Integer, default: 0)
-- `stock` (Integer, default: 0)
-- `is_featured` (Boolean)
-- `is_top_rated` (Boolean)
+## 5. INTEGRATION STEPS (FUTURE)
+1. **API Service**: Update `src/services/api.js` in frontend to point to `process.env.VITE_API_URL`.
+2. **Redux Thunks**: Convert existing mock-data logic in Redux slices to use Axios calls to the backend.
+3. **Environment Variables**: Use `.env` for both frontend (API URL) and backend (DB URI, JWT Secret).
+4. **CORS Configuration**: Ensure the backend allows requests from the frontend domain.
 
-### C. Reviews Table
-- `id` (UUID)
-- `product_id` (Foreign Key)
-- `user_id` (Foreign Key)
-- `user_name` (String)
-- `rating` (Integer, 1-5)
-- `comment` (Text)
-- `date` (Timestamp)
+## 6. DEVELOPMENT ROADMAP
+- **Phase 1**: User Auth & Profile API.
+- **Phase 2**: Product & Category Management.
+- **Phase 3**: Cart Persistence (Optional: Store cart in DB for logged-in users).
+- **Phase 4**: Checkout & Payment Gateway Integration.
+- **Phase 5**: Blog & Interaction (Comments/Likes) API.
+- **Phase 6**: Admin Dashboard API.
 
-### D. Orders Table
-- `id` (UUID)
-- `user_id` (Foreign Key)
-- `total_amount` (Decimal)
-- `status` (Enum: 'Pending', 'In Transit', 'Delivered', 'Cancelled')
-- `payment_status` (Enum: 'Unpaid', 'Paid')
-- `shipping_address` (JSON: {street, city, zip})
-- `items` (JSON Array: [{product_id, quantity, price_at_purchase}])
+---
+*Created by Antigravity AI*
 
-### E. Blog Posts (Journal) Table
-- `id` (UUID)
-- `title` (String)
-- `slug` (String, unique)
-- `excerpt` (Text) - Short summary for listing
-- `content` (Rich Text/HTML)
-- `featured_image` (String)
-- `author_name` (String)
-- `category` (String)
-- `tags` (JSON Array)
-- `published_at` (Timestamp)
-- `read_time` (Integer) - Estimated minutes
-
-## 4. API SPECIFICATIONS & RESPONSE FORMATS
-...
-### BLOG ENDPOINTS
-- `GET /api/blogs`: List all blog posts
-- `GET /api/blogs/{slug}`: Single blog post details
-
-## 5. SPECIAL BUSINESS LOGIC REQUIREMENTS
-...
-5. **Blog Search**: Implement keyword search across blog titles and content.
-
-## 6. PAYMENT INTEGRATION (CHAPA/STRIPE)
-...
-- Implement a `POST /api/payments/initialize` endpoint.
-- Redirect user to the payment URL.
-- Handle `POST /api/payments/webhook` to verify transaction status and update Order status to 'Paid'.
-
-## 7. SECURITY CONSIDERATIONS
-- Implement CORS for your specific frontend domain.
-- Use Middleware to protect `/orders`, `/profile`, and `/admin/*` routes.
-- Sanitize all text inputs to prevent XSS.
-- Rate limiting on Auth and Search endpoints.

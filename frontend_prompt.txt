@@ -1,20 +1,38 @@
+# HERD SHOP - FRONTEND ANALYSIS & FUTURE ROADMAP
+
+## 1. ARCHITECTURE SNAPSHOT
+- **Core Stack**: React 19 (Stable), Vite (Build Tool).
+- **Styling**: Tailwind CSS 3.4/4.0 with `@tailwindcss/vite` plugin.
+- **State Management**: Redux Toolkit (RTK) for global state (Auth, Cart, Products, Blog).
+- **Routing**: React Router 7.
+- **Animations**: Framer Motion for smooth transitions and hover effects.
+- **Icons**: Lucide React.
+- **Folder Structure**: Feature-based modularity (`src/features/...`).
+
+## 2. CURRENT FEATURES
+- **E-commerce**: Product listing, details, cart management, checkout flow.
+- **Journal/Blog**: Article listing, single article reading, sharing.
+- **User System**: Login/Signup UI, Profile management, Order history, Settings.
+- **UI/UX**: Responsive design, dark/light compatibility, skeletons for loading, glassmorphism elements.
+
+## 3. FUTURE SCALABILITY PLAN
+- **TypeScript Migration**: The project currently uses `.jsx`. Migrating to `.tsx` will provide better type safety for props and Redux state.
+- **Data Fetching**: Integrate `TanStack Query` (React Query) for handling server state, caching, and background synchronization once the backend is ready.
+- **Admin Dashboard**: Build a separate `/admin` route or application to manage products, inventory, and blog posts.
+- **SEO Optimization**: Use `react-helmet-async` for meta tags on product and blog pages to improve search engine visibility.
+- **Performance**: Implement image optimization (using `next/image` equivalent logic or a Vite plugin) and further component memoization.
+
+## 4. INSTRUCTIONS FOR FUTURE DEVELOPMENT
+- Always keep features isolated in `src/features`.
+- Use the `Layout` component for consistent page structure.
+- Maintain the `IS_API` toggle in `.env` for easy switching between mock and real data.
+- Ensure all new UI components are built using the existing Tailwind config for design consistency.
+
+---
+
 You are a senior React architect and frontend engineer.
+...
 
-Goal: Analyze THIS EXISTING React project repository end-to-end and produce an optimized, production-ready version of it (without needing backend API endpoints). You must base decisions on the actual codebase you see in the workspace, not generic assumptions.
-
-Deliverables:
-1) A concrete refactor/upgrade plan tailored to the repo.
-2) The actual code changes across the repo to implement the plan.
-3) A short MIGRATION.md describing what changed and how to run it.
-4) Keep the app behavior the same unless explicitly improved; avoid breaking changes.
-
-Hard constraints:
-- Do NOT invent API endpoints or backend contracts.
-- Use the existing UI/flows and improve architecture, DX, performance, and reliability.
-- Prefer minimal, surgical changes; but do make meaningful improvements where it clearly helps.
-- If the repo already uses a tool/library, reuse it unless there is a clear benefit to migrate.
-- Do not add heavy dependencies unless justified.
-- No placeholder code: every addition must compile and run.
 
 ============================================================
 1) Repo Analysis (MANDATORY)
