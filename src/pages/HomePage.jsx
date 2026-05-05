@@ -194,17 +194,17 @@ const HomePage = () => {
       </section>
 
       {/* Features - About Page Bottom Section Style */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-20">
           <h2 className="text-4xl font-black text-text mb-4">Why Choose Herd?</h2>
           <p className="text-gray-500 max-w-2xl mx-auto">We combine cutting-edge technology with minimalist design to bring you the best experience.</p>
-        </div>
+        </div>  
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
           {[
-            { icon: <Zap size={32} className="text-accent" />, title: "Fast Delivery", desc: "Get your orders in record time with our express shipping." },
-            { icon: <Shield size={32} className="text-primary" />, title: "Secure Payment", desc: "Your transactions are protected by industry-leading security." },
-            { icon: <Truck size={32} className="text-secondary" />, title: "Free Shipping", desc: "Enjoy free shipping on all orders over $100." }
+            { icon: <Zap size={48} className="text-accent" />, title: "Fast Delivery", desc: "Get your orders in record time with our express shipping." },
+            { icon: <Shield size={48} className="text-primary" />, title: "Secure Payment", desc: "Your transactions are protected by industry-leading security." },
+            { icon: <Truck size={48} className="text-secondary" />, title: "Free Shipping", desc: "Enjoy free shipping on all orders over $100." }
           ].map((feature, i) => (
             <div key={i} className="group text-center">
               <div className="relative mb-8 mx-auto w-40 h-40">

@@ -239,10 +239,69 @@ const Layout = () => {
               <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
                 Premium lifestyle goods curated for the modern individual. Quality, aesthetic, and purpose in every piece.
               </p>
-              <div className="flex gap-6 pt-2">
-                <a href="#" className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">Instagram</a>
-                <a href="#" className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">Twitter</a>
-                <a href="#" className="text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors">Facebook</a>
+              <div className="flex gap-3 pt-2">
+                {/* Instagram */}
+                <a
+                  href="https://www.instagram.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Instagram"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 12, background: 'linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(220,39,67,0.2)' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(220,39,67,0.35)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(220,39,67,0.2)'; }}
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="white" strokeWidth="2"/>
+                    <circle cx="12" cy="12" r="4" fill="none" stroke="white" strokeWidth="2"/>
+                    <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+                  </svg>
+                </a>
+
+                {/* Twitter / X */}
+                <a
+                  href="https://twitter.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Twitter / X"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 12, background: '#000', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.25)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)'; }}
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
+
+                {/* Facebook */}
+                <a
+                  href="https://www.facebook.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="Facebook"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 12, background: '#1877F2', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(24,119,242,0.25)' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(24,119,242,0.4)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(24,119,242,0.25)'; }}
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+                    <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+                  </svg>
+                </a>
+
+                {/* YouTube */}
+                <a
+                  href="https://www.youtube.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="YouTube"
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 12, background: '#FF0000', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(255,0,0,0.2)' }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(255,0,0,0.35)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(255,0,0,0.2)'; }}
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+                    <path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/>
+                    <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="black"/>
+                  </svg>
+                </a>
               </div>
             </div>
 
@@ -284,7 +343,7 @@ const Layout = () => {
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest italic">© 2024 Herd Shop. Designed for Excellence.</p>
             <div className="flex items-center gap-8">
               <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Visa_2014_logo_detail.svg" alt="Visa" className="h-5 object-contain" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Visa_Inc._logo_%282005%E2%80%932014%29.svg" alt="Visa" className="h-5 object-contain" />
               <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MasterCard" className="h-8 object-contain" />
             </div>
           </div>
