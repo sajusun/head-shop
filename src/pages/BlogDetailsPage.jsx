@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
-  User, Clock, ArrowLeft, Share2, MessageSquare, Heart, Check, X, Search
+  ArrowLeft, Share2, MessageSquare, Heart, Check, X, Link2
 } from 'lucide-react';
 import { toggleBlogFavorite } from '../features/favorites/blogFavoriteSlice';
 
@@ -63,6 +63,20 @@ const BlogDetailsPage = () => {
   const [comments, setComments] = useState(mockComments);
   const [likeCount, setLikeCount] = useState(post?.id === 'blog-1' ? 128 : 47);
   const [likeAnimating, setLikeAnimating] = useState(false);
+  const shareRef = useRef(null);
+
+  // Close share popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (shareRef.current && !shareRef.current.contains(e.target)) {
+        setShowShare(false);
+      }
+    };
+    if (showShare) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showShare]);
 
   const handleFavorite = () => {
     if (!user) {
@@ -101,6 +115,59 @@ const BlogDetailsPage = () => {
     setComments([newComment, ...comments]);
     setCommentText("");
   };
+
+  const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
+  const encodedUrl = encodeURIComponent(currentUrl);
+  const encodedTitle = encodeURIComponent(post?.title || '');
+
+  const shareLinks = [
+    {
+      name: 'Facebook',
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      color: '#1877F2',
+      bg: '#EBF3FF',
+      icon: (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#1877F2">
+          <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'Twitter / X',
+      url: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+      color: '#000000',
+      bg: '#F2F2F2',
+      icon: (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#000">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'WhatsApp',
+      url: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,
+      color: '#25D366',
+      bg: '#EDFBF1',
+      icon: (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#25D366">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+          <path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.309A9.954 9.954 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 11.999 2zm.001 18a7.95 7.95 0 01-4.051-1.111l-.29-.173-3.003.788.8-2.924-.19-.3A7.944 7.944 0 014 12c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8z" />
+        </svg>
+      ),
+    },
+    {
+      name: 'LinkedIn',
+      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+      color: '#0A66C2',
+      bg: '#E8F1FB',
+      icon: (
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="#0A66C2">
+          <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+          <circle cx="4" cy="4" r="2" />
+        </svg>
+      ),
+    },
+  ];
 
   const handleCopyLink = () => {
     try {
@@ -149,7 +216,7 @@ const BlogDetailsPage = () => {
             </div>
 
             <div className="flex items-center gap-3 relative">
-              <div className="relative">
+              <div className="relative" ref={shareRef}>
                 <button 
                   onClick={() => setShowShare(!showShare)}
                   className={`p-3 rounded-2xl transition-all ${showShare ? 'bg-primary text-white' : 'bg-gray-50 text-gray-400 hover:text-primary'}`}
@@ -158,17 +225,51 @@ const BlogDetailsPage = () => {
                 </button>
                 
                 {showShare && (
-                  <div className="absolute right-0 top-full mt-4 w-64 bg-white border border-gray-100 rounded-3xl shadow-2xl p-6 z-50">
-                    <div className="flex justify-between items-center mb-6">
-                      <h4 className="text-sm font-black text-text uppercase tracking-widest">Share</h4>
-                      <button onClick={() => setShowShare(false)}><X size={16} /></button>
+                  <div className="absolute right-0 top-full mt-4 w-72 bg-white border border-gray-100 rounded-3xl shadow-2xl p-6 z-50">
+                    <div className="flex justify-between items-center mb-5">
+                      <h4 className="text-sm font-black text-text uppercase tracking-widest">Share This Post</h4>
+                      <button onClick={() => setShowShare(false)} className="p-1 hover:bg-gray-100 rounded-lg transition-colors">
+                        <X size={16} className="text-gray-400" />
+                      </button>
                     </div>
-                    <div className="space-y-2">
-                      <button onClick={handleCopyLink} className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors">
-                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
-                          {copied ? <Check size={16} /> : <Search size={16} />}
+
+                    {/* Social Platform Buttons */}
+                    <div className="space-y-2 mb-4">
+                      {shareLinks.map((item) => (
+                        <a
+                          key={item.name}
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setShowShare(false)}
+                          className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:scale-[1.02] hover:shadow-sm"
+                          style={{ background: item.bg }}
+                        >
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+                          >
+                            {item.icon}
+                          </div>
+                          <span className="text-sm font-bold" style={{ color: item.color }}>
+                            {item.name}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-100 pt-3">
+                      <button
+                        onClick={handleCopyLink}
+                        className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors"
+                      >
+                        <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                          {copied ? <Check size={16} className="text-green-500" /> : <Link2 size={16} className="text-gray-500" />}
                         </div>
-                        <span className="text-sm font-bold text-gray-600">{copied ? "Copied!" : "Copy Link"}</span>
+                        <span className={`text-sm font-bold ${copied ? 'text-green-500' : 'text-gray-600'}`}>
+                          {copied ? 'Link Copied! ✓' : 'Copy Link'}
+                        </span>
                       </button>
                     </div>
                   </div>
