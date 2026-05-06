@@ -30,15 +30,16 @@ HERD SHOP is a premium eCommerce platform built with React 19, Vite, and Tailwin
 > **Requirements:**
 > 1. **Auth System**: API-based Signup, Login, and Profile Management using Laravel Sanctum.
 > 2. **Product API**: CRUD for products, categories, and inventory. Implement SKU management and dynamic product variations. **Crucial**: Support dependent variations using a mapping system (e.g., specific colors only available for specific sizes) as implemented in the frontend. Implement advanced filtering (category, price range) and search.
-> 3. **Order System**: Checkout logic, support for 'Buy Now' (direct checkout), automated order number generation, user order history, and an Admin order management dashboard API.
-> 4. **Blog/CMS API**: CRUD for blog posts, categories, and a comment system with approval logic.
-> 5. **Notification API**: Endpoint to fetch user-specific notifications, mark as read, and mark all as read. Trigger notifications automatically on order status changes.
-> 6. **Admin Authorization**: Use Spatie MediaLibrary for images and Spatie Permissions or simple 'role' check for protecting Admin routes.
-> 6. **API Structure**: Use API Resources for consistent JSON responses and Form Requests for validation.
-> 7. **Best Practices**: Implement Service Classes for business logic, Repositories (optional), and clear separation of concerns.
-> 8. **Middleware**: Ensure CORS is configured and use standard Auth/Guest middlewares.
+> 3. **Order System**: Checkout logic, support for 'Buy Now' (direct checkout), automated order number generation, user order history with status tracking, and an Admin order management dashboard API.
+> 4. **Blog/CMS API**: CRUD for blog posts, categories, and a comment system with approval logic and 'Like' reaction tracking.
+> 5. **Notification API**: Endpoint to fetch user-specific notifications, mark as read, and mark all as read. Trigger notifications automatically on order status changes or promotions.
+> 6. **Pagination**: Implement cursor-based or offset pagination for product and blog listings (default 24 items per page).
+> 7. **Admin Authorization**: Use Spatie MediaLibrary for images and Spatie Permissions or simple 'role' check for protecting Admin routes.
+> 8. **API Structure**: Use API Resources for consistent JSON responses and Form Requests for validation.
+> 9. **Best Practices**: Implement Service Classes for business logic, Repositories (optional), and clear separation of concerns.
+> 10. **Middleware**: Ensure CORS is configured and use standard Auth/Guest middlewares.
 > 
-> 9. **Variation Logic**: The `variants` field in the Product API should provide:
+> 11. **Variation Logic**: The `variants` field in the Product API should provide:
 >    - `colors`: Array of objects (name, code).
 >    - `sizes`: Array of strings.
 >    - `sizeColorMap`: Object mapping sizes to available color names (e.g., `{"S": ["Red", "Blue"], "M": ["Green"]}`).

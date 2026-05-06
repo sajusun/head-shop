@@ -11,18 +11,19 @@
 
 ## 2. CURRENT FEATURES
 - **E-commerce**: 
-  - Product listing with advanced filtering.
+  - Product listing with **Redesigned Header** (Centered search, LayoutGrid categories, ArrowUpDown sorting).
+  - **Pagination System**: Full functional pagination with 24 items per page and smooth scroll-to-top.
   - Premium Product Details: SKU tracking, Image gallery, Rating/Reviews.
-  - **New**: Related Products Slider (Auto-scroll + Manual navigation).
-  - **New**: Variant Selection (Colors with dependent size filtering via `sizeColorMap`).
-  - **New**: 'Buy Now' direct checkout flow alongside Cart management.
+  - **Related Products Slider**: Auto-scroll + Manual navigation.
+  - **Variant Selection**: Colors with dependent size filtering via `sizeColorMap`.
+  - **'Buy Now'** direct checkout flow alongside Cart management.
 - **Journal/Blog**: Article listing, single article reading, sharing, Like reaction system.
-- **User System**: Login/Signup UI, Profile management, Order history, Favorites/Wishlist.
+- **User System**: Login/Signup UI, Profile management, Order history (detailed tracking), Favorites/Wishlist.
 - **Notifications**: 
   - Real-time Toast notifications for immediate feedback.
   - Notification Center (Bell icon) for persistent order updates, account alerts, and promotions.
   - Global state management via `notificationSlice`.
-- **UI/UX**: Responsive design, dark mode compatibility, Framer Motion micro-animations, glassmorphism.
+- **UI/UX**: Responsive design, dark mode compatibility, Framer Motion micro-animations, glassmorphism, optimized padding/spacing.
 
 ## 3. FUTURE SCALABILITY PLAN
 - **TypeScript Migration**: The project currently uses `.jsx`. Migrating to `.tsx` will provide better type safety for props and Redux state.

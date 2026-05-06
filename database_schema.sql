@@ -107,6 +107,8 @@ CREATE TABLE IF NOT EXISTS `blogs` (
     `content` LONGTEXT NOT NULL,
     `featured_image` VARCHAR(255) NULL,
     `status` ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+    `likes_count` INT DEFAULT 0,
+    `views_count` INT DEFAULT 0,
     `published_at` TIMESTAMP NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -186,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `comments` (
     FOREIGN KEY (`parent_id`) REFERENCES `comments`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 13. Favorites Table (Pivot)
+-- 13. Favorites Table (Pivot for Products)
 CREATE TABLE IF NOT EXISTS `favorites` (
     `user_id` BIGINT UNSIGNED NOT NULL,
     `product_id` BIGINT UNSIGNED NOT NULL,
@@ -194,6 +196,16 @@ CREATE TABLE IF NOT EXISTS `favorites` (
     PRIMARY KEY (`user_id`, `product_id`),
     FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
     FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 13.1 Blog Likes Table (Pivot for Blogs)
+CREATE TABLE IF NOT EXISTS `blog_likes` (
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `blog_id` BIGINT UNSIGNED NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`user_id`, `blog_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`blog_id`) REFERENCES `blogs`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 14. Tags Table
