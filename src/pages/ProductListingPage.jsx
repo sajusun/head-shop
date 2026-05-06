@@ -11,7 +11,7 @@ const ProductListingPage = () => {
   const [showCategoryPanel, setShowCategoryPanel] = useState(false);
   const [sortBy, setSortBy] = useState('Newest');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const itemsPerPage = 24;
   const panelRef = useRef(null);
 
   useEffect(() => {
@@ -64,21 +64,21 @@ const ProductListingPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-      
+
       {/* Search & Header Section */}
       <div className="flex flex-col items-center mb-10 space-y-6">
         <div className="w-full max-w-2xl relative">
           <div className="relative group">
-            <input 
-              type="text" 
-              placeholder="Search products by name or category..." 
+            <input
+              type="text"
+              placeholder="Search products by name or category..."
               value={searchQuery}
               onChange={(e) => dispatch(setSearchQuery(e.target.value))}
               className="w-full pl-12 pr-14 py-4 bg-white border border-gray-100 rounded-3xl text-base font-medium shadow-xl shadow-primary/5 focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all outline-none"
             />
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary" size={20} />
             {searchQuery && (
-              <button 
+              <button
                 onClick={() => dispatch(setSearchQuery(''))}
                 className="absolute right-5 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
@@ -93,11 +93,10 @@ const ProductListingPage = () => {
           <div className="relative" ref={panelRef}>
             <button
               onClick={() => setShowCategoryPanel(!showCategoryPanel)}
-              className={`flex items-center gap-2.5 px-5 py-3.5 rounded-2xl border transition-all font-bold text-sm ${
-                categoryFilter !== 'All' || showCategoryPanel
-                ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
-                : 'bg-white text-text border-gray-100 hover:border-primary hover:text-primary shadow-sm'
-              }`}
+              className={`flex items-center gap-2.5 px-5 py-3.5 rounded-2xl border transition-all font-bold text-sm ${categoryFilter !== 'All' || showCategoryPanel
+                  ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20'
+                  : 'bg-white text-text border-gray-100 hover:border-primary hover:text-primary shadow-sm'
+                }`}
             >
               <LayoutGrid size={16} />
               {categoryFilter === 'All' ? 'Categories' : categoryFilter}
@@ -127,11 +126,10 @@ const ProductListingPage = () => {
                             dispatch(setCategoryFilter(category));
                             setShowCategoryPanel(false);
                           }}
-                          className={`p-4 rounded-2xl text-left transition-all border ${
-                            categoryFilter === category
-                            ? 'bg-primary/5 border-primary/20 text-primary'
-                            : 'bg-gray-50 border-transparent hover:bg-white hover:border-gray-200 text-gray-600'
-                          }`}
+                          className={`p-4 rounded-2xl text-left transition-all border ${categoryFilter === category
+                              ? 'bg-primary/5 border-primary/20 text-primary'
+                              : 'bg-gray-50 border-transparent hover:bg-white hover:border-gray-200 text-gray-600'
+                            }`}
                         >
                           <p className="font-bold text-sm">{category}</p>
                         </button>
@@ -152,11 +150,10 @@ const ProductListingPage = () => {
               <button
                 key={option}
                 onClick={() => setSortBy(option)}
-                className={`px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${
-                  sortBy === option
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-400 hover:text-text'
-                }`}
+                className={`px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${sortBy === option
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-400 hover:text-text'
+                  }`}
               >
                 {option}
               </button>
@@ -204,11 +201,10 @@ const ProductListingPage = () => {
                     <button
                       key={pageNumber}
                       onClick={() => handlePageChange(pageNumber)}
-                      className={`w-10 h-10 rounded-xl font-bold text-xs transition-all ${
-                        currentPage === pageNumber
-                        ? 'bg-primary text-white shadow-md shadow-primary/20'
-                        : 'bg-white text-gray-500 border border-gray-100 hover:border-primary hover:text-primary'
-                      }`}
+                      className={`w-10 h-10 rounded-xl font-bold text-xs transition-all ${currentPage === pageNumber
+                          ? 'bg-primary text-white shadow-md shadow-primary/20'
+                          : 'bg-white text-gray-500 border border-gray-100 hover:border-primary hover:text-primary'
+                        }`}
                     >
                       {pageNumber}
                     </button>
@@ -235,7 +231,7 @@ const ProductListingPage = () => {
           <p className="text-gray-500 max-w-sm mx-auto">
             Try adjusting your search or explore a different category to find what you're looking for.
           </p>
-          <button 
+          <button
             onClick={() => {
               dispatch(setSearchQuery(''));
               dispatch(setCategoryFilter('All'));
