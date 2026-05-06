@@ -1,52 +1,56 @@
-# HERD SHOP - BACKEND DEVELOPMENT GUIDE & MASTER PROMPT
+# HERD SHOP - BACKEND DEVELOPMENT GUIDE & MASTER PROMPT (LARAVEL)
 
 ## 1. PROJECT OVERVIEW
-HERD SHOP is a premium eCommerce platform built with React 19, Vite, and Tailwind CSS. The frontend is already structured with features like Product Listing, Cart, Checkout, Blog (Journal), and User Profiles.
+HERD SHOP is a premium eCommerce platform built with React 19, Vite, and Tailwind CSS. The backend will be built with Laravel to provide a robust, scalable, and secure API for the frontend.
 
 ## 2. BACKEND ARCHITECTURE (RECOMMENDED)
-- **Runtime**: Node.js
-- **Framework**: Express.js (or NestJS for better scaling)
-- **Database**: MongoDB (Flexible for products/blog) or PostgreSQL (Relational for orders/inventory).
-- **Authentication**: JWT (JSON Web Tokens) with HttpOnly Cookies.
-- **File Storage**: Cloudinary or AWS S3 for product/blog images.
-- **Payment**: SSLCommerz / Stripe / Chapa (as per region).
+- **Runtime**: PHP 8.2+
+- **Framework**: Laravel 11
+- **Database**: MySQL (Relational for orders, inventory, and users)
+- **Authentication**: Laravel Sanctum (Token-based API Auth)
+- **API Pattern**: RESTful API with JSON Resources
+- **File Storage**: Laravel Storage (with S3 or Cloudinary driver for images)
+- **Payment**: Integration with SSLCommerz / Stripe / Chapa (via Laravel packages)
 
 ## 3. DATABASE SCHEMA (ENTITY RELATIONSHIPS)
-- **Users**: id, name, email, password, role (admin/user), address, phone.
-- **Products**: id, name, slug, description, price, offerPrice, category, stock, images[], ratings, reviewsCount.
-- **Orders**: id, userId, items[{productId, quantity, price}], totalAmount, status (Pending/Shipped/Delivered), paymentStatus, shippingAddress.
-- **Blogs**: id, title, slug, excerpt, content (HTML/JSON), featuredImage, author, tags, createdAt.
-- **Comments**: id, blogId, userId, content, createdAt.
+- **Users**: id, name, email, password, role (admin/user), avatar, phone, timestamps, softDeletes.
+- **Categories**: id, name, slug, image, type (product/blog), timestamps.
+- **Products**: id, category_id, name, slug, description, price, offer_price, stock, is_featured, timestamps, softDeletes.
+- **Product_Images**: id, product_id, image_path, is_primary, timestamps.
+- **Orders**: id, user_id, order_number, subtotal, tax, total_amount, status (pending/processing/shipped/delivered), payment_status, shipping_address, timestamps.
+- **Order_Items**: id, order_id, product_id, quantity, price, timestamps.
+- **Blogs**: id, author_id, title, slug, excerpt, content, featured_image, status (draft/published), timestamps.
+- **Comments**: id, blog_id, user_id, content, status (pending/approved), timestamps.
+- **Reviews**: id, product_id, user_id, rating, comment, timestamps.
 
 ## 4. MASTER PROMPT FOR BACKEND GENERATION
-> "Build a production-ready Node.js/Express backend for an eCommerce site called HERD SHOP. The frontend uses React 19 and Redux Toolkit.
+> "Build a production-ready Laravel 11 API backend for an eCommerce site called HERD SHOP. The frontend is built with React 19 and Redux Toolkit.
 > 
 > **Requirements:**
-> 1. **Auth System**: Signup, Login, Profile Management using JWT.
-> 2. **Product API**: CRUD for products, filter by category/price, search functionality.
-> 3. **Order System**: Checkout flow, order history for users, order management for admins.
-> 4. **Blog System**: API for listing posts, single post details, and comments.
-> 5. **Admin Protected Routes**: Only admins can add/edit products and blogs.
-> 6. **Middleware**: Error handling, Auth guards, and CORS.
-> 7. **Validation**: Use Joi or Zod for request validation.
-> 8. **Database**: Use Mongoose (MongoDB) with clean models.
+> 1. **Auth System**: API-based Signup, Login, and Profile Management using Laravel Sanctum.
+> 2. **Product API**: CRUD for products, categories, and inventory. Implement advanced filtering (category, price range) and search.
+> 3. **Order System**: Checkout logic, automated order number generation, user order history, and an Admin order management dashboard API.
+> 4. **Blog/CMS API**: CRUD for blog posts, categories, and a comment system with approval logic.
+> 5. **Admin Authorization**: Use Spatie MediaLibrary for images and Spatie Permissions or simple 'role' check for protecting Admin routes.
+> 6. **API Structure**: Use API Resources for consistent JSON responses and Form Requests for validation.
+> 7. **Best Practices**: Implement Service Classes for business logic, Repositories (optional), and clear separation of concerns.
+> 8. **Middleware**: Ensure CORS is configured and use standard Auth/Guest middlewares.
 > 
-> Provide a modular folder structure (controllers, models, routes, middlewares, config)."
+> Provide a clean Laravel structure with Controllers, Models (with relationships), Migrations, and API routes."
 
 ## 5. INTEGRATION STEPS (FUTURE)
-1. **API Service**: Update `src/services/api.js` in frontend to point to `process.env.VITE_API_URL`.
-2. **Redux Thunks**: Convert existing mock-data logic in Redux slices to use Axios calls to the backend.
-3. **Environment Variables**: Use `.env` for both frontend (API URL) and backend (DB URI, JWT Secret).
-4. **CORS Configuration**: Ensure the backend allows requests from the frontend domain.
+1. **API URL**: Set `VITE_API_URL` in the frontend `.env` to point to the Laravel dev server (e.g., `http://localhost:8000/api`).
+2. **Axios Configuration**: Update `src/utils/axios.js` to include the `Authorization: Bearer <token>` header from Redux state.
+3. **Redux Thunks**: Migrate mock data logic to asynchronous thunks that hit the Laravel endpoints.
+4. **Environment Variables**: Configure Laravel `.env` for `DB_DATABASE`, `APP_URL`, and `SANCTUM_STATEFUL_DOMAINS`.
 
 ## 6. DEVELOPMENT ROADMAP
-- **Phase 1**: User Auth & Profile API.
-- **Phase 2**: Product & Category Management.
-- **Phase 3**: Cart Persistence (Optional: Store cart in DB for logged-in users).
-- **Phase 4**: Checkout & Payment Gateway Integration.
-- **Phase 5**: Blog & Interaction (Comments/Likes) API.
-- **Phase 6**: Admin Dashboard API.
+- **Phase 1**: Database Migrations & Sanctum Auth Setup.
+- **Phase 2**: Product & Category API with Image Uploads.
+- **Phase 3**: Cart Persistence & Checkout Logic (DB-driven).
+- **Phase 4**: Order Fulfillment & Payment Gateway Webhooks.
+- **Phase 5**: Blog/Journal API & Interaction (Comments/Likes).
+- **Phase 6**: Admin Statistics & Dashboard API.
 
 ---
-*Created by Antigravity AI*
-
+*Updated for Laravel by Antigravity AI*

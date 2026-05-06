@@ -153,11 +153,38 @@ const ProductDetailsPage = () => {
             )}
           </div>
 
-          <p className="text-gray-600 leading-relaxed mb-10 text-lg">
+          <p className="text-gray-600 leading-relaxed mb-8 text-lg">
             {product.description}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 mt-auto">
+          {/* Specifications & Amenities */}
+          <div className="space-y-8 mb-10">
+            {/* Specs Grid */}
+            {product.specs && (
+              <div className="grid grid-cols-2 gap-4 border-t border-b border-gray-100 py-6">
+                {product.specs.map((spec, i) => (
+                  <div key={i} className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">{spec.label}</span>
+                    <span className="text-sm font-bold text-text">{spec.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Amenities/Highlights */}
+            {product.amenities && (
+              <div className="flex flex-wrap gap-3">
+                {product.amenities.map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+                    <span className="text-xs font-bold text-gray-600">{item}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 mt-auto pt-6 border-t border-gray-100 lg:border-none">
             <div className="flex items-center border border-gray-200 rounded-xl p-1 bg-white">
               <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}

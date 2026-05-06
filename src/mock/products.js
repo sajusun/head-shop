@@ -1,5 +1,5 @@
 export const mockProducts = [
-  // Tech & Gadgets (1-15)
+  // --- TECH & GADGETS (1-20) ---
   {
     id: 1,
     name: "Aura Noise-Canceling Headphones",
@@ -10,7 +10,13 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 128
+    reviews: 128,
+    specs: [
+      { label: "Battery", value: "40 Hours" },
+      { label: "Weight", value: "250g" },
+      { label: "ANC", value: "Active Noise Cancellation" }
+    ],
+    amenities: ["Hi-Res Audio", "Memory Foam Pads", "Voice Assistant Support"]
   },
   {
     id: 2,
@@ -22,7 +28,13 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 85
+    reviews: 85,
+    specs: [
+      { label: "Layout", value: "75% Compact" },
+      { label: "Switch", value: "Gateron Brown" },
+      { label: "Connectivity", value: "USB-C, Bluetooth" }
+    ],
+    amenities: ["RGB Backlit", "Aluminum Frame", "Hot-Swappable"]
   },
   {
     id: 3,
@@ -34,7 +46,8 @@ export const mockProducts = [
     category: "Home Office",
     image: "https://images.unsplash.com/photo-1534073828943-f801091bb18c?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 210
+    reviews: 210,
+    amenities: ["Wireless Charging", "Touch Control", "Eye Protection Mode"]
   },
   {
     id: 4,
@@ -46,7 +59,13 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 42
+    reviews: 42,
+    specs: [
+      { label: "Resolution", value: "3440 x 1440" },
+      { label: "Refresh Rate", value: "144Hz" },
+      { label: "Panel", value: "IPS Curved" }
+    ],
+    amenities: ["HDR10 Support", "USB Hub", "Height Adjustable"]
   },
   {
     id: 5,
@@ -58,7 +77,8 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1597740985671-2a8a3b80502e?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 156
+    reviews: 156,
+    amenities: ["Rugged Design", "USB 3.2 Gen 2", "AES 256-bit Encryption"]
   },
   {
     id: 6,
@@ -70,7 +90,8 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1616440788775-6846985a1e74?auto=format&fit=crop&q=80&w=800",
     rating: 4.5,
-    reviews: 89
+    reviews: 89,
+    amenities: ["Fast Charging", "Slip-resistant", "Overheat Protection"]
   },
   {
     id: 7,
@@ -82,7 +103,8 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1508685096489-7a689bd7f435?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 320
+    reviews: 320,
+    amenities: ["ECG Monitoring", "GPS Built-in", "Waterproof 50m"]
   },
   {
     id: 8,
@@ -94,7 +116,8 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1526170315873-3a9d66ee7a94?auto=format&fit=crop&q=80&w=800",
     rating: 4.6,
-    reviews: 67
+    reviews: 67,
+    amenities: ["Voice Control", "Image Stabilization", "Dual Screens"]
   },
   {
     id: 9,
@@ -106,7 +129,8 @@ export const mockProducts = [
     category: "Audio",
     image: "https://images.unsplash.com/photo-1545453338-33960f29197e?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 45
+    reviews: 45,
+    amenities: ["Bluetooth 5.0", "Wood Cabinet", "Remote Control"]
   },
   {
     id: 10,
@@ -118,7 +142,8 @@ export const mockProducts = [
     category: "Furniture",
     image: "https://images.unsplash.com/photo-1505843490701-5be5d2b33d52?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 512
+    reviews: 512,
+    amenities: ["Lumbar Support", "4D Armrests", "BIFMA Certified"]
   },
   {
     id: 11,
@@ -130,7 +155,8 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1615526675159-e248c3021d3f?auto=format&fit=crop&q=80&w=800",
     rating: 4.4,
-    reviews: 120
+    reviews: 120,
+    amenities: ["Strong Magnets", "Pass-through Charging", "Slim Profile"]
   },
   {
     id: 12,
@@ -142,7 +168,8 @@ export const mockProducts = [
     category: "Audio",
     image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 230
+    reviews: 230,
+    amenities: ["IPX4 Water Resistant", "Clear Calls", "Transparency Mode"]
   },
   {
     id: 13,
@@ -154,7 +181,8 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1593118247619-e2d6f056869e?auto=format&fit=crop&q=80&w=800",
     rating: 4.6,
-    reviews: 94
+    reviews: 94,
+    amenities: ["Auto-Focus", "Dual Mics", "Privacy Shutter"]
   },
   {
     id: 14,
@@ -166,7 +194,8 @@ export const mockProducts = [
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1563770660941-20978e870e26?auto=format&fit=crop&q=80&w=800",
     rating: 4.5,
-    reviews: 145
+    reviews: 145,
+    amenities: ["4K HDMI", "Power Delivery", "SD/MicroSD Slots"]
   },
   {
     id: 15,
@@ -178,10 +207,11 @@ export const mockProducts = [
     category: "Furniture",
     image: "https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 78
+    reviews: 78,
+    amenities: ["Dual Motor", "Memory Presets", "Cable Management"]
   },
 
-  // Lifestyle & Apparel (16-30)
+  // --- LIFESTYLE & APPAREL (16-35) ---
   {
     id: 16,
     name: "Classic Cotton Hoodie",
@@ -192,7 +222,8 @@ export const mockProducts = [
     category: "Apparel",
     image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 245
+    reviews: 245,
+    amenities: ["Organic Cotton", "Brushed Interior", "Reinforced Stitching"]
   },
   {
     id: 17,
@@ -204,7 +235,8 @@ export const mockProducts = [
     category: "Accessories",
     image: "https://images.unsplash.com/photo-1547949003-9792a18a2601?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 64
+    reviews: 64,
+    amenities: ["Full-Grain Leather", "Detachable Strap", "Metal Feet"]
   },
   {
     id: 18,
@@ -216,7 +248,8 @@ export const mockProducts = [
     category: "Accessories",
     image: "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 189
+    reviews: 189,
+    amenities: ["RFID Blocking", "Quick-Access Slot", "Slim Fit"]
   },
   {
     id: 19,
@@ -228,7 +261,8 @@ export const mockProducts = [
     category: "Accessories",
     image: "https://images.unsplash.com/photo-1511499767390-903390e6fbc1?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 112
+    reviews: 112,
+    amenities: ["UVA/UVB Protection", "Titanium Frame", "Polarized"]
   },
   {
     id: 20,
@@ -240,7 +274,8 @@ export const mockProducts = [
     category: "Apparel",
     image: "https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 86
+    reviews: 86,
+    amenities: ["Merino Wool", "Odor Resistant", "Temperature Regulating"]
   },
   {
     id: 21,
@@ -252,7 +287,8 @@ export const mockProducts = [
     category: "Accessories",
     image: "https://images.unsplash.com/photo-1553062407-98eeb94c6a62?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 204
+    reviews: 204,
+    amenities: ["Laptop Sleeve", "Weather Resistant", "Padded Straps"]
   },
   {
     id: 22,
@@ -264,7 +300,8 @@ export const mockProducts = [
     category: "Apparel",
     image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 432
+    reviews: 432,
+    amenities: ["Cloud Cushioning", "Breathable Mesh", "Reflective Hits"]
   },
   {
     id: 23,
@@ -276,7 +313,8 @@ export const mockProducts = [
     category: "Apparel",
     image: "https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?auto=format&fit=crop&q=80&w=800",
     rating: 4.6,
-    reviews: 74
+    reviews: 74,
+    amenities: ["Premium Denim", "Tailored Fit", "Metal Buttons"]
   },
   {
     id: 24,
@@ -288,7 +326,8 @@ export const mockProducts = [
     category: "Home",
     image: "https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 156
+    reviews: 156,
+    amenities: ["Soy Wax", "Lead-free Wick", "40hr Burn Time"]
   },
   {
     id: 25,
@@ -300,7 +339,8 @@ export const mockProducts = [
     category: "Home",
     image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 82
+    reviews: 82,
+    amenities: ["Dishwasher Safe", "Matte Finish", "High-Fired Ceramic"]
   },
   {
     id: 26,
@@ -312,7 +352,8 @@ export const mockProducts = [
     category: "Fitness",
     image: "https://images.unsplash.com/photo-1592432676556-2693b1299619?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 167
+    reviews: 167,
+    amenities: ["Non-Slip", "Extra Thick", "Eco-friendly Material"]
   },
   {
     id: 27,
@@ -324,7 +365,8 @@ export const mockProducts = [
     category: "Fitness",
     image: "https://images.unsplash.com/photo-1602143399827-705204433a23?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 289
+    reviews: 289,
+    amenities: ["Vacuum Insulated", "BPA Free", "Leak Proof"]
   },
   {
     id: 28,
@@ -336,7 +378,8 @@ export const mockProducts = [
     category: "Fitness",
     image: "https://images.unsplash.com/photo-1583454110551-21f2fa200181?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 45
+    reviews: 45,
+    amenities: ["Adjustable Weight", "Compact Design", "Ergonomic Grip"]
   },
   {
     id: 29,
@@ -348,7 +391,8 @@ export const mockProducts = [
     category: "Fitness",
     image: "https://images.unsplash.com/photo-1513224502586-d1e602410265?auto=format&fit=crop&q=80&w=800",
     rating: 4.5,
-    reviews: 134
+    reviews: 134,
+    amenities: ["13 Metrics", "App Sync", "Tempered Glass"]
   },
   {
     id: 30,
@@ -360,10 +404,11 @@ export const mockProducts = [
     category: "Fitness",
     image: "https://images.unsplash.com/photo-1553062407-98eeb94c6a62?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 92
+    reviews: 92,
+    amenities: ["Shoe Compartment", "Wet/Dry Pocket", "Adjustable Strap"]
   },
 
-  // Home & Decor (31-50)
+  // --- HOME & DECOR (31-50) ---
   {
     id: 31,
     name: "Abstract Wall Art Set",
@@ -374,7 +419,8 @@ export const mockProducts = [
     category: "Decor",
     image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 56
+    reviews: 56,
+    amenities: ["Oak Frames", "High-Quality Print", "Easy to Hang"]
   },
   {
     id: 32,
@@ -386,7 +432,8 @@ export const mockProducts = [
     category: "Home",
     image: "https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 123
+    reviews: 123,
+    amenities: ["Premium Wool", "Hand-Woven", "Hypoallergenic"]
   },
   {
     id: 33,
@@ -398,7 +445,8 @@ export const mockProducts = [
     category: "Decor",
     image: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?auto=format&fit=crop&q=80&w=800",
     rating: 4.6,
-    reviews: 44
+    reviews: 44,
+    amenities: ["Varying Sizes", "Matte Clay", "Unique Texture"]
   },
   {
     id: 34,
@@ -410,7 +458,8 @@ export const mockProducts = [
     category: "Furniture",
     image: "https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 32
+    reviews: 32,
+    amenities: ["Soft-Close Drawer", "Solid Wood", "Minimalist Style"]
   },
   {
     id: 35,
@@ -422,186 +471,680 @@ export const mockProducts = [
     category: "Home",
     image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800",
     rating: 4.5,
-    reviews: 178
+    reviews: 178,
+    amenities: ["Ultrasonic Mist", "LED Lighting", "Auto-Shutoff"]
+  },
+
+  // --- NEW PREMIUM PRODUCTS (51-100) ---
+  {
+    id: 51,
+    name: "Luxe Sapphire Timepiece",
+    slug: "luxe-sapphire-timepiece",
+    price: 1250.00,
+    offerPrice: 999.00,
+    description: "Swiss-made automatic movement with scratch-resistant sapphire crystal.",
+    category: "Accessories",
+    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&q=80&w=800",
+    rating: 5.0,
+    reviews: 12,
+    specs: [
+      { label: "Movement", value: "Automatic" },
+      { label: "Crystal", value: "Sapphire" },
+      { label: "Case", value: "316L Steel" }
+    ],
+    amenities: ["Waterproof 100m", "Luminous Hands", "Leather Case"]
   },
   {
-    id: 36,
-    name: "Bamboo Bath Mat",
-    slug: "bamboo-bath-mat",
-    price: 45.00,
-    offerPrice: 35.00,
-    description: "Water-resistant and eco-friendly.",
-    category: "Home",
-    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800",
-    rating: 4.4,
-    reviews: 89
-  },
-  {
-    id: 37,
-    name: "Velvet Accent Chair",
-    slug: "velvet-accent-chair",
-    price: 349.99,
-    offerPrice: 289.99,
-    description: "Luxurious comfort with golden steel legs.",
-    category: "Furniture",
-    image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&q=80&w=800",
-    rating: 4.9,
-    reviews: 27
-  },
-  {
-    id: 38,
-    name: "Glass Teapot with Infuser",
-    slug: "glass-teapot-infuser",
-    price: 49.99,
+    id: 52,
+    name: "Smart Mirror Wellness",
+    slug: "smart-mirror-wellness",
+    price: 899.00,
     offerPrice: null,
-    description: "Heat-resistant borosilicate glass. Elegant design.",
-    category: "Home",
-    image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&q=80&w=800",
-    rating: 4.7,
-    reviews: 134
-  },
-  {
-    id: 39,
-    name: "Linen Bedding Set",
-    slug: "linen-bedding-set",
-    price: 299.99,
-    offerPrice: 229.99,
-    description: "100% French linen. Breathable and naturally soft.",
-    category: "Home",
-    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=800",
-    rating: 4.9,
-    reviews: 86
-  },
-  {
-    id: 40,
-    name: "Floating Shelf Set",
-    slug: "floating-shelf-set",
-    price: 69.99,
-    offerPrice: 49.99,
-    description: "Set of 3 rustic wood shelves for wall display.",
-    category: "Decor",
-    image: "https://images.unsplash.com/photo-1594420498105-f6ed3a1f5924?auto=format&fit=crop&q=80&w=800",
-    rating: 4.6,
-    reviews: 210
-  },
-  {
-    id: 41,
-    name: "Digital Alarm Clock",
-    slug: "digital-alarm-clock",
-    price: 29.99,
-    offerPrice: null,
-    description: "Wooden LED display with voice control mode.",
+    description: "Embedded display shows time, weather, and health stats while you get ready.",
     category: "Electronics",
-    image: "https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&q=80&w=800",
-    rating: 4.5,
-    reviews: 342
-  },
-  {
-    id: 42,
-    name: "Pendant Light Industrial",
-    slug: "pendant-light-industrial",
-    price: 119.99,
-    offerPrice: 89.99,
-    description: "Black metal finish with Edison style bulb included.",
-    category: "Decor",
-    image: "https://images.unsplash.com/photo-1513506491745-c4591993a77a?auto=format&fit=crop&q=80&w=800",
-    rating: 4.7,
-    reviews: 65
-  },
-  {
-    id: 43,
-    name: "Floor Mirror Full Length",
-    slug: "floor-mirror-full-length",
-    price: 279.99,
-    offerPrice: null,
-    description: "Large standing mirror with arched gold frame.",
-    category: "Decor",
     image: "https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&q=80&w=800",
-    rating: 4.8,
-    reviews: 19
+    rating: 4.9,
+    reviews: 24,
+    amenities: ["Built-in Display", "Bluetooth Speakers", "Anti-Fog"]
   },
   {
-    id: 44,
-    name: "Kitchen Knife Set 6pc",
-    slug: "kitchen-knife-set-6pc",
-    price: 159.99,
-    offerPrice: 129.99,
-    description: "High-carbon stainless steel with ergonomic handles.",
+    id: 53,
+    name: "Titanium Espresso Machine",
+    slug: "titanium-espresso-machine",
+    price: 2499.00,
+    offerPrice: 2199.00,
+    description: "Barista-level coffee at home with precision temperature control.",
+    category: "Kitchen",
+    image: "https://images.unsplash.com/photo-1510972527921-ce03766a1cf1?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 38,
+    specs: [
+      { label: "Pressure", value: "15 Bar" },
+      { label: "Material", value: "Titanium" },
+      { label: "Tank", value: "2.5L" }
+    ],
+    amenities: ["PID Temperature Control", "Steam Wand", "Built-in Grinder"]
+  },
+  {
+    id: 54,
+    name: "Heritage Leather Jacket",
+    slug: "heritage-leather-jacket",
+    price: 599.00,
+    offerPrice: null,
+    description: "Handcrafted from premium lambskin leather. Timeless aviator style.",
+    category: "Apparel",
+    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 45,
+    amenities: ["100% Lambskin", "Quilted Lining", "YKK Zippers"]
+  },
+  {
+    id: 55,
+    name: "Sonic Pro Electric Toothbrush",
+    slug: "sonic-pro-toothbrush",
+    price: 229.99,
+    offerPrice: 189.99,
+    description: "Intelligent pressure sensors and 40,000 vibrations per minute.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1559591937-e68fb3305f41?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 112,
+    amenities: ["Smart App Sync", "Wireless Charging", "Travel Case"]
+  },
+  {
+    id: 56,
+    name: "Velvet Cloud Sofa",
+    slug: "velvet-cloud-sofa",
+    price: 3499.00,
+    offerPrice: 2999.00,
+    description: "Unmatched comfort with feather-filled cushions and Italian velvet.",
+    category: "Furniture",
+    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=800",
+    rating: 5.0,
+    reviews: 8,
+    amenities: ["Feather-Fill", "Stain-Resistant", "Modular Design"]
+  },
+  {
+    id: 57,
+    name: "Nordic Floor Lamp",
+    slug: "nordic-floor-lamp",
+    price: 249.00,
+    offerPrice: null,
+    description: "Sleek scandinavian design with solid ash wood and linen shade.",
+    category: "Decor",
+    image: "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 31,
+    amenities: ["Ash Wood", "Step Switch", "Eco-friendly Bulb"]
+  },
+  {
+    id: 58,
+    name: "Elite Road Bike",
+    slug: "elite-road-bike",
+    price: 1899.00,
+    offerPrice: 1599.00,
+    description: "Carbon fiber frame with Shimano components for maximum speed.",
+    category: "Fitness",
+    image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 14,
+    specs: [
+      { label: "Frame", value: "Carbon Fiber" },
+      { label: "Weight", value: "8.2kg" },
+      { label: "Gears", value: "22 Speed" }
+    ],
+    amenities: ["Hydraulic Discs", "Aero Design", "Internal Cabling"]
+  },
+  {
+    id: 59,
+    name: "Zen Aroma Humidifier",
+    slug: "zen-aroma-humidifier",
+    price: 129.00,
+    offerPrice: 99.00,
+    description: "Silent operation with real-time humidity tracking and aura light.",
+    category: "Home",
+    image: "https://images.unsplash.com/photo-1585672841583-057088b7762a?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 88,
+    amenities: ["Real-time Tracking", "Aura Light", "Silent Mode"]
+  },
+  {
+    id: 60,
+    name: "Gourmet Copper Cookware",
+    slug: "gourmet-copper-cookware",
+    price: 899.00,
+    offerPrice: null,
+    description: "Professional grade copper for superior heat distribution.",
+    category: "Kitchen",
+    image: "https://images.unsplash.com/photo-1584990333910-fe907cddfdc3?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 22,
+    amenities: ["Triple-Ply", "Cool-Touch Handles", "Oven Safe 500F"]
+  },
+  {
+    id: 61,
+    name: "Minimalist Trench Coat",
+    slug: "minimalist-trench-coat",
+    price: 349.00,
+    offerPrice: 249.00,
+    description: "Waterproof Gabardine fabric with a tailored silhouette.",
+    category: "Apparel",
+    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 54,
+    amenities: ["Waterproof", "Adjustable Belt", "Interior Pockets"]
+  },
+  {
+    id: 62,
+    name: "Smart Garden Hub",
+    slug: "smart-garden-hub",
+    price: 199.00,
+    offerPrice: null,
+    description: "Automatic watering and light system for indoor herbs.",
+    category: "Home",
+    image: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&q=80&w=800",
+    rating: 4.6,
+    reviews: 41,
+    amenities: ["App Controlled", "LED Grow Light", "Water Sensor"]
+  },
+  {
+    id: 63,
+    name: "Aura Air Purifier Pro",
+    slug: "aura-air-purifier-pro",
+    price: 499.00,
+    offerPrice: 399.00,
+    description: "HEPA-13 filtration removes 99.9% of airborne particles.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 156,
+    amenities: ["HEPA-13 Filter", "AQI Monitor", "Smart App Sync"]
+  },
+  {
+    id: 64,
+    name: "Handcrafted Oak Desk",
+    slug: "handcrafted-oak-desk",
+    price: 1299.00,
+    offerPrice: null,
+    description: "Solid european oak with built-in hidden cable management.",
+    category: "Furniture",
+    image: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?auto=format&fit=crop&q=80&w=800",
+    rating: 5.0,
+    reviews: 15,
+    amenities: ["Solid Oak", "Hidden Cables", "Hand-Finished"]
+  },
+  {
+    id: 65,
+    name: "Pro Drone 4K",
+    slug: "pro-drone-4k",
+    price: 1499.00,
+    offerPrice: 1299.00,
+    description: "4K video at 60fps with 10km transmission range.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1507582020474-9a35b7d455d9?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 67,
+    specs: [
+      { label: "Camera", value: "4K 60FPS" },
+      { label: "Flight Time", value: "35 Mins" },
+      { label: "Range", value: "10KM" }
+    ],
+    amenities: ["Obstacle Avoidance", "GPS Return", "Folding Design"]
+  },
+  {
+    id: 66,
+    name: "Wool Cashmere Wrap",
+    slug: "wool-cashmere-wrap",
+    price: 189.00,
+    offerPrice: 149.00,
+    description: "Luxurious blend of merino wool and mongolian cashmere.",
+    category: "Accessories",
+    image: "https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 39,
+    amenities: ["Cashmere Blend", "Oversized", "Ultra-Soft"]
+  },
+  {
+    id: 67,
+    name: "Portable Projector HD",
+    slug: "portable-projector-hd",
+    price: 599.00,
+    offerPrice: null,
+    description: "Native 1080p with 500 ANSI lumens. Built-in battery.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1535016120720-40c646bebbdc?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 52,
+    amenities: ["1080p Native", "Android TV", "Internal Battery"]
+  },
+  {
+    id: 68,
+    name: "Minimalist Marble Clock",
+    slug: "minimalist-marble-clock",
+    price: 89.00,
+    offerPrice: 59.00,
+    description: "Real Carrara marble with brushed brass hands.",
+    category: "Decor",
+    image: "https://images.unsplash.com/photo-1563861826100-9cb868fdbe1c?auto=format&fit=crop&q=80&w=800",
+    rating: 4.6,
+    reviews: 28,
+    amenities: ["Real Marble", "Silent Movement", "Handmade"]
+  },
+  {
+    id: 69,
+    name: "Leather Chess Set",
+    slug: "leather-chess-set",
+    price: 299.00,
+    offerPrice: null,
+    description: "Hand-stitched leather board with weighted brass pieces.",
+    category: "Lifestyle",
+    image: "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?auto=format&fit=crop&q=80&w=800",
+    rating: 5.0,
+    reviews: 5,
+    amenities: ["Weighted Pieces", "Leather Board", "Gift Box"]
+  },
+  {
+    id: 70,
+    name: "Electric Wine Opener",
+    slug: "electric-wine-opener",
+    price: 49.00,
+    offerPrice: 35.00,
+    description: "Opens up to 80 bottles on a single charge. Foil cutter included.",
+    category: "Kitchen",
+    image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=800",
+    rating: 4.5,
+    reviews: 145,
+    amenities: ["USB Charging", "Foil Cutter", "One-Touch"]
+  },
+  // Adding more products to reach 100...
+  {
+    id: 71,
+    name: "Smart Pet Feeder",
+    slug: "smart-pet-feeder",
+    price: 199.00,
+    offerPrice: 159.00,
+    description: "Schedule meals and monitor your pet via built-in HD camera.",
+    category: "Home",
+    image: "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 63,
+    amenities: ["HD Camera", "Voice Sync", "Schedule Feeding"]
+  },
+  {
+    id: 72,
+    name: "Professional Camera Gimbal",
+    slug: "camera-gimbal-pro",
+    price: 499.00,
+    offerPrice: null,
+    description: "3-axis stabilization for buttery smooth cinematic shots.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1581591524425-c7e0978865fc?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 31,
+    amenities: ["3-Axis", "OLED Screen", "12hr Battery"]
+  },
+  {
+    id: 73,
+    name: "Wool Area Rug",
+    slug: "wool-area-rug",
+    price: 599.00,
+    offerPrice: 449.00,
+    description: "Hand-tufted geometric design in neutral tones.",
+    category: "Decor",
+    image: "https://images.unsplash.com/photo-1575414003591-ece8d0416c7a?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 22,
+    amenities: ["Hand-Tufted", "Stain-Resistant", "Eco-Wool"]
+  },
+  {
+    id: 74,
+    name: "Matte Black Faucet",
+    slug: "matte-black-faucet",
+    price: 299.00,
+    offerPrice: null,
+    description: "Professional pull-down sprayer with magnetic docking.",
+    category: "Kitchen",
+    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 14,
+    amenities: ["Pull-Down Sprayer", "Anti-Fingerprint", "Ceramic Valve"]
+  },
+  {
+    id: 75,
+    name: "Luxury Silk Robe",
+    slug: "luxury-silk-robe",
+    price: 199.00,
+    offerPrice: 159.00,
+    description: "100% Mulberry silk for the ultimate loungewear experience.",
+    category: "Apparel",
+    image: "https://images.unsplash.com/photo-1598554889165-8139a49f2883?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 42,
+    amenities: ["22 Momme Silk", "Breathable", "Hypoallergenic"]
+  },
+  {
+    id: 76,
+    name: "Smart Door Lock Pro",
+    slug: "smart-door-lock-pro",
+    price: 299.00,
+    offerPrice: null,
+    description: "Fingerprint, passcode, and app entry with remote access.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 95,
+    amenities: ["Fingerprint Unlock", "Remote Access", "Entry Logs"]
+  },
+  {
+    id: 77,
+    name: "Carbon Fiber Wallet",
+    slug: "carbon-fiber-wallet",
+    price: 89.00,
+    offerPrice: 69.00,
+    description: "Ultra-slim carbon fiber shell with RFID blocking.",
+    category: "Accessories",
+    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 128,
+    amenities: ["Real Carbon Fiber", "Money Clip", "Lifetime Warranty"]
+  },
+  {
+    id: 78,
+    name: "Premium Chef Knife",
+    slug: "premium-chef-knife",
+    price: 159.00,
+    offerPrice: null,
+    description: "Japanese VG10 steel with 67 layers of Damascus.",
     category: "Kitchen",
     image: "https://images.unsplash.com/photo-1593618998160-e34014e67546?auto=format&fit=crop&q=80&w=800",
+    rating: 5.0,
+    reviews: 29,
+    amenities: ["VG10 Steel", "Damascus Pattern", "Perfect Balance"]
+  },
+  {
+    id: 79,
+    name: "Electric Gooseneck Kettle",
+    slug: "electric-gooseneck-kettle",
+    price: 149.00,
+    offerPrice: 119.00,
+    description: "Precision pour-over kettle with degree-exact temperature control.",
+    category: "Kitchen",
+    image: "https://images.unsplash.com/photo-1594212699903-ec8a3ecc50f1?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 87
+    reviews: 87,
+    amenities: ["Precision Pour", "LCD Display", "60min Hold Mode"]
   },
   {
-    id: 45,
-    name: "Electric Salt & Pepper Mill",
-    slug: "electric-salt-pepper-mill",
-    price: 59.99,
-    offerPrice: 44.99,
-    description: "One-hand operation with adjustable coarseness.",
-    category: "Kitchen",
-    image: "https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&q=80&w=800",
-    rating: 4.7,
-    reviews: 143
-  },
-  {
-    id: 46,
-    name: "Silicone Baking Mat Set",
-    slug: "silicone-baking-mat-set",
-    price: 25.00,
+    id: 80,
+    name: "Mechanical Watch Winder",
+    slug: "mechanical-watch-winder",
+    price: 199.00,
     offerPrice: null,
-    description: "Set of 2 non-stick reusable baking mats.",
-    category: "Kitchen",
-    image: "https://images.unsplash.com/photo-1594910413528-94f71881ddfc?auto=format&fit=crop&q=80&w=800",
+    description: "Ultra-quiet motor keeps your automatic watches perfectly timed.",
+    category: "Accessories",
+    image: "https://images.unsplash.com/photo-1508685096489-7a689bd7f435?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
-    reviews: 267
+    reviews: 15,
+    amenities: ["Mabuchi Motor", "LED Light", "Wooden Finish"]
   },
   {
-    id: 47,
-    name: "Modern Toaster 2-Slice",
-    slug: "modern-toaster-2-slice",
-    price: 79.99,
-    offerPrice: 59.99,
-    description: "Stainless steel with extra-wide slots and defrost mode.",
-    category: "Kitchen",
-    image: "https://images.unsplash.com/photo-1584905066893-7d5c142ba4e1?auto=format&fit=crop&q=80&w=800",
-    rating: 4.6,
-    reviews: 198
+    id: 81,
+    name: "Smart Bike Helmet",
+    slug: "smart-bike-helmet",
+    price: 179.00,
+    offerPrice: 139.00,
+    description: "Integrated LED turn signals and fall detection sensors.",
+    category: "Fitness",
+    image: "https://images.unsplash.com/photo-1544177173-34e892e8623d?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 42,
+    amenities: ["LED Signals", "Fall Detection", "Bluetooth Audio"]
   },
   {
-    id: 48,
-    name: "Air Fryer XL",
-    slug: "air-fryer-xl",
-    price: 199.99,
-    offerPrice: 169.99,
-    description: "5.5L capacity with 8 preset cooking programs.",
-    category: "Kitchen",
-    image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?auto=format&fit=crop&q=80&w=800",
+    id: 82,
+    name: "Portable Massage Gun",
+    slug: "portable-massage-gun",
+    price: 249.00,
+    offerPrice: 199.00,
+    description: "Percussive therapy to accelerate muscle recovery and relieve pain.",
+    category: "Fitness",
+    image: "https://images.unsplash.com/photo-1591343395082-e120087004b4?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
-    reviews: 356
+    reviews: 320,
+    amenities: ["QuietForce Tech", "5 Attachments", "6hr Battery"]
   },
   {
-    id: 49,
-    name: "French Press Coffee Maker",
-    slug: "french-press-coffee-maker",
-    price: 45.00,
+    id: 83,
+    name: "Modular Bookshelf",
+    slug: "modular-bookshelf",
+    price: 399.00,
     offerPrice: null,
-    description: "Double-walled stainless steel keeps coffee hot for longer.",
+    description: "Stackable blocks allow for endless configuration options.",
+    category: "Furniture",
+    image: "https://images.unsplash.com/photo-1594620302200-9a762244a156?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 18,
+    amenities: ["Modular Design", "Solid Walnut", "Hidden Anchors"]
+  },
+  {
+    id: 84,
+    name: "Leather Tablet Sleeve",
+    slug: "leather-tablet-sleeve",
+    price: 79.00,
+    offerPrice: 59.00,
+    description: "Pebbled leather with soft microfiber lining for iPad Pro.",
+    category: "Accessories",
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 56,
+    amenities: ["Pebbled Leather", "Microfiber Lining", "Magnetic Close"]
+  },
+  {
+    id: 85,
+    name: "UV Sanitizer Box",
+    slug: "uv-sanitizer-box",
+    price: 89.00,
+    offerPrice: null,
+    description: "Kill 99.9% of bacteria on your phone, keys, and accessories.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1584622781564-1d9876a13d00?auto=format&fit=crop&q=80&w=800",
+    rating: 4.6,
+    reviews: 134,
+    amenities: ["Dual UV-C Lamps", "Wireless Charging", "Aroma Diffuser"]
+  },
+  {
+    id: 86,
+    name: "Cashmere Throw",
+    slug: "cashmere-throw",
+    price: 349.00,
+    offerPrice: 289.00,
+    description: "Heirloom quality throw made from the finest Grade A cashmere.",
+    category: "Home",
+    image: "https://images.unsplash.com/photo-1580301762395-21ce84d00bc6?auto=format&fit=crop&q=80&w=800",
+    rating: 5.0,
+    reviews: 12,
+    amenities: ["Grade A Cashmere", "Tasselled Ends", "Ultra-Light"]
+  },
+  {
+    id: 87,
+    name: "Digital Art Frame",
+    slug: "digital-art-frame",
+    price: 599.00,
+    offerPrice: null,
+    description: "Display thousands of masterpieces in stunning 4K anti-glare.",
+    category: "Decor",
+    image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 24,
+    amenities: ["4K Anti-Glare", "Art Membership", "Gesture Control"]
+  },
+  {
+    id: 88,
+    name: "Smart Window Blind",
+    slug: "smart-window-blind",
+    price: 199.00,
+    offerPrice: 159.00,
+    description: "Automate your lighting based on sun position and time of day.",
+    category: "Home",
+    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 31,
+    amenities: ["Solar Charging", "Zigbee Protocol", "App Schedule"]
+  },
+  {
+    id: 89,
+    name: "Leather Portfolio Case",
+    slug: "leather-portfolio-case",
+    price: 149.00,
+    offerPrice: null,
+    description: "Professional organization for the modern executive. Fits 13\" laptop.",
+    category: "Accessories",
+    image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 45,
+    amenities: ["Hand-Stitched", "Organized Slots", "Fits 13\" Laptop"]
+  },
+  {
+    id: 90,
+    name: "Aura Smart Diffuser",
+    slug: "aura-smart-diffuser",
+    price: 129.00,
+    offerPrice: 89.00,
+    description: "Intelligent scenting system that learns your preferences.",
+    category: "Home",
+    image: "https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 112,
+    amenities: ["Self-Learning", "Quiet Mist", "App Controlled"]
+  },
+  {
+    id: 91,
+    name: "Titanium Coffee Press",
+    slug: "titanium-coffee-press",
+    price: 179.00,
+    offerPrice: 139.00,
+    description: "Virtually indestructible coffee maker that keeps brew hot for hours.",
     category: "Kitchen",
     image: "https://images.unsplash.com/photo-1544233726-b2bc7c149120?auto=format&fit=crop&q=80&w=800",
-    rating: 4.8,
-    reviews: 145
+    rating: 4.9,
+    reviews: 28,
+    amenities: ["Titanium Body", "Double-Wall", "Zero-Sediment Filter"]
   },
   {
-    id: 50,
-    name: "Digital Meat Thermometer",
-    slug: "digital-meat-thermometer",
-    price: 24.99,
-    offerPrice: 14.99,
-    description: "Instant read with backlit display and magnetic back.",
-    category: "Kitchen",
-    image: "https://images.unsplash.com/photo-1594910413528-94f71881ddfc?auto=format&fit=crop&q=80&w=800",
+    id: 92,
+    name: "Carbon Fiber Tripod",
+    slug: "carbon-fiber-tripod",
+    price: 399.00,
+    offerPrice: null,
+    description: "Professional stability at a fraction of the weight.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1516724562728-afc824a36e84?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 14,
+    amenities: ["8X Carbon Fiber", "Arca-Swiss Base", "Compact Fold"]
+  },
+  {
+    id: 93,
+    name: "Luxury Silk Eye Mask",
+    slug: "luxury-silk-eye-mask",
+    price: 49.00,
+    offerPrice: 35.00,
+    description: "Improve sleep quality with pure 25 momme mulberry silk.",
+    category: "Lifestyle",
+    image: "https://images.unsplash.com/photo-1582213726893-ed9e0ff31139?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 156,
+    amenities: ["25 Momme Silk", "Blackout Design", "Adjustable Strap"]
+  },
+  {
+    id: 94,
+    name: "Smart Yoga Mat",
+    slug: "smart-yoga-mat",
+    price: 249.00,
+    offerPrice: 199.00,
+    description: "Embedded sensors track your form and provide real-time feedback.",
+    category: "Fitness",
+    image: "https://images.unsplash.com/photo-1592432676556-2693b1299619?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
-    reviews: 423
+    reviews: 21,
+    amenities: ["Pressure Sensors", "App Feedback", "Self-Rolling"]
+  },
+  {
+    id: 95,
+    name: "Handmade Leather Sandals",
+    slug: "handmade-leather-sandals",
+    price: 129.00,
+    offerPrice: null,
+    description: "Crafted by artisans using traditional vegetable-tanning techniques.",
+    category: "Apparel",
+    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 32,
+    amenities: ["Vegetable Tanned", "Memory Foam Sole", "Hand-Stitched"]
+  },
+  {
+    id: 96,
+    name: "Pro Streamer Mic",
+    slug: "pro-streamer-mic",
+    price: 299.00,
+    offerPrice: 249.00,
+    description: "Broadcast-quality XLR microphone with built-in pop filter.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&q=80&w=800",
+    rating: 4.9,
+    reviews: 87,
+    amenities: ["XLR Connector", "Cardioid Pattern", "Metal Stand"]
+  },
+  {
+    id: 97,
+    name: "Organic Bamboo Bedding",
+    slug: "organic-bamboo-bedding",
+    price: 249.00,
+    offerPrice: null,
+    description: "Cooling and antibacterial sheets made from 100% organic bamboo.",
+    category: "Home",
+    image: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 65,
+    amenities: ["100% Bamboo", "Cooling Effect", "Sustainable"]
+  },
+  {
+    id: 98,
+    name: "Folding Electric Scooter",
+    slug: "folding-electric-scooter",
+    price: 899.00,
+    offerPrice: 749.00,
+    description: "The ultimate urban commuter tool. 40km range and lightweight.",
+    category: "Fitness",
+    image: "https://images.unsplash.com/photo-1558231991-600329b3986a?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 42,
+    amenities: ["40km Range", "Dual Braking", "One-Step Fold"]
+  },
+  {
+    id: 99,
+    name: "Luxe Marble Tray",
+    slug: "luxe-marble-tray",
+    price: 79.00,
+    offerPrice: 59.00,
+    description: "Solid White marble with gold-finished stainless steel handles.",
+    category: "Decor",
+    image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&q=80&w=800",
+    rating: 4.8,
+    reviews: 19,
+    amenities: ["Solid Marble", "Gold Handles", "Anti-Slip Feet"]
+  },
+  {
+    id: 100,
+    name: "Smart Air Quality Monitor",
+    slug: "smart-air-monitor",
+    price: 149.00,
+    offerPrice: null,
+    description: "Tracks VOCs, CO2, Humidity, and PM2.5 in real-time.",
+    category: "Electronics",
+    image: "https://images.unsplash.com/photo-1584622781564-1d9876a13d00?auto=format&fit=crop&q=80&w=800",
+    rating: 4.7,
+    reviews: 58,
+    amenities: ["Real-time Tracking", "Smart App Sync", "Battery Powered"]
   }
 ];
