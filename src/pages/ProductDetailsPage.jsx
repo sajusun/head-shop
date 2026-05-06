@@ -5,7 +5,7 @@ import { fetchProductBySlug, clearCurrentProduct } from '../features/products/pr
 import { fetchReviews } from '../features/reviews/reviewSlice';
 import { addToCart } from '../features/cart/cartSlice';
 import { toggleFavorite } from '../features/favorites/favoriteSlice';
-import { Heart, ShoppingBag, Share2, ArrowLeft, Star, MessageSquare, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { Heart, ShoppingBag, Share2, ArrowLeft, Star, MessageSquare, ChevronLeft, ChevronRight, ArrowRight, Zap } from 'lucide-react';
 import Button from '../components/Button';
 import RatingStars from '../components/RatingStars';
 import ReviewItem from '../features/reviews/ReviewItem';
@@ -22,6 +22,10 @@ const ProductDetailsPage = () => {
   const favorites = useSelector(state => state.favorites.items);
   const isFavorite = favorites.some(item => item.id === product?.id);
   const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [availableColors, setAvailableColors] = useState([]);
+  const [selectedVariant, setSelectedVariant] = useState({});
   const relatedRef = useRef(null);
   const autoScrollDir = useRef(1); // 1 = forward, -1 = reverse
 
@@ -74,8 +78,61 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     if (product) {
       dispatch(fetchReviews(product.id));
+      // Set default variants
+      if (product.variants) {
+        if (product.variants.sizes) {
+          const firstSize = product.variants.sizes[0];
+          setSelectedSize(firstSize);
+          
+          // Initial colors based on first size
+          if (product.variants.sizeColorMap) {
+            const colorsForSize = product.variants.sizeColorMap[firstSize] || [];
+            setAvailableColors(colorsForSize);
+            if (colorsForSize.length > 0) setSelectedColor(colorsForSize[0]);
+          } else if (product.variants.colors) {
+            setAvailableColors(product.variants.colors.map(c => c.name));
+            setSelectedColor(product.variants.colors[0].name);
+          }
+        } else if (product.variants.colors) {
+          setAvailableColors(product.variants.colors.map(c => c.name));
+          setSelectedColor(product.variants.colors[0].name);
+        }
+        
+        // Handle other dynamic variants
+        const defaults = {};
+        Object.keys(product.variants).forEach(key => {
+          if (key !== 'colors' && key !== 'sizes' && key !== 'sizeColorMap') {
+            defaults[key] = product.variants[key][0];
+          }
+        });
+        setSelectedVariant(defaults);
+      }
     }
   }, [dispatch, product]);
+
+  // Handle Size Change effect
+  useEffect(() => {
+    if (product?.variants?.sizeColorMap && selectedSize) {
+      const colors = product.variants.sizeColorMap[selectedSize] || [];
+      setAvailableColors(colors);
+      
+      // Auto-select first available color if current color is not available in new size
+      if (!colors.includes(selectedColor)) {
+        setSelectedColor(colors[0] || null);
+      }
+    }
+  }, [selectedSize, product, selectedColor]);
+
+  const handleBuyNow = () => {
+    dispatch(addToCart({ 
+      ...product, 
+      quantity, 
+      selectedColor, 
+      selectedSize,
+      ...selectedVariant 
+    }));
+    navigate('/checkout');
+  };
 
   const handleShare = async () => {
     const shareUrl = window.location.href;
@@ -158,7 +215,10 @@ const ProductDetailsPage = () => {
             </div>
           </div>
 
-          <h1 className="text-4xl font-black text-text mb-4">{product.name}</h1>
+          <h1 className="text-4xl font-black text-text mb-2">{product.name}</h1>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-1 rounded">SKU: {product.sku || 'HERD-MOCK'}</span>
+          </div>
           
           <div className="flex items-center gap-4 mb-8">
             <div className="flex items-center gap-1">
@@ -192,6 +252,97 @@ const ProductDetailsPage = () => {
           <p className="text-gray-600 leading-relaxed mb-8 text-lg">
             {product.description}
           </p>
+
+          {/* Variation Selectors */}
+          {product.variants && (
+            <div className="space-y-8 mb-10 pb-8 border-b border-gray-100">
+              {/* Color Selector */}
+              {product.variants.colors && (
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-sm font-bold text-text uppercase tracking-wider">Color: <span className="text-gray-400 font-medium ml-1">{selectedColor}</span></span>
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                    {product.variants.colors
+                      .filter(color => availableColors.includes(color.name))
+                      .map((color, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedColor(color.name)}
+                        className={`group relative w-12 h-12 rounded-full flex items-center justify-center transition-all ${
+                          selectedColor === color.name ? 'ring-2 ring-primary ring-offset-2' : 'hover:ring-2 hover:ring-gray-200 hover:ring-offset-2'
+                        }`}
+                        title={color.name}
+                      >
+                        <span 
+                          className="w-10 h-10 rounded-full border border-gray-100 shadow-inner"
+                          style={{ backgroundColor: color.code }}
+                        ></span>
+                        {selectedColor === color.name && (
+                          <motion.span 
+                            layoutId="color-active"
+                            className="absolute inset-0 rounded-full border-2 border-primary"
+                          />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Size Selector */}
+              {product.variants.sizes && (
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-sm font-bold text-text uppercase tracking-wider">Size: <span className="text-gray-400 font-medium ml-1">{selectedSize}</span></span>
+                    <button className="text-xs font-bold text-primary hover:underline">Size Guide</button>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {product.variants.sizes.map((size, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedSize(size)}
+                        className={`min-w-[60px] h-12 px-4 rounded-xl font-bold text-sm transition-all border ${
+                          selectedSize === size 
+                            ? 'bg-text text-white border-text shadow-lg' 
+                            : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary'
+                        }`}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Dynamic Other Variants (e.g. Switches, Materials) */}
+              {Object.keys(product.variants).map(key => {
+                if (key === 'colors' || key === 'sizes' || key === 'sizeColorMap') return null;
+                return (
+                  <div key={key}>
+                    <div className="mb-4">
+                      <span className="text-sm font-bold text-text uppercase tracking-wider">{key}: <span className="text-gray-400 font-medium ml-1">{selectedVariant[key]}</span></span>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      {product.variants[key].map((option, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setSelectedVariant(prev => ({ ...prev, [key]: option }))}
+                          className={`px-6 h-12 rounded-xl font-bold text-sm transition-all border ${
+                            selectedVariant[key] === option 
+                              ? 'bg-text text-white border-text shadow-lg' 
+                              : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary'
+                          }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* Specifications & Amenities */}
           <div className="space-y-8 mb-10">
@@ -234,10 +385,24 @@ const ProductDetailsPage = () => {
             </div>
             <Button 
               size="lg" 
-              className="flex-1 gap-2 rounded-xl"
-              onClick={() => dispatch(addToCart({ ...product, quantity }))}
+              variant="outline"
+              className="flex-1 gap-2 rounded-xl border-gray-200"
+              onClick={() => dispatch(addToCart({ 
+                ...product, 
+                quantity, 
+                selectedColor, 
+                selectedSize,
+                ...selectedVariant 
+              }))}
             >
               <ShoppingBag size={20} /> Add to Cart
+            </Button>
+            <Button 
+              size="lg" 
+              className="flex-1 gap-2 rounded-xl bg-accent hover:bg-accent/90"
+              onClick={handleBuyNow}
+            >
+              <Zap size={20} fill="currentColor" /> Buy Now
             </Button>
           </div>
         </motion.div>

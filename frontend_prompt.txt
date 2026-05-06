@@ -10,10 +10,15 @@
 - **Folder Structure**: Feature-based modularity (`src/features/...`).
 
 ## 2. CURRENT FEATURES
-- **E-commerce**: Product listing, details, cart management, checkout flow.
-- **Journal/Blog**: Article listing, single article reading, sharing.
-- **User System**: Login/Signup UI, Profile management, Order history, Settings.
-- **UI/UX**: Responsive design, dark/light compatibility, skeletons for loading, glassmorphism elements.
+- **E-commerce**: 
+  - Product listing with advanced filtering.
+  - Premium Product Details: SKU tracking, Image gallery, Rating/Reviews.
+  - **New**: Related Products Slider (Auto-scroll + Manual navigation).
+  - **New**: Variant Selection (Colors with dependent size filtering via `sizeColorMap`).
+  - **New**: 'Buy Now' direct checkout flow alongside Cart management.
+- **Journal/Blog**: Article listing, single article reading, sharing, Like reaction system.
+- **User System**: Login/Signup UI, Profile management, Order history, Favorites/Wishlist.
+- **UI/UX**: Responsive design, dark mode compatibility, Framer Motion micro-animations, glassmorphism.
 
 ## 3. FUTURE SCALABILITY PLAN
 - **TypeScript Migration**: The project currently uses `.jsx`. Migrating to `.tsx` will provide better type safety for props and Redux state.
@@ -27,6 +32,8 @@
 - Use the `Layout` component for consistent page structure.
 - Maintain the `IS_API` toggle in `.env` for easy switching between mock and real data.
 - Ensure all new UI components are built using the existing Tailwind config for design consistency.
+- **Product Variants**: Use the `sizeColorMap` logic for apparel/accessories to ensure color availability is synced with selected sizes.
+- **Direct Checkout**: The `Buy Now` button must bypass the cart summary and navigate directly to `/checkout` after adding the single item to the state.
 
 ---
 

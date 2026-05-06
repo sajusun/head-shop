@@ -2,6 +2,7 @@ export const mockProducts = [
   // --- TECH & GADGETS (1-20) ---
   {
     id: 1,
+    sku: "HERD-1001",
     name: "Aura Noise-Canceling Headphones",
     slug: "aura-noise-canceling-headphones",
     price: 349.99,
@@ -11,6 +12,13 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
     reviews: 128,
+    variants: {
+      colors: [
+        { name: "Phantom Black", code: "#1a1a1a" },
+        { name: "Arctic White", code: "#f5f5f5" },
+        { name: "Midnight Blue", code: "#191970" }
+      ]
+    },
     specs: [
       { label: "Battery", value: "40 Hours" },
       { label: "Weight", value: "250g" },
@@ -20,6 +28,7 @@ export const mockProducts = [
   },
   {
     id: 2,
+    sku: "HERD-1002",
     name: "Minimalist Mechanical Keyboard",
     slug: "minimalist-mechanical-keyboard",
     price: 189.99,
@@ -29,6 +38,13 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
     reviews: 85,
+    variants: {
+      colors: [
+        { name: "Space Gray", code: "#7d7d7d" },
+        { name: "Silver", code: "#c0c0c0" }
+      ],
+      switches: ["Red", "Brown", "Blue"]
+    },
     specs: [
       { label: "Layout", value: "75% Compact" },
       { label: "Switch", value: "Gateron Brown" },
@@ -38,6 +54,7 @@ export const mockProducts = [
   },
   {
     id: 3,
+    sku: "HERD-1003",
     name: "Smart Desk Lamp Gen 2",
     slug: "smart-desk-lamp-gen-2",
     price: 89.99,
@@ -47,6 +64,12 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1534073828943-f801091bb18c?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
     reviews: 210,
+    variants: {
+      colors: [
+        { name: "Matte Black", code: "#2b2b2b" },
+        { name: "Pure White", code: "#ffffff" }
+      ]
+    },
     amenities: ["Wireless Charging", "Touch Control", "Eye Protection Mode"]
   },
   {
@@ -214,6 +237,7 @@ export const mockProducts = [
   // --- LIFESTYLE & APPAREL (16-35) ---
   {
     id: 16,
+    sku: "HERD-1016",
     name: "Classic Cotton Hoodie",
     slug: "classic-cotton-hoodie",
     price: 79.99,
@@ -223,10 +247,26 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
     reviews: 245,
+    variants: {
+      colors: [
+        { name: "Heather Gray", code: "#9ca3af" },
+        { name: "Navy Blue", code: "#1e3a8a" },
+        { name: "Forest Green", code: "#064e3b" },
+        { name: "Midnight Black", code: "#0f172a" }
+      ],
+      sizes: ["S", "M", "L", "XL"],
+      sizeColorMap: {
+        "S": ["Heather Gray", "Navy Blue"],
+        "M": ["Navy Blue", "Forest Green"],
+        "L": ["Forest Green", "Midnight Black"],
+        "XL": ["Midnight Black"]
+      }
+    },
     amenities: ["Organic Cotton", "Brushed Interior", "Reinforced Stitching"]
   },
   {
     id: 17,
+    sku: "HERD-1017",
     name: "Leather Weekend Bag",
     slug: "leather-weekend-bag",
     price: 299.99,
@@ -236,10 +276,18 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1547949003-9792a18a2601?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
     reviews: 64,
+    variants: {
+      colors: [
+        { name: "Cognac", code: "#8d4925" },
+        { name: "Vintage Brown", code: "#5d3a1a" },
+        { name: "Onyx Black", code: "#1a1a1a" }
+      ]
+    },
     amenities: ["Full-Grain Leather", "Detachable Strap", "Metal Feet"]
   },
   {
     id: 18,
+    sku: "HERD-1018",
     name: "Minimalist Leather Wallet",
     slug: "minimalist-leather-wallet",
     price: 59.99,
@@ -249,6 +297,13 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
     reviews: 189,
+    variants: {
+      colors: [
+        { name: "Tan", code: "#d2b48c" },
+        { name: "Black", code: "#000000" },
+        { name: "Espresso", code: "#3d2b1f" }
+      ]
+    },
     amenities: ["RFID Blocking", "Quick-Access Slot", "Slim Fit"]
   },
   {
@@ -266,32 +321,51 @@ export const mockProducts = [
   },
   {
     id: 20,
+    sku: "HERD-1020",
     name: "Merino Wool Sweater",
     slug: "merino-wool-sweater",
     price: 119.99,
     offerPrice: null,
-    description: "Ultra-soft and breathable wool sourced sustainably.",
+    description: "Ultra-soft and breathable wool sourced sustainably. Minimalist design for versatile styling.",
     category: "Apparel",
     image: "https://images.unsplash.com/photo-1556906781-9a412961c28c?auto=format&fit=crop&q=80&w=800",
     rating: 4.7,
     reviews: 86,
+    variants: {
+      colors: [
+        { name: "Cream", code: "#fdfdfd" },
+        { name: "Camel", code: "#c19a6b" },
+        { name: "Charcoal", code: "#36454f" }
+      ],
+      sizes: ["S", "M", "L", "XL"]
+    },
     amenities: ["Merino Wool", "Odor Resistant", "Temperature Regulating"]
   },
   {
     id: 21,
+    sku: "HERD-1021",
     name: "Canvas Backpack Pro",
     slug: "canvas-backpack-pro",
     price: 149.99,
     offerPrice: 109.99,
-    description: "Water-resistant canvas with dedicated 16\" laptop sleeve.",
+    description: "Water-resistant canvas with dedicated 16\" laptop sleeve. Perfect for daily commute and travel.",
     category: "Accessories",
     image: "https://images.unsplash.com/photo-1553062407-98eeb94c6a62?auto=format&fit=crop&q=80&w=800",
     rating: 4.8,
     reviews: 204,
+    variants: {
+      colors: [
+        { name: "Olive", code: "#3d4a3e" },
+        { name: "Carbon", code: "#2d2d2d" },
+        { name: "Rust", code: "#8b4513" }
+      ],
+      sizes: ["15L", "20L", "25L"]
+    },
     amenities: ["Laptop Sleeve", "Weather Resistant", "Padded Straps"]
   },
   {
     id: 22,
+    sku: "HERD-1022",
     name: "Performance Sneakers",
     slug: "performance-sneakers",
     price: 159.99,
@@ -301,10 +375,19 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=800",
     rating: 4.9,
     reviews: 432,
+    variants: {
+      colors: [
+        { name: "Electric Red", code: "#dc2626" },
+        { name: "Stealth Black", code: "#171717" },
+        { name: "Cloud White", code: "#f8fafc" }
+      ],
+      sizes: ["7", "8", "9", "10", "11", "12"]
+    },
     amenities: ["Cloud Cushioning", "Breathable Mesh", "Reflective Hits"]
   },
   {
     id: 23,
+    sku: "HERD-1023",
     name: "Denim Jacket V2",
     slug: "denim-jacket-v2",
     price: 129.99,
@@ -314,6 +397,13 @@ export const mockProducts = [
     image: "https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?auto=format&fit=crop&q=80&w=800",
     rating: 4.6,
     reviews: 74,
+    variants: {
+      colors: [
+        { name: "Indigo Wash", code: "#1e3a8a" },
+        { name: "Black Fade", code: "#374151" }
+      ],
+      sizes: ["S", "M", "L", "XL"]
+    },
     amenities: ["Premium Denim", "Tailored Fit", "Metal Buttons"]
   },
   {

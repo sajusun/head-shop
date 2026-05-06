@@ -51,23 +51,45 @@ const CartPage = () => {
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-bold text-text truncate sm:text-lg">{item.name}</h3>
                     <button 
-                      onClick={() => dispatch(removeFromCart(item.id))}
+                      onClick={() => dispatch(removeFromCart(item))}
                       className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                     >
                       <Trash2 size={18} />
                     </button>
                   </div>
-                  <p className="text-sm text-gray-400 mb-4">{item.category}</p>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1 mb-4">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{item.category}</span>
+                    {item.selectedColor && (
+                      <span className="text-xs font-bold text-primary flex items-center gap-1.5 before:content-[''] before:w-1 before:h-1 before:bg-gray-300 before:rounded-full">
+                        Color: {item.selectedColor}
+                      </span>
+                    )}
+                    {item.selectedSize && (
+                      <span className="text-xs font-bold text-primary flex items-center gap-1.5 before:content-[''] before:w-1 before:h-1 before:bg-gray-300 before:rounded-full">
+                        Size: {item.selectedSize}
+                      </span>
+                    )}
+                  </div>
                   
                   <div className="flex items-center justify-between">
                     <div className="flex items-center border border-gray-100 rounded-xl p-1 bg-gray-50">
                       <button 
-                        onClick={() => dispatch(updateQuantity({ id: item.id, quantity: Math.max(1, item.quantity - 1) }))}
+                        onClick={() => dispatch(updateQuantity({ 
+                          id: item.id, 
+                          selectedColor: item.selectedColor, 
+                          selectedSize: item.selectedSize,
+                          quantity: Math.max(1, item.quantity - 1) 
+                        }))}
                         className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors"
                       ><Minus size={14} /></button>
                       <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
                       <button 
-                        onClick={() => dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }))}
+                        onClick={() => dispatch(updateQuantity({ 
+                          id: item.id, 
+                          selectedColor: item.selectedColor, 
+                          selectedSize: item.selectedSize,
+                          quantity: item.quantity + 1 
+                        }))}
                         className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary transition-colors"
                       ><Plus size={14} /></button>
                     </div>
