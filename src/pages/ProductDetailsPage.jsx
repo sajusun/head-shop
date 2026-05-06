@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductBySlug, clearCurrentProduct } from '../features/products/productSlice';
 import { fetchReviews } from '../features/reviews/reviewSlice';
 import { addToCart } from '../features/cart/cartSlice';
 import { toggleFavorite } from '../features/favorites/favoriteSlice';
-import { Heart, ShoppingBag, Share2, ArrowLeft, Star, MessageSquare } from 'lucide-react';
+import { Heart, ShoppingBag, Share2, ArrowLeft, Star, MessageSquare, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import Button from '../components/Button';
 import RatingStars from '../components/RatingStars';
 import ReviewItem from '../features/reviews/ReviewItem';
@@ -22,13 +22,49 @@ const ProductDetailsPage = () => {
   const favorites = useSelector(state => state.favorites.items);
   const isFavorite = favorites.some(item => item.id === product?.id);
   const [quantity, setQuantity] = useState(1);
+  const relatedRef = useRef(null);
+  const autoScrollDir = useRef(1); // 1 = forward, -1 = reverse
 
   const relatedProducts = useMemo(() => {
     if (!product || !allProducts.length) return [];
     return allProducts
       .filter(item => item.id !== product.id && item.category === product.category)
-      .slice(0, 4);
+      .slice(0, 10);
   }, [product, allProducts]);
+
+  // Related Products Auto-scroll
+  useEffect(() => {
+    const el = relatedRef.current;
+    if (!el || relatedProducts.length <= 4) return;
+
+    const interval = setInterval(() => {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      const maxScroll = scrollWidth - clientWidth;
+
+      if (scrollLeft >= maxScroll - 10) {
+        autoScrollDir.current = -1;
+      } else if (scrollLeft <= 10) {
+        autoScrollDir.current = 1;
+      }
+
+      el.scrollTo({
+        left: scrollLeft + autoScrollDir.current * clientWidth,
+        behavior: 'smooth',
+      });
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [relatedProducts]);
+
+  const scroll = (ref, direction) => {
+    if (ref.current) {
+      const { scrollLeft, clientWidth } = ref.current;
+      const scrollTo = direction === 'left'
+        ? scrollLeft - clientWidth
+        : scrollLeft + clientWidth;
+      ref.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchProductBySlug(slug));
@@ -208,19 +244,46 @@ const ProductDetailsPage = () => {
       </div>
 
       {/* Related Products Section */}
-      <section className="border-t border-gray-100 pt-20 mb-20">
+      <section className="border-t border-gray-100 pt-20 mb-20 relative group/related">
         <div className="flex justify-between items-end mb-10">
           <div>
+            <span className="text-accent font-black uppercase tracking-widest text-xs mb-2 block">More to Explore</span>
             <h2 className="text-3xl font-black text-text mb-2">Related Products</h2>
             <p className="text-gray-500">You might also like these premium items from {product.category}</p>
           </div>
-          <Link to="/products" className="text-primary font-bold hover:underline">View All</Link>
+          <Link to="/products" className="text-primary font-bold flex items-center gap-2 hover:underline">
+            View All <ArrowRight size={18} />
+          </Link>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {relatedProducts.map(item => (
-            <ProductCard key={item.id} product={item} />
-          ))}
+        <div className="relative">
+          {/* Left Button */}
+          <button
+            onClick={() => scroll(relatedRef, 'left')}
+            className="absolute -left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 flex items-center justify-center text-text hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl z-10 opacity-0 group-hover/related:opacity-100 hidden lg:flex"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          
+          {/* Right Button */}
+          <button
+            onClick={() => scroll(relatedRef, 'right')}
+            className="absolute -right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 flex items-center justify-center text-text hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl z-10 opacity-0 group-hover/related:opacity-100 hidden lg:flex"
+          >
+            <ChevronRight size={24} />
+          </button>
+
+          <div
+            ref={relatedRef}
+            className="flex gap-8 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide no-scrollbar"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {relatedProducts.map(item => (
+              <div key={item.id} className="min-w-[280px] sm:min-w-[320px] snap-start">
+                <ProductCard product={item} />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
