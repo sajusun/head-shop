@@ -1,15 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MessageSquare, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 
 const ContactPage = () => {
+  const location = useLocation();
   const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: 'General Inquiry',
+    message: ''
+  });
+
+  useEffect(() => {
+    if (location.state) {
+      setFormData(prev => ({
+        ...prev,
+        subject: location.state.subject || 'General Inquiry',
+        message: location.state.orderId ? `Regarding Order: ${location.state.orderId}\n\n` : ''
+      }));
+    }
+  }, [location.state]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
     // Simulate API call
-    setTimeout(() => setSubmitted(false), 5000);
+    setTimeout(() => {
+      setSubmitted(false);
+      setFormData({
+        name: '',
+        email: '',
+        subject: 'General Inquiry',
+        message: ''
+      });
+    }, 5000);
   };
 
   return (
@@ -92,6 +123,9 @@ const ContactPage = () => {
                     <input 
                       required
                       type="text" 
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
                       placeholder="John Doe"
                       className="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all text-text font-medium"
                     />
@@ -101,6 +135,9 @@ const ContactPage = () => {
                     <input 
                       required
                       type="email" 
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
                       placeholder="john@example.com"
                       className="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all text-text font-medium"
                     />
@@ -109,11 +146,16 @@ const ContactPage = () => {
                 
                 <div className="space-y-2">
                   <label className="text-sm font-black text-text uppercase tracking-widest ml-1">Subject</label>
-                  <select className="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all text-text font-medium appearance-none">
-                    <option>General Inquiry</option>
-                    <option>Order Support</option>
-                    <option>Returns & Exchanges</option>
-                    <option>Wholesale</option>
+                  <select 
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all text-text font-medium appearance-none"
+                  >
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Order Support">Order Support</option>
+                    <option value="Returns & Exchanges">Returns & Exchanges</option>
+                    <option value="Wholesale">Wholesale</option>
                   </select>
                 </div>
 
@@ -122,6 +164,9 @@ const ContactPage = () => {
                   <textarea 
                     required
                     rows="5"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
                     placeholder="Tell us what's on your mind..."
                     className="w-full px-6 py-4 bg-gray-50 border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-primary/10 transition-all text-text font-medium resize-none"
                   ></textarea>
@@ -145,3 +190,4 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
+
