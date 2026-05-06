@@ -61,17 +61,17 @@ const HomePage = () => {
   return (
     <div className="space-y-20 pb-20">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white pt-12 lg:pt-20 pb-20 lg:pb-32">
+      <section className="relative overflow-hidden bg-white pt-4 lg:pt-12 pb-12 lg:pb-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto">
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-6"
             >
               New Collection 2024
             </motion.span>
-            <motion.h1 
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -79,7 +79,7 @@ const HomePage = () => {
             >
               Elevate Your <span className="text-primary italic">Lifestyle</span> With Premium Goods.
             </motion.h1>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -87,7 +87,7 @@ const HomePage = () => {
             >
               Discover our curated collection of high-quality products designed for the modern individual. Quality meets aesthetic.
             </motion.p>
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -164,7 +164,7 @@ const HomePage = () => {
       </section>
 
       {/* Flash Sale Section */}
-      <section className="bg-primary/5 py-24">
+      <section className="bg-primary/5 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
             <div>
@@ -212,13 +212,13 @@ const HomePage = () => {
 
         <div className="relative">
           {/* Slider Buttons */}
-          <button 
+          <button
             onClick={() => scroll(scrollRef, 'left')}
             className="absolute -left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 flex items-center justify-center text-text hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl z-10 opacity-0 group-hover:opacity-100 hidden lg:flex"
           >
             <ChevronLeft size={24} />
           </button>
-          <button 
+          <button
             onClick={() => scroll(scrollRef, 'right')}
             className="absolute -right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-md border border-gray-100 flex items-center justify-center text-text hover:bg-primary hover:text-white hover:border-primary transition-all shadow-xl z-10 opacity-0 group-hover:opacity-100 hidden lg:flex"
           >
@@ -232,7 +232,7 @@ const HomePage = () => {
               ))}
             </div>
           ) : (
-            <div 
+            <div
               ref={scrollRef}
               className="flex gap-8 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide no-scrollbar"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
@@ -252,8 +252,8 @@ const HomePage = () => {
         <div className="text-center mb-20">
           <h2 className="text-4xl font-black text-text mb-4">Why Choose Herd?</h2>
           <p className="text-gray-500 max-w-2xl mx-auto">We combine cutting-edge technology with minimalist design to bring you the best experience.</p>
-        </div>  
-        
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-16">
           {[
             { icon: <Zap size={48} className="text-accent" />, title: "Fast Delivery", desc: "Get your orders in record time with our express shipping." },
@@ -265,7 +265,7 @@ const HomePage = () => {
                 {/* Aura Glow */}
                 <div className="absolute inset-0 bg-primary/10 rounded-full scale-100 group-hover:scale-125 transition-transform duration-500 blur-xl opacity-50 group-hover:opacity-100"></div>
                 <div className="absolute inset-0 bg-gray-50 rounded-full scale-105 group-hover:scale-110 transition-transform duration-500"></div>
-                
+
                 {/* Icon Container */}
                 <div className="relative w-full h-full rounded-full bg-white flex items-center justify-center border-4 border-white shadow-xl group-hover:shadow-2xl transition-all duration-500 overflow-hidden">
                   <div className="group-hover:scale-110 transition-transform duration-500">

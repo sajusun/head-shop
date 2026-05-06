@@ -58,6 +58,7 @@ const AppRoutes = () => {
   {/* Public Legal & Settings Pages */}
           <Route path="accessibility" element={<AccessibilityPage />} />
           <Route path="cookie-settings" element={<CookieSettingsPage />} />
+          <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="terms-of-use" element={<TermsOfUsePage />} />
           <Route path="shipping-policy" element={<ShippingPolicyPage />} />
           <Route path="returns-exchanges" element={<ReturnsExchangesPage />} />
