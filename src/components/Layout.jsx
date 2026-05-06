@@ -5,6 +5,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { fetchProducts } from '../features/products/productSlice';
 import { motion, AnimatePresence } from 'framer-motion';
+import NotificationCenter from './notifications/NotificationCenter';
+import ToastContainer from './notifications/ToastContainer';
 
 const Layout = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -159,6 +161,8 @@ const Layout = () => {
                 <Link to="/favorites" className="p-2 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
                   <Heart size={20} />
                 </Link>
+                
+                <NotificationCenter />
                 
                 <Link to="/cart" className="p-2 text-gray-600 hover:text-primary hover:bg-primary/5 rounded-full transition-all relative">
                   <ShoppingBag size={20} />
@@ -349,6 +353,9 @@ const Layout = () => {
           </div>
         </div>
       </footer>
+
+      {/* Global Notifications */}
+      <ToastContainer />
     </div>
   );
 };

@@ -5,6 +5,7 @@ import cartReducer from '../features/cart/cartSlice';
 import favoriteReducer from '../features/favorites/favoriteSlice';
 import blogFavoriteReducer from '../features/favorites/blogFavoriteSlice';
 import reviewReducer from '../features/reviews/reviewSlice';
+import notificationReducer from '../features/notifications/notificationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     favorites: favoriteReducer,
     blogFavorites: blogFavoriteReducer,
     reviews: reviewReducer,
+    notifications: notificationReducer,
   },
 });

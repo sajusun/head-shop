@@ -22,6 +22,7 @@ HERD SHOP is a premium eCommerce platform built with React 19, Vite, and Tailwin
 - **Blogs**: id, author_id, title, slug, excerpt, content, featured_image, status (draft/published), timestamps.
 - **Comments**: id, blog_id, user_id, content, status (pending/approved), timestamps.
 - **Reviews**: id, product_id, user_id, rating, comment, timestamps.
+- **Notifications**: id, user_id, type (order/promo/info), title, message, is_read, timestamps.
 
 ## 4. MASTER PROMPT FOR BACKEND GENERATION
 > "Build a production-ready Laravel 11 API backend for an eCommerce site called HERD SHOP. The frontend is built with React 19 and Redux Toolkit.
@@ -31,7 +32,8 @@ HERD SHOP is a premium eCommerce platform built with React 19, Vite, and Tailwin
 > 2. **Product API**: CRUD for products, categories, and inventory. Implement SKU management and dynamic product variations. **Crucial**: Support dependent variations using a mapping system (e.g., specific colors only available for specific sizes) as implemented in the frontend. Implement advanced filtering (category, price range) and search.
 > 3. **Order System**: Checkout logic, support for 'Buy Now' (direct checkout), automated order number generation, user order history, and an Admin order management dashboard API.
 > 4. **Blog/CMS API**: CRUD for blog posts, categories, and a comment system with approval logic.
-> 5. **Admin Authorization**: Use Spatie MediaLibrary for images and Spatie Permissions or simple 'role' check for protecting Admin routes.
+> 5. **Notification API**: Endpoint to fetch user-specific notifications, mark as read, and mark all as read. Trigger notifications automatically on order status changes.
+> 6. **Admin Authorization**: Use Spatie MediaLibrary for images and Spatie Permissions or simple 'role' check for protecting Admin routes.
 > 6. **API Structure**: Use API Resources for consistent JSON responses and Form Requests for validation.
 > 7. **Best Practices**: Implement Service Classes for business logic, Repositories (optional), and clear separation of concerns.
 > 8. **Middleware**: Ensure CORS is configured and use standard Auth/Guest middlewares.

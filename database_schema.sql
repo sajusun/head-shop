@@ -223,7 +223,23 @@ CREATE TABLE IF NOT EXISTS `newsletter_subscriptions` (
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 17. Notifications Table
+CREATE TABLE IF NOT EXISTS `notifications` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `type` ENUM('order', 'promo', 'info', 'alert') NOT NULL DEFAULT 'info',
+    `title` VARCHAR(255) NOT NULL,
+    `message` TEXT NOT NULL,
+    `link` VARCHAR(255) NULL,
+    `is_read` BOOLEAN DEFAULT FALSE,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Indexes for Performance
+CREATE INDEX `idx_notifications_user` ON `notifications`(`user_id`);
+CREATE INDEX `idx_notifications_is_read` ON `notifications`(`is_read`);
 CREATE INDEX `idx_products_category` ON `products`(`category_id`);
 CREATE INDEX `idx_products_status` ON `products`(`status`);
 CREATE INDEX `idx_products_slug` ON `products`(`slug`);
