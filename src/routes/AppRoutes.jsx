@@ -18,6 +18,11 @@ const GalleryPage = lazy(() => import('../pages/GalleryPage'));
 const OrdersPage = lazy(() => import('../pages/OrdersPage'));
 const SettingsPage = lazy(() => import('../pages/SettingsPage'));
 
+// Admin Pages
+const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
+const AdminProducts = lazy(() => import('../pages/admin/AdminProducts'));
+const AdminLayout = lazy(() => import('../components/admin/AdminLayout'));
+
 // add public pages for footer
 const AccessibilityPage = lazy(() => import('../pages/AccessibilityPage'));
 const CookieSettingsPage = lazy(() => import('../pages/CookieSettingsPage'));
@@ -32,6 +37,20 @@ const BlogDetailsPage = lazy(() => import('../pages/BlogDetailsPage'));
 const PrivateRoute = ({ children }) => {
   const { user } = useSelector(state => state.auth);
   return user ? children : <Navigate to="/login" />;
+};
+
+const AdminRoute = ({ children }) => {
+  const { user, token } = useSelector(state => state.auth);
+  
+  // Robust check: use Redux state or fallback to localStorage
+  const currentUser = user || JSON.parse(localStorage.getItem('user'));
+  const currentToken = token || localStorage.getItem('token');
+
+  if (!currentUser || !currentToken || currentUser.role !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
 };
 
 const AppRoutes = () => {
@@ -90,6 +109,20 @@ const AppRoutes = () => {
               </PrivateRoute>
             } 
           />
+        </Route>
+
+        {/* Admin Routes */}
+        <Route 
+          path="/admin" 
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          {/* Add other admin sub-routes here */}
         </Route>
       </Routes>
     </Suspense>

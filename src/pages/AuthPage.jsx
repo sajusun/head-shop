@@ -19,7 +19,12 @@ const AuthPage = () => {
     const action = isLogin ? login : register;
     const resultAction = await dispatch(action(formData));
     if (action.fulfilled.match(resultAction)) {
-      navigate('/profile');
+      const user = resultAction.payload.user;
+      if (user && user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/profile');
+      }
     }
   };
 
