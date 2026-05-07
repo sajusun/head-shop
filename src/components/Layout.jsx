@@ -1,24 +1,160 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Heart, User, Search, LogOut, X, Settings } from 'lucide-react';
+import { ShoppingBag, Heart, User, Search, LogOut, X, Settings, Send, CheckCircle2, Mail, Bell } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../features/auth/authSlice';
 import { fetchProducts } from '../features/products/productSlice';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationCenter from './notifications/NotificationCenter';
 import ToastContainer from './notifications/ToastContainer';
+import api from '../services/api';
+
+const NewsletterModal = ({ isOpen, onClose }) => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('idle'); // idle, loading, success, error
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setStatus('loading');
+    try {
+      await api.post('/newsletter/subscribe', { email });
+      setStatus('success');
+      setMessage('You have been added to our premium list!');
+      setTimeout(() => {
+        onClose();
+        setStatus('idle');
+        setMessage('');
+        setEmail('');
+      }, 3000);
+    } catch (error) {
+      setStatus('error');
+      setMessage(error.response?.data?.message || 'Something went wrong. Please try again.');
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="relative w-full max-w-lg bg-white rounded-[3rem] shadow-2xl overflow-hidden"
+          >
+            <button 
+              onClick={onClose}
+              className="absolute right-6 top-6 p-2 text-gray-400 hover:text-text hover:bg-gray-100 rounded-full transition-all z-10"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="relative h-48 bg-primary overflow-hidden">
+              <div className="absolute inset-0 opacity-20">
+                {[...Array(6)].map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="absolute border border-white rounded-full" 
+                    style={{ 
+                      width: `${(i+1)*100}px`, 
+                      height: `${(i+1)*100}px`, 
+                      left: '50%', 
+                      top: '50%', 
+                      transform: 'translate(-50%, -50%)' 
+                    }} 
+                  />
+                ))}
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-3xl flex items-center justify-center text-white border border-white/20 shadow-2xl">
+                  <Mail size={40} />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-10 text-center">
+              <h2 className="text-3xl font-black text-text mb-4">Join the Herd</h2>
+              <p className="text-gray-500 mb-8 leading-relaxed">
+                Subscribe to receive early access to new drops, exclusive member-only offers, and lifestyle curation.
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="relative">
+                  <input 
+                    type="email" 
+                    placeholder="your@email.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={status === 'loading' || status === 'success'}
+                    className="w-full h-16 bg-gray-50 border-none rounded-2xl px-6 focus:ring-2 focus:ring-primary/20 transition-all font-bold text-center text-lg"
+                    required
+                  />
+                </div>
+                <button 
+                  type="submit"
+                  disabled={status === 'loading' || status === 'success'}
+                  className="w-full h-16 bg-primary text-white rounded-2xl font-black text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:bg-gray-200 disabled:shadow-none"
+                >
+                  {status === 'loading' ? (
+                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : status === 'success' ? (
+                    <>
+                      <CheckCircle2 size={24} />
+                      Joined Successfully
+                    </>
+                  ) : (
+                    <>
+                      <Send size={20} />
+                      Subscribe Now
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {message && (
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className={`mt-4 text-sm font-bold ${status === 'success' ? 'text-green-500' : 'text-red-500'}`}
+                >
+                  {message}
+                </motion.p>
+              )}
+
+              <p className="mt-8 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                No spam. Only excellence. Unsubscribe anytime.
+              </p>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const Layout = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
+  
   const searchRef = useRef(null);
   const menuTimeoutRef = useRef(null);
   
   const dispatch = useDispatch();
   const cartItems = useSelector(state => state.cart.items);
   const products = useSelector(state => state.products.items);
-  const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const cartCount = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
   const { user } = useSelector(state => state.auth);
   const navigate = useNavigate();
 
@@ -33,25 +169,19 @@ const Layout = () => {
     }, 300);
   };
 
-  // Load products globally if not already loaded
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  // Suggestions logic
   const suggestions = useMemo(() => {
     if (!searchQuery.trim()) return [];
     const query = searchQuery.toLowerCase();
-
     return products.filter(p => {
       const categoryName = p.category?.name || p.category || '';
-
-      return p.name.toLowerCase().includes(query) ||
-        categoryName.toLowerCase().includes(query);
+      return p.name.toLowerCase().includes(query) || categoryName.toLowerCase().includes(query);
     }).slice(0, 5);
   }, [searchQuery, products]);
 
-  // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
@@ -82,6 +212,8 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
+      <NewsletterModal isOpen={isNewsletterOpen} onClose={() => setIsNewsletterOpen(false)} />
+      
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,15 +247,11 @@ const Layout = () => {
                 />
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                 {searchQuery && (
-                  <button 
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-text"
-                  >
+                  <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-text">
                     <X size={14} />
                   </button>
                 )}
 
-                {/* Suggestions Dropdown */}
                 <AnimatePresence>
                   {showSuggestions && suggestions.length > 0 && (
                     <motion.div
@@ -247,73 +375,20 @@ const Layout = () => {
               <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
                 Premium lifestyle goods curated for the modern individual. Quality, aesthetic, and purpose in every piece.
               </p>
-              <div className="flex gap-3 pt-2">
-                {/* Instagram */}
-                <a
-                  href="https://www.instagram.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Instagram"
-                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 12, background: 'linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(220,39,67,0.2)' }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(220,39,67,0.35)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(220,39,67,0.2)'; }}
+              <div className="pt-2">
+                <button 
+                  onClick={() => setIsNewsletterOpen(true)}
+                  className="flex items-center gap-3 bg-gray-50 px-5 py-3 rounded-2xl border border-gray-100 hover:bg-gray-100 transition-all group"
                 >
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
-                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="white" strokeWidth="2"/>
-                    <circle cx="12" cy="12" r="4" fill="none" stroke="white" strokeWidth="2"/>
-                    <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
-                  </svg>
-                </a>
-
-                {/* Twitter / X */}
-                <a
-                  href="https://twitter.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Twitter / X"
-                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 12, background: '#000', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.25)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)'; }}
-                >
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="white">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </a>
-
-                {/* Facebook */}
-                <a
-                  href="https://www.facebook.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Facebook"
-                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 12, background: '#1877F2', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(24,119,242,0.25)' }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(24,119,242,0.4)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(24,119,242,0.25)'; }}
-                >
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
-                    <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
-                  </svg>
-                </a>
-
-                {/* YouTube */}
-                <a
-                  href="https://www.youtube.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="YouTube"
-                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 38, height: 38, borderRadius: 12, background: '#FF0000', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(255,0,0,0.2)' }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(255,0,0,0.35)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(255,0,0,0.2)'; }}
-                >
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
-                    <path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/>
-                    <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="black"/>
-                  </svg>
-                </a>
+                  <div className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                    <Bell size={16} />
+                  </div>
+                  <span className="text-xs font-black text-text uppercase tracking-widest">Join the Newsletter</span>
+                </button>
               </div>
             </div>
 
-            {/* Column 2: Quick Links */}
+            {/* Column 2: Company */}
             <div>
               <h4 className="text-sm font-black text-text uppercase tracking-widest mb-8">Company</h4>
               <ul className="space-y-4">
@@ -324,7 +399,7 @@ const Layout = () => {
               </ul>
             </div>
 
-            {/* Column 3: Customer Care */}
+            {/* Column 3: Support */}
             <div>
               <h4 className="text-sm font-black text-text uppercase tracking-widest mb-8">Support</h4>
               <ul className="space-y-4">
@@ -348,11 +423,11 @@ const Layout = () => {
           </div>
 
           <div className="pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest italic">© 2024 Herd Shop. Designed for Excellence.</p>
-            <div className="flex items-center gap-8">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-6 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/Visa_Inc._logo_%282005%E2%80%932014%29.svg" alt="Visa" className="h-5 object-contain" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MasterCard" className="h-8 object-contain" />
+            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest italic">© 2026 Herd Shop. Designed for Excellence.</p>
+            <div className="flex items-center gap-8 opacity-40 grayscale">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MasterCard" className="h-6" />
             </div>
           </div>
         </div>
