@@ -1,36 +1,69 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { fetchProducts, setSearchQuery, setCategoryFilter } from '../features/products/productSlice';
 import ProductCard from '../components/ProductCard';
-import { Search, Filter, SlidersHorizontal, LayoutGrid, ChevronDown, X, ArrowUpDown } from 'lucide-react';
+import { Search, LayoutGrid, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ProductListingPage = () => {
   const dispatch = useDispatch();
-  const { items: products, loading, searchQuery, categoryFilter } = useSelector(state => state.products);
+  const { items: products, loading, searchQuery, categoryFilter, pagination } = useSelector(state => state.products);
   const [showCategoryPanel, setShowCategoryPanel] = useState(false);
   const [sortBy, setSortBy] = useState('Newest');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(() => Math.max(Number(searchParams.get('page')) || 1, 1));
   const itemsPerPage = 24;
   const panelRef = useRef(null);
 
+  const sortMap = {
+    'Newest': 'latest',
+    'Price: Low to High': 'price_low',
+    'Price: High to Low': 'price_high',
+  };
+
+  const toSlug = (value) => value.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+
+  const updateSearchParams = useCallback((updates) => {
+    setSearchParams((currentParams) => {
+      const nextParams = new URLSearchParams(currentParams);
+
+      Object.entries(updates).forEach(([key, value]) => {
+        if (!value || value === '1') {
+          nextParams.delete(key);
+        } else {
+          nextParams.set(key, value);
+        }
+      });
+
+      return nextParams;
+    });
+  }, [setSearchParams]);
+
   useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+    dispatch(fetchProducts({
+      page: currentPage,
+      per_page: itemsPerPage,
+      search: searchQuery,
+      category: categoryFilter === 'All' ? '' : toSlug(categoryFilter),
+      sort: sortMap[sortBy],
+    }));
+  }, [dispatch, currentPage, searchQuery, categoryFilter, sortBy]);
 
   useEffect(() => {
     const query = searchParams.get('q');
     if (query !== null) {
       dispatch(setSearchQuery(query));
     }
+
+    setCurrentPage(Math.max(Number(searchParams.get('page')) || 1, 1));
   }, [dispatch, searchParams]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, categoryFilter]);
+    updateSearchParams({ page: '1' });
+  }, [searchQuery, categoryFilter, sortBy, updateSearchParams]);
 
   // Close panel when clicking outside
   useEffect(() => {
@@ -46,34 +79,31 @@ const ProductListingPage = () => {
   const getCategoryName = (product) => product.category?.name || product.category || 'Uncategorized';
   const categories = ['All', ...new Set(products.map(getCategoryName))];
 
-  const filteredProducts = useMemo(() => {
-    let result = products.filter(product => {
-      const categoryName = getCategoryName(product);
-      const query = searchQuery.trim().toLowerCase();
-      const matchesSearch = !query ||
-        product.name.toLowerCase().includes(query) ||
-        product.description?.toLowerCase().includes(query) ||
-        categoryName.toLowerCase().includes(query);
-      const matchesCategory = categoryFilter === 'All' || categoryName === categoryFilter;
-      return matchesSearch && matchesCategory;
-    });
+  const totalPages = pagination?.last_page || 1;
+  const totalProducts = pagination?.total ?? products.length;
+  const pageStart = pagination?.from ?? (products.length ? 1 : 0);
+  const pageEnd = pagination?.to ?? products.length;
 
-    // Simple sorting logic
-    if (sortBy === 'Price: Low to High') result.sort((a, b) => a.price - b.price);
-    if (sortBy === 'Price: High to Low') result.sort((a, b) => b.price - a.price);
+  const visiblePages = useMemo(() => {
+    const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
 
-    return result;
-  }, [products, searchQuery, categoryFilter, sortBy]);
+    return [...pages]
+      .filter((page) => page >= 1 && page <= totalPages)
+      .sort((a, b) => a - b)
+      .reduce((result, page, index, source) => {
+        if (index > 0 && page - source[index - 1] > 1) {
+          result.push('ellipsis');
+        }
 
-  // Pagination Logic
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const paginatedProducts = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredProducts, currentPage, itemsPerPage]);
+        result.push(page);
+        return result;
+      }, []);
+  }, [currentPage, totalPages]);
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    const nextPage = Math.min(Math.max(page, 1), totalPages);
+    setCurrentPage(nextPage);
+    updateSearchParams({ page: String(nextPage) });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -88,13 +118,19 @@ const ProductListingPage = () => {
               type="text"
               placeholder="Search products by name or category..."
               value={searchQuery}
-              onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+              onChange={(e) => {
+                dispatch(setSearchQuery(e.target.value));
+                updateSearchParams({ q: e.target.value, page: '1' });
+              }}
               className="w-full pl-12 pr-14 py-4 bg-white border border-gray-100 rounded-3xl text-base font-medium shadow-xl shadow-primary/5 focus:ring-4 focus:ring-primary/5 focus:border-primary/30 transition-all outline-none"
             />
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary" size={20} />
             {searchQuery && (
               <button
-                onClick={() => dispatch(setSearchQuery(''))}
+                onClick={() => {
+                  dispatch(setSearchQuery(''));
+                  updateSearchParams({ q: '', page: '1' });
+                }}
                 className="absolute right-5 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X size={18} className="text-gray-400" />
@@ -178,7 +214,7 @@ const ProductListingPage = () => {
 
         <div className="text-center">
           <p className="text-sm font-medium text-gray-400">
-            Showing <span className="text-text font-black">{paginatedProducts.length}</span> of <span className="text-text font-black">{filteredProducts.length}</span> treasures
+            Showing <span className="text-text font-black">{pageStart}-{pageEnd}</span> of <span className="text-text font-black">{totalProducts}</span> treasures
           </p>
         </div>
       </div>
@@ -190,10 +226,10 @@ const ProductListingPage = () => {
             <div key={i} className="aspect-[4/5] bg-gray-100 animate-pulse rounded-[32px]"></div>
           ))}
         </div>
-      ) : paginatedProducts.length > 0 ? (
+      ) : products.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            {paginatedProducts.map(product => (
+            {products.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -210,8 +246,15 @@ const ProductListingPage = () => {
               </button>
 
               <div className="flex items-center gap-1.5">
-                {[...Array(totalPages)].map((_, i) => {
-                  const pageNumber = i + 1;
+                {visiblePages.map((pageNumber, index) => {
+                  if (pageNumber === 'ellipsis') {
+                    return (
+                      <span key={`ellipsis-${index}`} className="px-2 text-xs font-bold text-gray-300">
+                        ...
+                      </span>
+                    );
+                  }
+
                   return (
                     <button
                       key={pageNumber}
@@ -250,6 +293,7 @@ const ProductListingPage = () => {
             onClick={() => {
               dispatch(setSearchQuery(''));
               dispatch(setCategoryFilter('All'));
+              updateSearchParams({ q: '', page: '1' });
             }}
             className="mt-8 px-8 py-4 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all"
           >

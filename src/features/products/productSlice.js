@@ -3,10 +3,14 @@ import productService from '../../services/productService';
 
 export const fetchProducts = createAsyncThunk(
   'products/fetchAll',
-  async (_, { rejectWithValue }) => {
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await productService.getAll();
-      return response.data?.data ?? response.data;
+      const response = await productService.getAll(params);
+
+      return {
+        items: response.data?.data ?? response.data,
+        pagination: response.data?.pagination ?? null,
+      };
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -34,6 +38,14 @@ const productSlice = createSlice({
     error: null,
     searchQuery: '',
     categoryFilter: 'All',
+    pagination: {
+      current_page: 1,
+      last_page: 1,
+      per_page: 24,
+      total: 0,
+      from: null,
+      to: null,
+    },
   },
   reducers: {
     setSearchQuery: (state, action) => {
@@ -54,7 +66,19 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = action.payload.items;
+        if (action.payload.pagination) {
+          state.pagination = action.payload.pagination;
+        } else {
+          state.pagination = {
+            current_page: 1,
+            last_page: 1,
+            per_page: action.payload.items.length,
+            total: action.payload.items.length,
+            from: action.payload.items.length ? 1 : null,
+            to: action.payload.items.length || null,
+          };
+        }
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
