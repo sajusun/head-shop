@@ -2,13 +2,24 @@ import api from './api';
 import API_CONFIG from '../config/api';
 import { mockUser } from '../mock/users';
 
+const mockAdmin = {
+  ...mockUser,
+  id: '1',
+  name: 'Admin User',
+  email: 'admin@herdshop.com',
+  role: 'admin',
+  token: 'mock-admin-token',
+};
+
 const authService = {
   login: async (credentials) => {
     if (!API_CONFIG.USE_API) {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           if (credentials.email === 'john@example.com' && credentials.password === 'password') {
-            resolve({ data: mockUser });
+            resolve({ data: { ...mockUser, role: 'user' } });
+          } else if (credentials.email === 'admin@herdshop.com' && credentials.password === 'admin123') {
+            resolve({ data: mockAdmin });
           } else {
             reject({ response: { data: { message: 'Invalid credentials' } } });
           }
@@ -21,7 +32,7 @@ const authService = {
   register: async (userData) => {
     if (!API_CONFIG.USE_API) {
       return new Promise((resolve) => {
-        setTimeout(() => resolve({ data: { ...mockUser, ...userData } }), 1000);
+        setTimeout(() => resolve({ data: { ...mockUser, ...userData, role: 'user' } }), 1000);
       });
     }
     return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/register`, userData);
@@ -33,7 +44,7 @@ const authService = {
         setTimeout(() => resolve({ data: mockUser }), 500);
       });
     }
-    return api.get(`${API_CONFIG.ENDPOINTS.AUTH}/profile`);
+    return api.get(`${API_CONFIG.ENDPOINTS.AUTH}/user-profile`);
   }
 };
 

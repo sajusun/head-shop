@@ -6,11 +6,19 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await authService.login(credentials);
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      return response.data;
+      const payload = response.data?.data ?? response.data;
+      const token = payload.access_token ?? payload.token;
+      const user = payload.user ?? payload;
+
+      if (!token || !user) {
+        return rejectWithValue('Invalid login response');
+      }
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return { ...payload, access_token: token, user };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Login failed');
+      return rejectWithValue(error.response?.data?.message || error.response?.data?.error || 'Login failed');
     }
   }
 );
@@ -20,9 +28,17 @@ export const register = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await authService.register(userData);
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      return response.data;
+      const payload = response.data?.data ?? response.data;
+      const token = payload.access_token ?? payload.token;
+      const user = payload.user ?? payload;
+
+      if (!token || !user) {
+        return rejectWithValue('Registration completed. Please login with your new account.');
+      }
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return { ...payload, access_token: token, user };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Registration failed');
     }

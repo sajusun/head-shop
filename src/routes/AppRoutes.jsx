@@ -10,7 +10,7 @@ const ProductListingPage = lazy(() => import('../pages/ProductListingPage'));
 const ProductDetailsPage = lazy(() => import('../pages/ProductDetailsPage'));
 const CartPage = lazy(() => import('../pages/CartPage'));
 const CheckoutPage = lazy(() => import('../pages/CheckoutPage'));
-const AuthPage = lazy(() => import('../pages/AuthPage'));
+const UserLoginPage = lazy(() => import('../pages/UserLoginPage'));
 const ProfilePage = lazy(() => import('../pages/ProfilePage'));
 const AboutPage = lazy(() => import('../pages/AboutPage'));
 const FavoritesPage = lazy(() => import('../pages/FavoritesPage'));
@@ -26,6 +26,7 @@ const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
 const AdminBlogs = lazy(() => import('../pages/admin/AdminBlogs'));
 const AdminNewsletter = lazy(() => import('../pages/admin/AdminNewsletter'));
 const AdminLayout = lazy(() => import('../components/admin/AdminLayout'));
+const AdminLoginPage = lazy(() => import('../pages/admin/AdminLoginPage'));
 
 // add public pages for footer
 const AccessibilityPage = lazy(() => import('../pages/AccessibilityPage'));
@@ -51,7 +52,7 @@ const AdminRoute = ({ children }) => {
   const currentToken = token || localStorage.getItem('token');
 
   if (!currentUser || !currentToken || currentUser.role !== 'admin') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   return children;
@@ -76,7 +77,7 @@ const AppRoutes = () => {
           <Route path="gallery" element={<GalleryPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
-          <Route path="login" element={<AuthPage />} />
+          <Route path="login" element={<UserLoginPage />} />
 
   {/* Public Legal & Settings Pages */}
           <Route path="accessibility" element={<AccessibilityPage />} />
@@ -114,6 +115,8 @@ const AppRoutes = () => {
             } 
           />
         </Route>
+
+        <Route path="/admin/login" element={<AdminLoginPage />} />
 
         {/* Admin Routes */}
         <Route 

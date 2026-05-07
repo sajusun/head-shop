@@ -25,7 +25,11 @@ const reviewService = {
         setTimeout(() => resolve({ data: newReview }), 500);
       });
     }
-    return api.post(API_CONFIG.ENDPOINTS.REVIEWS, reviewData);
+    return api.post(API_CONFIG.ENDPOINTS.REVIEWS, {
+      product_id: reviewData.productId,
+      rating: reviewData.rating,
+      comment: reviewData.comment,
+    });
   },
 
   deleteReview: async (id) => {
@@ -48,7 +52,9 @@ const reviewService = {
         setTimeout(() => resolve({ data: newReply }), 500);
       });
     }
-    return api.post(`${API_CONFIG.ENDPOINTS.REVIEWS}/${reviewId}/replies`, replyData);
+    return api.post(`${API_CONFIG.ENDPOINTS.REVIEWS}/${reviewId}/replies`, {
+      comment: replyData.comment,
+    });
   }
 };
 

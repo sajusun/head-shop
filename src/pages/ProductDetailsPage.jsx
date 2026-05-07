@@ -65,9 +65,14 @@ const ProductDetailsPage = () => {
   const regularPrice = selectedVariant?.price ?? product?.price ?? displayPrice;
   const offerPrice = selectedVariant?.offer_price ?? product?.offer_price ?? product?.offerPrice ?? null;
   const stock = selectedVariant?.stock ?? variants.reduce((total, variant) => total + (variant.stock || 0), 0) ?? product?.stock ?? 0;
-  const ratingAverage = product?.rating?.average ?? product?.rating ?? 0;
-  const displayedReviews = Array.isArray(product?.reviews) && product.reviews.length ? product.reviews : reviews;
-  const ratingCount = product?.rating?.count ?? displayedReviews.length;
+  const reviewItems = Array.isArray(reviews) ? reviews : [];
+  const productReviews = Array.isArray(product?.reviews) ? product.reviews : [];
+  const backendRatingAverage = Number(product?.rating?.average ?? product?.rating ?? 0) || 0;
+  const displayedReviews = reviewItems.length ? reviewItems : productReviews;
+  const ratingAverage = displayedReviews.length
+    ? displayedReviews.reduce((total, review) => total + Number(review.rating || 0), 0) / displayedReviews.length
+    : backendRatingAverage;
+  const ratingCount = Math.max(product?.rating?.count ?? 0, displayedReviews.length);
 
   const relatedProducts = useMemo(() => {
     if (!product || !allProducts.length) return [];
@@ -117,9 +122,7 @@ const ProductDetailsPage = () => {
 
   useEffect(() => {
     if (product) {
-      if (!Array.isArray(product.reviews)) {
-        dispatch(fetchReviews(product.id));
-      }
+      dispatch(fetchReviews(product.id));
       const firstVariant = Array.isArray(product.variants) ? product.variants[0] : null;
       setSelectedSize(firstVariant?.size?.id || null);
       setSelectedColor(firstVariant?.color?.id || null);

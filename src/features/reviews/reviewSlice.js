@@ -6,9 +6,10 @@ export const fetchReviews = createAsyncThunk(
   async (productId, { rejectWithValue }) => {
     try {
       const response = await reviewService.getByProductId(productId);
-      return response.data;
+      const reviews = response.data?.data ?? response.data;
+      return Array.isArray(reviews) ? reviews : [];
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -18,9 +19,10 @@ export const addReview = createAsyncThunk(
   async (reviewData, { rejectWithValue }) => {
     try {
       const response = await reviewService.addReview(reviewData);
-      return response.data;
+      const review = response.data?.data ?? response.data;
+      return review && typeof review === 'object' ? review : null;
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -30,9 +32,10 @@ export const addReply = createAsyncThunk(
   async ({ reviewId, replyData }, { rejectWithValue }) => {
     try {
       const response = await reviewService.addReply(reviewId, replyData);
-      return { reviewId, reply: response.data };
+      const reply = response.data?.data ?? response.data;
+      return { reviewId, reply: reply && typeof reply === 'object' ? reply : null };
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -53,21 +56,43 @@ const reviewSlice = createSlice({
       })
       .addCase(fetchReviews.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchReviews.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       .addCase(addReview.fulfilled, (state, action) => {
-        state.items.unshift(action.payload);
+        state.loading = false;
+        if (action.payload) {
+          state.items.unshift(action.payload);
+        }
+      })
+      .addCase(addReview.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addReview.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       .addCase(addReply.fulfilled, (state, action) => {
+        state.loading = false;
+        if (!action.payload.reply) return;
+
         const review = state.items.find(r => r.id === action.payload.reviewId);
         if (review) {
           if (!review.replies) review.replies = [];
           review.replies.push(action.payload.reply);
         }
+      })
+      .addCase(addReply.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addReply.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

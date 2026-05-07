@@ -9,21 +9,22 @@ const ReviewForm = ({ productId }) => {
   const [comment, setComment] = useState('');
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
+  const { loading, error } = useSelector(state => state.reviews || {});
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!comment.trim()) return;
 
-    dispatch(addReview({
+    const result = await dispatch(addReview({
       productId,
-      userId: user.id,
-      userName: user.name,
       rating,
       comment,
     }));
 
-    setComment('');
-    setRating(5);
+    if (addReview.fulfilled.match(result)) {
+      setComment('');
+      setRating(5);
+    }
   };
 
   if (!user) {
@@ -56,7 +57,13 @@ const ReviewForm = ({ productId }) => {
         />
       </div>
 
-      <Button type="submit" className="w-full">Submit Review</Button>
+      {error && (
+        <p className="text-sm text-red-500 mb-4">{error}</p>
+      )}
+
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? 'Submitting...' : 'Submit Review'}
+      </Button>
     </form>
   );
 };
