@@ -11,7 +11,8 @@ import {
   FiX, 
   FiBell,
   FiFileText,
-  FiMail
+  FiMail,
+  FiMessageSquare
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../features/auth/authSlice';
@@ -30,6 +31,7 @@ const AdminLayout = () => {
     { label: 'Users', icon: FiUsers, path: '/admin/users' },
     { label: 'Journal', icon: FiFileText, path: '/admin/journal' },
     { label: 'Newsletter', icon: FiMail, path: '/admin/newsletter' },
+    { label: 'Contact', icon: FiMessageSquare, path: '/admin/contact' },
   ];
 
   const handleLogout = () => {

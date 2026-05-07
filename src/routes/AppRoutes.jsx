@@ -27,6 +27,7 @@ const AdminOrders = lazy(() => import('../pages/admin/AdminOrders'));
 const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
 const AdminBlogs = lazy(() => import('../pages/admin/AdminBlogs'));
 const AdminNewsletter = lazy(() => import('../pages/admin/AdminNewsletter'));
+const AdminContact = lazy(() => import('../pages/admin/AdminContact'));
 const AdminLayout = lazy(() => import('../components/admin/AdminLayout'));
 const AdminLoginPage = lazy(() => import('../pages/admin/AdminLoginPage'));
 
@@ -137,6 +138,7 @@ const AppRoutes = () => {
           <Route path="users" element={<AdminUsers />} />
           <Route path="journal" element={<AdminBlogs />} />
           <Route path="newsletter" element={<AdminNewsletter />} />
+          <Route path="contact" element={<AdminContact />} />
           {/* Add other admin sub-routes here */}
         </Route>
       </Routes>

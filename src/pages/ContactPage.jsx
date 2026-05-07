@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MessageSquare, Phone, MapPin, Send, CheckCircle } from 'lucide-react';
+import { Mail, MessageSquare, Phone, MapPin, Send, CheckCircle, Loader2 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import api from '../services/api';
 
 const ContactPage = () => {
   const location = useLocation();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,25 +29,32 @@ const ContactPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (error) setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    // Simulate API call
-    setTimeout(() => {
-      setSubmitted(false);
+    setLoading(true);
+    setError('');
+
+    try {
+      await api.post('/contact', formData);
+      setSubmitted(true);
       setFormData({
         name: '',
         email: '',
         subject: 'General Inquiry',
         message: ''
       });
-    }, 5000);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-32">
+    <div className="min-h-screen pt-20 pb-32 bg-gray-50/30">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid lg:grid-cols-2 gap-20 items-start">
           
@@ -61,8 +71,8 @@ const ContactPage = () => {
             </p>
 
             <div className="space-y-10">
-              <div className="flex gap-6 items-start">
-                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shrink-0">
+              <div className="flex gap-6 items-start group">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-primary shrink-0 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
                   <Mail size={24} />
                 </div>
                 <div>
@@ -72,8 +82,8 @@ const ContactPage = () => {
                 </div>
               </div>
 
-              <div className="flex gap-6 items-start">
-                <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-text shrink-0">
+              <div className="flex gap-6 items-start group">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-text shrink-0 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
                   <MessageSquare size={24} />
                 </div>
                 <div>
@@ -83,8 +93,8 @@ const ContactPage = () => {
                 </div>
               </div>
 
-              <div className="flex gap-6 items-start">
-                <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-text shrink-0">
+              <div className="flex gap-6 items-start group">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-text shrink-0 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
                   <MapPin size={24} />
                 </div>
                 <div>
@@ -172,12 +182,21 @@ const ContactPage = () => {
                   ></textarea>
                 </div>
 
+                {error && (
+                  <p className="text-sm font-bold text-red-500 bg-red-50 p-4 rounded-xl">{error}</p>
+                )}
+
                 <button 
                   type="submit"
-                  className="w-full py-5 bg-primary text-white font-black rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-100 transition-all shadow-xl shadow-primary/20"
+                  disabled={loading}
+                  className="w-full py-5 bg-primary text-white font-black rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-100 transition-all shadow-xl shadow-primary/20 disabled:bg-gray-300 disabled:shadow-none disabled:hover:scale-100"
                 >
-                  <Send size={20} />
-                  Send Message
+                  {loading ? (
+                    <Loader2 className="animate-spin" size={20} />
+                  ) : (
+                    <Send size={20} />
+                  )}
+                  {loading ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}
@@ -190,4 +209,3 @@ const ContactPage = () => {
 };
 
 export default ContactPage;
-
