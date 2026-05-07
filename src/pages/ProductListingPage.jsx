@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'react-router-dom';
 import { fetchProducts, setSearchQuery, setCategoryFilter } from '../features/products/productSlice';
 import ProductCard from '../components/ProductCard';
 import { Search, Filter, SlidersHorizontal, LayoutGrid, ChevronDown, X, ArrowUpDown } from 'lucide-react';
@@ -11,12 +12,20 @@ const ProductListingPage = () => {
   const [showCategoryPanel, setShowCategoryPanel] = useState(false);
   const [sortBy, setSortBy] = useState('Newest');
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams] = useSearchParams();
   const itemsPerPage = 24;
   const panelRef = useRef(null);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+
+  useEffect(() => {
+    const query = searchParams.get('q');
+    if (query !== null) {
+      dispatch(setSearchQuery(query));
+    }
+  }, [dispatch, searchParams]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -34,12 +43,18 @@ const ProductListingPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const categories = ['All', ...new Set(products.map(p => p.category))];
+  const getCategoryName = (product) => product.category?.name || product.category || 'Uncategorized';
+  const categories = ['All', ...new Set(products.map(getCategoryName))];
 
   const filteredProducts = useMemo(() => {
     let result = products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = categoryFilter === 'All' || product.category === categoryFilter;
+      const categoryName = getCategoryName(product);
+      const query = searchQuery.trim().toLowerCase();
+      const matchesSearch = !query ||
+        product.name.toLowerCase().includes(query) ||
+        product.description?.toLowerCase().includes(query) ||
+        categoryName.toLowerCase().includes(query);
+      const matchesCategory = categoryFilter === 'All' || categoryName === categoryFilter;
       return matchesSearch && matchesCategory;
     });
 

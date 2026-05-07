@@ -41,10 +41,14 @@ const Layout = () => {
   // Suggestions logic
   const suggestions = useMemo(() => {
     if (!searchQuery.trim()) return [];
-    return products.filter(p => 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchQuery.toLowerCase())
-    ).slice(0, 5);
+    const query = searchQuery.toLowerCase();
+
+    return products.filter(p => {
+      const categoryName = p.category?.name || p.category || '';
+
+      return p.name.toLowerCase().includes(query) ||
+        categoryName.toLowerCase().includes(query);
+    }).slice(0, 5);
   }, [searchQuery, products]);
 
   // Close suggestions when clicking outside
@@ -136,11 +140,11 @@ const Layout = () => {
                             className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-xl transition-colors text-left"
                           >
                             <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden shrink-0">
-                              <img src={product.image} alt="" className="w-full h-full object-cover" />
+                              <img src={product.thumbnail || product.image} alt="" className="w-full h-full object-cover" />
                             </div>
                             <div className="min-w-0">
                               <p className="text-sm font-bold text-text truncate">{product.name}</p>
-                              <p className="text-xs text-gray-500 capitalize">{product.category}</p>
+                              <p className="text-xs text-gray-500 capitalize">{product.category?.name || product.category}</p>
                             </div>
                           </button>
                         ))}

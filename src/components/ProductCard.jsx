@@ -12,6 +12,11 @@ const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const favorites = useSelector(state => state.favorites.items);
   const isFavorite = favorites.some(item => item.id === product.id);
+  const image = product.thumbnail || product.image;
+  const category = product.category?.name || product.category;
+  const rating = product.rating?.average ?? product.rating ?? 0;
+  const offerPrice = product.offer_price ?? product.offerPrice;
+  const price = product.price;
 
   const handleShare = async (e) => {
     e.preventDefault();
@@ -43,15 +48,15 @@ const ProductCard = ({ product }) => {
       <Link to={`/product/${product.slug}`} className="block">
         <div className="aspect-square overflow-hidden bg-gray-100 relative">
           <img 
-            src={product.image} 
+            src={image} 
             alt={product.name} 
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
           
           {/* Sale Badge */}
-          {product.offerPrice && (
+          {offerPrice && (
             <div className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg z-10 animate-pulse">
-              {Math.round(((product.price - product.offerPrice) / product.price) * 100)}% OFF
+              {Math.round(((price - offerPrice) / price) * 100)}% OFF
             </div>
           )}
 
@@ -78,8 +83,8 @@ const ProductCard = ({ product }) => {
 
         <div className="p-5">
           <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-primary uppercase tracking-wider">{product.category}</span>
-            <RatingStars rating={product.rating} size={14} />
+            <span className="text-xs font-semibold text-primary uppercase tracking-wider">{category}</span>
+            <RatingStars rating={rating} size={14} />
           </div>
           <h3 className="font-bold text-text mb-1 truncate group-hover:text-primary transition-colors">
             {product.name}
@@ -89,13 +94,13 @@ const ProductCard = ({ product }) => {
           </p>
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
-              {product.offerPrice ? (
+              {offerPrice ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-black text-primary">${product.offerPrice}</span>
-                  <span className="text-sm text-gray-400 line-through decoration-red-400/50">${product.price}</span>
+                  <span className="text-xl font-black text-primary">${offerPrice}</span>
+                  <span className="text-sm text-gray-400 line-through decoration-red-400/50">${price}</span>
                 </div>
               ) : (
-                <span className="text-xl font-black text-text">${product.price}</span>
+                <span className="text-xl font-black text-text">${price}</span>
               )}
             </div>
             <Button

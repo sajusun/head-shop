@@ -9,7 +9,11 @@ const productService = {
         setTimeout(() => resolve({ data: mockProducts }), 500);
       });
     }
-    return api.get(API_CONFIG.ENDPOINTS.PRODUCTS);
+    return api.get(API_CONFIG.ENDPOINTS.PRODUCTS, {
+      params: {
+        per_page: 100,
+      },
+    });
   },
 
   getById: async (id) => {
@@ -35,7 +39,7 @@ const productService = {
         }, 500);
       });
     }
-    return api.get(`${API_CONFIG.ENDPOINTS.PRODUCTS}/slug/${slug}`);
+    return api.get(`${API_CONFIG.ENDPOINTS.PRODUCTS}/${slug}`);
   }
 };
 

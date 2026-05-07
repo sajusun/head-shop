@@ -6,7 +6,7 @@ export const fetchProducts = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await productService.getAll();
-      return response.data;
+      return response.data?.data ?? response.data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -18,7 +18,7 @@ export const fetchProductBySlug = createAsyncThunk(
   async (slug, { rejectWithValue }) => {
     try {
       const response = await productService.getBySlug(slug);
-      return response.data;
+      return response.data?.data ?? response.data;
     } catch (error) {
       return rejectWithValue(error.message);
     }

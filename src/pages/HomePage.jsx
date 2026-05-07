@@ -44,8 +44,8 @@ const HomePage = () => {
 
   const featuredProducts = products.slice(0, 8);
   const topRatedProducts = products
-    .filter(p => p.rating >= 4)
-    .sort((a, b) => b.rating - a.rating)
+    .filter(p => (p.rating?.average ?? p.rating ?? 0) >= 4)
+    .sort((a, b) => (b.rating?.average ?? b.rating ?? 0) - (a.rating?.average ?? a.rating ?? 0))
     .slice(0, 20);
 
   const scroll = (ref, direction) => {
@@ -181,7 +181,7 @@ const HomePage = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {products
-              .filter(p => p.offerPrice !== null)
+              .filter(p => (p.offer_price ?? p.offerPrice) !== null)
               .slice(0, 4)
               .map((product, i) => (
                 <motion.div

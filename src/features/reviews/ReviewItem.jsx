@@ -10,6 +10,8 @@ const ReviewItem = ({ review }) => {
   const [replyText, setReplyText] = useState('');
   const dispatch = useDispatch();
   const { user } = useSelector(state => state.auth);
+  const reviewerName = review.userName || review.user?.name || 'Customer';
+  const reviewDate = review.date || (review.created_at ? new Date(review.created_at).toLocaleDateString() : '');
 
   const handleReply = (e) => {
     e.preventDefault();
@@ -31,8 +33,8 @@ const ReviewItem = ({ review }) => {
             <User size={20} />
           </div>
           <div>
-            <h4 className="font-bold text-text">{review.userName}</h4>
-            <span className="text-xs text-gray-400">{review.date}</span>
+            <h4 className="font-bold text-text">{reviewerName}</h4>
+            <span className="text-xs text-gray-400">{reviewDate}</span>
           </div>
         </div>
         <RatingStars rating={review.rating} size={14} />
@@ -77,8 +79,8 @@ const ReviewItem = ({ review }) => {
               <CornerDownRight size={16} className="text-gray-400 shrink-0 mt-1" />
               <div className="flex-1">
                 <div className="flex justify-between items-center mb-1">
-                  <h5 className="text-sm font-bold text-text">{reply.userName}</h5>
-                  <span className="text-[10px] text-gray-400">{reply.date}</span>
+                  <h5 className="text-sm font-bold text-text">{reply.userName || reply.user?.name || 'Customer'}</h5>
+                  <span className="text-[10px] text-gray-400">{reply.date || (reply.created_at ? new Date(reply.created_at).toLocaleDateString() : '')}</span>
                 </div>
                 <p className="text-sm text-gray-600">{reply.comment}</p>
               </div>
