@@ -1,5 +1,5 @@
 import React, { lazy, Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useSelector } from 'react-redux';
 import ScrollToTop from '../components/ScrollToTop';
@@ -44,7 +44,8 @@ const BlogDetailsPage = lazy(() => import('../pages/BlogDetailsPage'));
 
 const PrivateRoute = ({ children }) => {
   const { user } = useSelector(state => state.auth);
-  return user ? children : <Navigate to="/login" />;
+  const location = useLocation();
+  return user ? children : <Navigate to="/login" state={{ from: location }} replace />;
 };
 
 const AdminRoute = ({ children }) => {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { addReview } from './reviewSlice';
 import Button from '../../components/Button';
 import RatingStars from '../../components/RatingStars';
@@ -8,6 +9,8 @@ const ReviewForm = ({ productId }) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSelector(state => state.auth);
   const { loading, error } = useSelector(state => state.reviews || {});
 
@@ -31,7 +34,13 @@ const ReviewForm = ({ productId }) => {
     return (
       <div className="bg-gray-50 border border-dashed border-gray-300 p-6 rounded-2xl text-center">
         <p className="text-gray-600 mb-2">Please login to write a review</p>
-        <Button variant="outline" size="sm">Login</Button>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => navigate('/login', { state: { from: location.pathname } })}
+        >
+          Login
+        </Button>
       </div>
     );
   }

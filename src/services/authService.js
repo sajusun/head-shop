@@ -45,6 +45,13 @@ const authService = {
       });
     }
     return api.get(`${API_CONFIG.ENDPOINTS.AUTH}/user-profile`);
+  },
+
+  logout: async () => {
+    if (!API_CONFIG.USE_API) {
+      return Promise.resolve();
+    }
+    return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/logout`);
   }
 };
 

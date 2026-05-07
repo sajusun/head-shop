@@ -3,12 +3,15 @@ import { User, CornerDownRight, Trash2 } from 'lucide-react';
 import RatingStars from '../../components/RatingStars';
 import Button from '../../components/Button';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { addReply } from './reviewSlice';
 
 const ReviewItem = ({ review }) => {
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyText, setReplyText] = useState('');
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSelector(state => state.auth);
   const reviewerName = review.userName || review.user?.name || 'Customer';
   const reviewDate = review.date || (review.created_at ? new Date(review.created_at).toLocaleDateString() : '');
@@ -47,7 +50,13 @@ const ReviewItem = ({ review }) => {
       {/* Action Buttons */}
       <div className="flex items-center gap-4 ml-13 mb-4">
         <button 
-          onClick={() => setShowReplyForm(!showReplyForm)}
+          onClick={() => {
+            if (!user) {
+              navigate('/login', { state: { from: location.pathname } });
+              return;
+            }
+            setShowReplyForm(!showReplyForm);
+          }}
           className="text-sm font-medium text-primary hover:underline focus:outline-none"
         >
           Reply

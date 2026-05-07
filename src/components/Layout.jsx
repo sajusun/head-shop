@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Heart, User, Search, LogOut, X, Settings, Send, CheckCircle2, Mail, Bell } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../features/auth/authSlice';
+import { logoutUser } from '../features/auth/authSlice';
 import { fetchProducts } from '../features/products/productSlice';
 import { motion, AnimatePresence } from 'framer-motion';
 import NotificationCenter from './notifications/NotificationCenter';
@@ -193,7 +193,7 @@ const Layout = () => {
   }, []);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     navigate('/');
   };
 

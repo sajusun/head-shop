@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heart, ShoppingCart, Share2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleFavorite } from '../features/favorites/favoriteSlice';
@@ -10,8 +10,11 @@ import { motion } from 'framer-motion';
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
+  const { user } = useSelector(state => state.auth);
+  const navigate = useNavigate();
+  const location = useLocation();
   const favorites = useSelector(state => state.favorites.items);
-  const isFavorite = favorites.some(item => item.id === product.id);
+  const isFavorite = user && favorites.some(item => item.id === product.id);
   const image = product.thumbnail || product.image;
   const category = product.category?.name || product.category;
   const rating = product.rating?.average ?? product.rating ?? 0;
@@ -64,6 +67,10 @@ const ProductCard = ({ product }) => {
             <button
               onClick={(e) => {
                 e.preventDefault();
+                if (!user) {
+                  navigate('/login', { state: { from: location.pathname } });
+                  return;
+                }
                 dispatch(toggleFavorite(product));
               }}
               className={`p-2 rounded-full shadow-lg backdrop-blur-md transition-all duration-200 ${

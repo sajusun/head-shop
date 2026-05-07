@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   CheckCircle2, 
   CreditCard, 
@@ -10,7 +10,8 @@ import {
   ChevronRight,
   ShieldCheck,
   Package,
-  Loader2
+  Loader2,
+  Lock
 } from 'lucide-react';
 import { clearCart, selectCartTotal } from '../features/cart/cartSlice';
 import Button from '../components/Button';
@@ -28,14 +29,21 @@ import {
 // Stripe Public Key - Placeholder
 const stripePromise = loadStripe('pk_test_51Hq7Y2L0Wv2X6y7B6V8Y9Q...'); // Use your real public key
 
-const CheckoutForm = ({ orderData, onSuccess, total }) => {
+const CheckoutForm = ({ orderData, onSuccess, total, isAuthenticated }) => {
   const stripe = useStripe();
   const elements = useElements();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
 
     if (!stripe || !elements) return;
 
@@ -116,16 +124,25 @@ const CheckoutForm = ({ orderData, onSuccess, total }) => {
         </div>
       )}
 
+      {!isAuthenticated && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3">
+          <Lock className="text-amber-500" size={20} />
+          <p className="text-xs text-amber-800 font-bold">Authentication required to complete payment.</p>
+        </div>
+      )}
+
       <Button 
         type="submit" 
         size="lg" 
         className="w-full rounded-2xl h-14 text-lg font-black shadow-xl shadow-primary/20"
-        disabled={!stripe || processing}
+        disabled={(orderData.payment_method === 'stripe' && !stripe) || processing}
       >
         {processing ? (
           <span className="flex items-center gap-2">
             <Loader2 className="animate-spin" /> Processing...
           </span>
+        ) : !isAuthenticated ? (
+          'Login to Place Order'
         ) : (
           `Pay $${(total * 1.1).toFixed(2)} & Place Order`
         )}
@@ -146,6 +163,7 @@ const CheckoutPage = () => {
   const total = useSelector(selectCartTotal);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({
     full_name: user?.name || '',
@@ -157,6 +175,17 @@ const CheckoutPage = () => {
     payment_method: 'stripe',
     notes: ''
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        full_name: user.name,
+        email: user.email,
+        phone: user.phone || ''
+      }));
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -176,6 +205,14 @@ const CheckoutPage = () => {
   const handleSuccess = (order) => {
     dispatch(clearCart());
     navigate('/order/success', { state: { order } });
+  };
+
+  const handleContinueToPayment = () => {
+    if (!user) {
+      navigate('/login', { state: { from: location.pathname } });
+    } else {
+      setStep('payment');
+    }
   };
 
   if (items.length === 0 && step !== 'success') {
@@ -301,10 +338,10 @@ const CheckoutPage = () => {
                     <Button 
                       size="lg" 
                       className="rounded-2xl px-12 h-14 font-black"
-                      onClick={() => setStep('payment')}
+                      onClick={handleContinueToPayment}
                       disabled={!formData.full_name || !formData.address || !formData.city}
                     >
-                      Continue to Payment
+                      {user ? 'Continue to Payment' : 'Login to Continue'}
                     </Button>
                   </div>
                 </motion.div>
@@ -368,6 +405,7 @@ const CheckoutPage = () => {
                         orderData={orderData} 
                         total={total} 
                         onSuccess={handleSuccess} 
+                        isAuthenticated={!!user}
                       />
                     </Elements>
                   </div>

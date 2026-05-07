@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authService from '../../services/authService';
+import { clearCart } from '../cart/cartSlice';
+import { clearFavorites } from '../favorites/favoriteSlice';
 
 export const login = createAsyncThunk(
   'auth/login',
@@ -41,6 +43,21 @@ export const register = createAsyncThunk(
       return { ...payload, access_token: token, user };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Registration failed');
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  'auth/logout',
+  async (_, { dispatch }) => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      dispatch(logout());
+      dispatch(clearCart());
+      dispatch(clearFavorites());
     }
   }
 );

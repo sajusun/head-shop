@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
   ArrowLeft, Share2, MessageSquare, Heart, Check, X, Link2, Loader2, Send
@@ -10,6 +10,7 @@ import { toggleBlogFavorite } from '../features/favorites/blogFavoriteSlice';
 const BlogDetailsPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   
   const [post, setPost] = useState(null);
@@ -50,7 +51,7 @@ const BlogDetailsPage = () => {
 
   const handleFavorite = async () => {
     if (!user || !token) {
-      navigate('/login');
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
     
@@ -79,7 +80,7 @@ const BlogDetailsPage = () => {
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!user || !token) {
-      navigate('/login');
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
     if (!commentText.trim()) return;
@@ -375,7 +376,7 @@ const BlogDetailsPage = () => {
             ) : (
               <div className="text-center py-6">
                 <p className="text-gray-500 font-bold mb-4">Please log in to join the conversation.</p>
-                <Link to="/login" className="px-8 py-3 bg-text text-white font-black rounded-xl inline-block hover:bg-primary transition-colors">Login Now</Link>
+                <Link to="/login" state={{ from: location.pathname }} className="px-8 py-3 bg-text text-white font-black rounded-xl inline-block hover:bg-primary transition-colors">Login Now</Link>
               </div>
             )}
           </div>

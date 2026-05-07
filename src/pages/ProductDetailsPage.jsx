@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductBySlug, clearCurrentProduct } from '../features/products/productSlice';
 import { fetchReviews } from '../features/reviews/reviewSlice';
@@ -16,16 +16,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 const ProductDetailsPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { items: allProducts, currentProduct: product, loading, error } = useSelector(state => state.products);
+  const { user } = useSelector(state => state.auth);
   const { items: reviews, loading: reviewsLoading } = useSelector(state => state.reviews);
   const favorites = useSelector(state => state.favorites.items);
-  const isFavorite = favorites.some(item => item.id === product?.id);
+  const isFavorite = user && favorites.some(item => item.id === product?.id);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const relatedRef = useRef(null);
+  const reviewsRef = useRef(null);
   const autoScrollDir = useRef(1); // 1 = forward, -1 = reverse
 
   const categoryName = product?.category?.name || product?.category || '';
@@ -104,6 +107,10 @@ const ProductDetailsPage = () => {
 
     return () => clearInterval(interval);
   }, [relatedProducts]);
+
+  const scrollToReviews = () => {
+    reviewsRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const scroll = (ref, direction) => {
     if (ref.current) {
@@ -234,7 +241,13 @@ const ProductDetailsPage = () => {
                 <Share2 size={20} />
               </button>
               <button 
-                onClick={() => dispatch(toggleFavorite(product))}
+                onClick={() => {
+                  if (!user) {
+                    navigate('/login', { state: { from: location.pathname } });
+                    return;
+                  }
+                  dispatch(toggleFavorite(product));
+                }}
                 className={`p-2.5 border rounded-full transition-all ${
                   isFavorite ? 'bg-red-50 border-red-500 text-red-500' : 'bg-white border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-500'
                 }`}
@@ -255,9 +268,12 @@ const ProductDetailsPage = () => {
               <span className="text-sm font-bold text-text ml-1">{Number(ratingAverage).toFixed(1)}</span>
             </div>
             <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
-            <span className="text-sm text-gray-500 flex items-center gap-1">
+            <button 
+              onClick={scrollToReviews}
+              className="text-sm text-gray-500 flex items-center gap-1 hover:text-primary transition-colors"
+            >
               <MessageSquare size={16} /> {ratingCount} reviews
-            </span>
+            </button>
             <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
             <span className={`text-sm font-bold ${stock > 0 ? 'text-green-500' : 'text-red-500'}`}>
               {stock > 0 ? `${stock} In Stock` : 'Out of Stock'}
@@ -390,7 +406,9 @@ const ProductDetailsPage = () => {
               variant="outline"
               className="flex-1 gap-2 rounded-xl border-gray-200"
               disabled={stock <= 0}
-              onClick={() => dispatch(addToCart(cartPayload()))}
+              onClick={() => {
+                dispatch(addToCart(cartPayload()));
+              }}
             >
               <ShoppingBag size={20} /> Add to Cart
             </Button>
@@ -398,7 +416,9 @@ const ProductDetailsPage = () => {
               size="lg" 
               className="flex-1 gap-2 rounded-xl bg-accent hover:bg-accent/90"
               disabled={stock <= 0}
-              onClick={handleBuyNow}
+              onClick={() => {
+                handleBuyNow();
+              }}
             >
               <Zap size={20} fill="currentColor" /> Buy Now
             </Button>
@@ -451,7 +471,7 @@ const ProductDetailsPage = () => {
       </section>
 
       {/* Reviews Section */}
-      <section className="border-t border-gray-100 pt-20">
+      <section ref={reviewsRef} className="border-t border-gray-100 pt-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
           <div className="lg:col-span-1">
             <h2 className="text-2xl font-black text-text mb-8">Customer Reviews</h2>

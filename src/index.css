@@ -15,6 +15,12 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px; /* Enhanced offset for sticky header */
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -23,25 +29,63 @@ body {
   min-height: 100vh;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Premium Aesthetic */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f9fafb;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4F46E5;
-  border-radius: 4px;
+  background: #e2e8f0;
+  border-radius: 100px;
+  border: 3px solid #f9fafb;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4338CA;
+  background: #94a3b8;
 }
 
-/* Transitions */
+/* Smooth Transitions */
 .page-transition {
-  transition: opacity 0.3s ease-in-out;
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom Selection */
+::selection {
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4F46E5;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth Reveal Classes */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
 }

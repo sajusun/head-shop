@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, ShoppingBag } from 'lucide-react';
 import { login, logout, register } from '../features/auth/authSlice';
 import Button from '../components/Button';
@@ -14,6 +14,7 @@ const AuthPage = ({ mode = 'user' }) => {
   const [roleError, setRoleError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { loading, error } = useSelector(state => state.auth);
 
   const handleSubmit = async (e) => {
@@ -37,7 +38,9 @@ const AuthPage = ({ mode = 'user' }) => {
       return;
     }
 
-    navigate(user?.role === 'admin' ? '/admin' : '/profile');
+    // Smart Redirect
+    const from = location.state?.from || (user?.role === 'admin' ? '/admin' : '/profile');
+    navigate(from, { replace: true });
   };
 
   const handleChange = (e) => {
