@@ -64,7 +64,7 @@ const ProductDetailsPage = () => {
   const displayPrice = selectedVariant?.effective_price ?? product?.effective_price ?? product?.offer_price ?? product?.offerPrice ?? product?.price ?? 0;
   const regularPrice = selectedVariant?.price ?? product?.price ?? displayPrice;
   const offerPrice = selectedVariant?.offer_price ?? product?.offer_price ?? product?.offerPrice ?? null;
-  const stock = selectedVariant?.stock ?? variants.reduce((total, variant) => total + (variant.stock || 0), 0) ?? product?.stock ?? 0;
+  const stock = selectedVariant?.stock ?? (variants.length ? variants.reduce((total, variant) => total + (variant.stock || 0), 0) : product?.stock) ?? 0;
   const reviewItems = Array.isArray(reviews) ? reviews : [];
   const productReviews = Array.isArray(product?.reviews) ? product.reviews : [];
   const backendRatingAverage = Number(product?.rating?.average ?? product?.rating ?? 0) || 0;
