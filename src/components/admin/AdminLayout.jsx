@@ -13,7 +13,8 @@ import {
   FiFileText,
   FiMail,
   FiMessageSquare,
-  FiFolder
+  FiFolder,
+  FiLayers
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { adminLogout } from '../../features/auth/adminAuthSlice';
@@ -29,6 +30,7 @@ const AdminLayout = () => {
     { label: 'Dashboard', icon: FiHome, path: '/admin' },
     { label: 'Products', icon: FiPackage, path: '/admin/products' },
     { label: 'Categories', icon: FiFolder, path: '/admin/categories' },
+    { label: 'Attributes', icon: FiLayers, path: '/admin/attributes' },
     { label: 'Orders', icon: FiShoppingCart, path: '/admin/orders' },
     { label: 'Users', icon: FiUsers, path: '/admin/users' },
     { label: 'Journal', icon: FiFileText, path: '/admin/journal' },
