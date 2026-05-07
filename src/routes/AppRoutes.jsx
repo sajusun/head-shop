@@ -17,6 +17,8 @@ const FavoritesPage = lazy(() => import('../pages/FavoritesPage'));
 const GalleryPage = lazy(() => import('../pages/GalleryPage'));
 const OrdersPage = lazy(() => import('../pages/OrdersPage'));
 const SettingsPage = lazy(() => import('../pages/SettingsPage'));
+const OrderSuccessPage = lazy(() => import('../pages/OrderSuccessPage'));
+const OrderFailPage = lazy(() => import('../pages/OrderFailPage'));
 
 // Admin Pages
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
@@ -77,6 +79,8 @@ const AppRoutes = () => {
           <Route path="gallery" element={<GalleryPage />} />
           <Route path="cart" element={<CartPage />} />
           <Route path="checkout" element={<CheckoutPage />} />
+          <Route path="order/success" element={<OrderSuccessPage />} />
+          <Route path="order/fail" element={<OrderFailPage />} />
           <Route path="login" element={<UserLoginPage />} />
 
   {/* Public Legal & Settings Pages */}

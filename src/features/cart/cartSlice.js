@@ -3,7 +3,15 @@ import { createSlice } from '@reduxjs/toolkit';
 const cartSlice = createSlice({
   name: 'cart',
   initialState: {
-    items: JSON.parse(localStorage.getItem('cart')) || [],
+    items: (() => {
+      try {
+        const savedCart = localStorage.getItem('cart');
+        return savedCart ? JSON.parse(savedCart) : [];
+      } catch (e) {
+        console.error('Failed to parse cart from localStorage:', e);
+        return [];
+      }
+    })(),
   },
   reducers: {
     addToCart: (state, action) => {
@@ -57,8 +65,9 @@ const cartSlice = createSlice({
 export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
 export const selectCartTotal = (state) => 
   state.cart.items.reduce((total, item) => {
-    const activePrice = item.offer_price || item.offerPrice || item.effective_price || item.price;
-    return total + activePrice * item.quantity;
+    const activePrice = Number(item.offer_price || item.offerPrice || item.effective_price || item.price || 0);
+    const quantity = Number(item.quantity || 0);
+    return total + (activePrice * quantity);
   }, 0);
 
 export default cartSlice.reducer;
