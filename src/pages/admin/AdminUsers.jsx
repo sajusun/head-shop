@@ -154,55 +154,84 @@ const AdminUsers = () => {
 
       {error && <div className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{error}</div>}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
-          <div className="col-span-full flex justify-center py-20">
-            <div className="w-10 h-10 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        ) : users.length === 0 ? (
-          <div className="col-span-full text-center py-20 text-gray-500">No users found.</div>
-        ) : (
-          users.map(user => (
-            <div key={user.id} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-              <div className="flex items-start justify-between gap-4 mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-black group-hover:bg-black group-hover:text-white transition-colors">
-                    <FiUser size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900">{user.name}</h3>
-                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                      {user.role}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex gap-1">
-                  <button onClick={() => openEditModal(user)} className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
-                    <FiEdit2 size={16} />
-                  </button>
-                  <button onClick={() => handleDelete(user)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                    <FiTrash2 size={16} />
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center text-sm text-gray-500 gap-3">
-                  <FiMail className="shrink-0" />
-                  <span className="truncate">{user.email}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-500 gap-3">
-                  <FiPhone className="shrink-0" />
-                  <span>{user.phone || 'No phone'}</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-500 gap-3">
-                  <FiCalendar className="shrink-0" />
-                  <span>Joined {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}</span>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-50/50 text-gray-500 text-xs font-semibold uppercase">
+              <tr>
+                <th className="px-6 py-4">User</th>
+                <th className="px-6 py-4">Contact Info</th>
+                <th className="px-6 py-4">Role</th>
+                <th className="px-6 py-4">Joined Date</th>
+                <th className="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {loading ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-10 text-center">
+                    <div className="mx-auto w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                  </td>
+                </tr>
+              ) : users.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="px-6 py-10 text-center text-gray-500">No users found.</td>
+                </tr>
+              ) : (
+                users.map(user => (
+                  <tr key={user.id} className="hover:bg-gray-50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-black group-hover:bg-black group-hover:text-white transition-colors shrink-0">
+                          <FiUser size={20} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-gray-900">{user.name}</p>
+                          <p className="text-xs text-gray-500">ID: #{user.id}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center text-sm text-gray-600 gap-2">
+                          <FiMail size={14} className="text-gray-400" />
+                          <span>{user.email}</span>
+                        </div>
+                        <div className="flex items-center text-xs text-gray-500 gap-2">
+                          <FiPhone size={14} className="text-gray-400" />
+                          <span>{user.phone || 'N/A'}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                        user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                      }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center text-sm text-gray-600 gap-2">
+                        <FiCalendar size={14} className="text-gray-400" />
+                        <span>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown'}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button onClick={() => openEditModal(user)} className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
+                          <FiEdit2 size={16} />
+                        </button>
+                        <button onClick={() => handleDelete(user)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                          <FiTrash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {pagination.last_page > 1 && (
