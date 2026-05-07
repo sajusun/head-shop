@@ -2,119 +2,144 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { 
-  ArrowLeft, Share2, MessageSquare, Heart, Check, X, Link2
+  ArrowLeft, Share2, MessageSquare, Heart, Check, X, Link2, Loader2, Send
 } from 'lucide-react';
+import api from '../services/api';
 import { toggleBlogFavorite } from '../features/favorites/blogFavoriteSlice';
-
-const blogPosts = [
-  {
-    id: 'blog-1',
-    title: "The Art of Minimalist Living: Quality Over Quantity",
-    slug: "art-of-minimalist-living",
-    excerpt: "Discover how stripping away the excess can lead to a more meaningful and aesthetically pleasing lifestyle.",
-    image: "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&q=80&w=1200",
-    author: "Elena Vance",
-    date: "May 1, 2024",
-    readTime: "5 min read",
-    category: "Lifestyle",
-    content: `
-      <p>In a world that constantly demands our attention and urges us to consume more, the philosophy of minimalism offers a breath of fresh air. It's not just about owning fewer things; it's about making room for more of what matters.</p>
-      
-      <h2>Defining Quality</h2>
-      <p>When we talk about quality over quantity, we're discussing the intentionality behind every purchase. Does this item serve a purpose? Does it bring joy? Is it built to last? At Herd Shop, we believe that a single, well-crafted piece is worth more than a dozen mass-produced alternatives.</p>
-      
-      <blockquote>
-        "Minimalism is the intentional promotion of the things we most value and the removal of everything that distracts us from it."
-      </blockquote>
-
-      <h2>Steps to a Minimalist Mindset</h2>
-      <ul>
-        <li><strong>Audit Your Space:</strong> Take a look at your surroundings. What hasn't been used in six months?</li>
-        <li><strong>Invest in Craftsmanship:</strong> Choose materials like solid wood, organic cotton, and recycled metals.</li>
-        <li><strong>Create White Space:</strong> Learn to appreciate the areas in your home that are empty.</li>
-      </ul>
-
-      <p>By choosing quality, we not only improve our own lives but also contribute to a more sustainable world. Every intentional choice is a vote for the kind of future we want to build.</p>
-    `
-  }
-];
-
-const mockComments = [
-  { id: 1, user: "Alex Rivera", text: "This really resonates with me. I've been trying to declutter my workspace for weeks!", date: "2 hours ago", avatar: "https://ui-avatars.com/api/?name=Alex+Rivera&background=random" },
-  { id: 2, user: "Sophia Chen", text: "Great points about quality. It's better to buy one thing that lasts a lifetime.", date: "5 hours ago", avatar: "https://ui-avatars.com/api/?name=Sophia+Chen&background=random" }
-];
 
 const BlogDetailsPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   
-  const auth = useSelector(state => state.auth);
-  const user = auth?.user;
-  const blogFavoritesState = useSelector(state => state.blogFavorites);
-  const blogFavorites = blogFavoritesState?.items || [];
-  
-  const post = blogPosts.find(p => p.slug === slug) || blogPosts[0];
-  const isFavorite = blogFavorites.some(item => item && item.id === post?.id);
-
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [commentText, setCommentText] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeAnimating, setLikeAnimating] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState(mockComments);
-  const [likeCount, setLikeCount] = useState(post?.id === 'blog-1' ? 128 : 47);
-  const [likeAnimating, setLikeAnimating] = useState(false);
   const shareRef = useRef(null);
 
-  // Close share popup when clicking outside
+  const auth = useSelector(state => state.auth);
+  const user = auth?.user;
+  const token = auth?.token;
+  
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (shareRef.current && !shareRef.current.contains(e.target)) {
-        setShowShare(false);
-      }
-    };
-    if (showShare) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showShare]);
+    fetchPost();
+  }, [slug]);
 
-  const handleFavorite = () => {
-    if (!user) {
+  const fetchPost = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/blogs/slug/${slug}`);
+      const data = response.data.data;
+      setPost(data);
+      setLikeCount(data.likes_count || 0);
+      setIsLiked(!!data.is_liked);
+    } catch (err) {
+      console.error('Error fetching blog post:', err);
+      setError('Article not found.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFavorite = async () => {
+    if (!user || !token) {
       navigate('/login');
       return;
     }
-    const wasLiked = isFavorite;
-    dispatch(toggleBlogFavorite({
-      id: post.id,
-      title: post.title,
-      image: post.image,
-      slug: post.slug,
-      date: post.date
-    }));
-    setLikeCount(prev => wasLiked ? prev - 1 : prev + 1);
+    
     setLikeAnimating(true);
     setTimeout(() => setLikeAnimating(false), 400);
+
+    try {
+      const response = await api.post(`/blogs/${post.id}/like`);
+      const { status, likes_count } = response.data.data;
+      setIsLiked(status === 'liked');
+      setLikeCount(likes_count);
+      
+      // Also sync with Redux favorites
+      dispatch(toggleBlogFavorite({
+        id: post.id,
+        title: post.title,
+        image: post.featured_image,
+        slug: post.slug,
+        date: post.published_at || post.created_at
+      }));
+    } catch (err) {
+      console.error('Error toggling like:', err);
+    }
   };
 
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
+    if (!user || !token) {
       navigate('/login');
       return;
     }
     if (!commentText.trim()) return;
 
-    const newComment = {
-      id: Date.now(),
-      user: user.name,
-      text: commentText,
-      date: "Just now",
-      avatar: user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=random`
-    };
-
-    setComments([newComment, ...comments]);
-    setCommentText("");
+    setIsSubmittingComment(true);
+    try {
+      const response = await api.post('/comments', {
+        blog_id: post.id,
+        content: commentText
+      });
+      
+      // Update local comments
+      const newComment = response.data.data;
+      setPost(prev => ({
+        ...prev,
+        comments: [
+          {
+            ...newComment,
+            user: user // Attach current user info manually to avoid re-fetch
+          },
+          ...(prev.comments || [])
+        ]
+      }));
+      setCommentText("");
+    } catch (err) {
+      console.error('Error posting comment:', err);
+      alert('Failed to post comment. Please try again.');
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
+
+  const handleCopyLink = () => {
+    try {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !post) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <h2 className="text-2xl font-bold mb-4">{error || 'Post not found'}</h2>
+        <Link to="/journal" className="text-primary font-bold hover:underline flex items-center gap-2">
+          <ArrowLeft size={16} /> Back to Journal
+        </Link>
+      </div>
+    );
+  }
 
   const currentUrl = typeof window !== 'undefined' ? window.location.href : '';
   const encodedUrl = encodeURIComponent(currentUrl);
@@ -169,18 +194,6 @@ const BlogDetailsPage = () => {
     },
   ];
 
-  const handleCopyLink = () => {
-    try {
-      navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  if (!post) return <div className="pt-32 text-center font-bold">Post not found</div>;
-
   return (
     <div className="min-h-screen pt-20 pb-32 bg-white text-text">
       <div className="max-w-4xl mx-auto px-4">
@@ -194,10 +207,10 @@ const BlogDetailsPage = () => {
         <header className="mb-12">
           <div className="flex items-center gap-4 mb-6">
             <span className="px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] rounded-full">
-              {post.category}
+              {post.category?.name || 'Journal'}
             </span>
             <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{post.readTime}</span>
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">5 min read</span>
           </div>
 
           <h1 className="text-5xl md:text-6xl font-black text-text tracking-tighter mb-8 leading-[1.1]">
@@ -207,11 +220,13 @@ const BlogDetailsPage = () => {
           <div className="flex items-center justify-between py-8 border-y border-gray-100">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-gray-100 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                <img src={`https://ui-avatars.com/api/?name=${post.author}&background=random`} alt={post.author} />
+                <img src={post.author?.avatar || `https://ui-avatars.com/api/?name=${post.author?.name}&background=random`} alt={post.author?.name} />
               </div>
               <div>
-                <p className="text-sm font-black text-text">{post.author}</p>
-                <p className="text-xs text-gray-500 font-medium">{post.date}</p>
+                <p className="text-sm font-black text-text">{post.author?.name || 'Admin'}</p>
+                <p className="text-xs text-gray-500 font-medium">
+                  {new Date(post.published_at || post.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                </p>
               </div>
             </div>
 
@@ -233,7 +248,6 @@ const BlogDetailsPage = () => {
                       </button>
                     </div>
 
-                    {/* Social Platform Buttons */}
                     <div className="space-y-2 mb-4">
                       {shareLinks.map((item) => (
                         <a
@@ -258,7 +272,6 @@ const BlogDetailsPage = () => {
                       ))}
                     </div>
 
-                    {/* Divider */}
                     <div className="border-t border-gray-100 pt-3">
                       <button
                         onClick={handleCopyLink}
@@ -279,7 +292,7 @@ const BlogDetailsPage = () => {
               <button
                 onClick={handleFavorite}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl transition-all duration-200 ${
-                  isFavorite
+                  isLiked
                     ? 'bg-red-50 text-red-500 shadow-sm shadow-red-100'
                     : 'bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50'
                 }`}
@@ -291,22 +304,10 @@ const BlogDetailsPage = () => {
                     transition: 'transform 0.25s cubic-bezier(0.34,1.56,0.64,1)'
                   }}
                 >
-                  <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
+                  <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
                 </span>
-                <span
-                  style={{
-                    fontSize: '0.8rem',
-                    fontWeight: 800,
-                    minWidth: '1.5rem',
-                    display: 'inline-block',
-                    transform: likeAnimating ? 'translateY(-2px)' : 'translateY(0)',
-                    transition: 'transform 0.25s ease',
-                    lineHeight: 1
-                  }}
-                >
-                  {likeCount >= 1000
-                    ? `${(likeCount / 1000).toFixed(1)}k`
-                    : likeCount}
+                <span className="text-xs font-black min-w-[1.5rem] text-center">
+                  {likeCount >= 1000 ? `${(likeCount / 1000).toFixed(1)}k` : likeCount}
                 </span>
               </button>
             </div>
@@ -315,70 +316,32 @@ const BlogDetailsPage = () => {
 
         {/* Image */}
         <div className="aspect-[16/9] rounded-[40px] overflow-hidden mb-16 shadow-2xl shadow-primary/5">
-          <img src={post.image} alt={post.title} className="w-full h-full object-cover" />
+          <img src={post.featured_image || "https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?auto=format&fit=crop&q=80&w=1200"} alt={post.title} className="w-full h-full object-cover" />
         </div>
 
         {/* Content */}
         <article 
-          className="prose prose-xl prose-primary max-w-none mb-24"
+          className="prose prose-xl prose-primary max-w-none mb-24 font-medium leading-relaxed text-gray-700"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
 
-        {/* ── LinkedIn-style Reaction Bar ── */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '18px 28px',
-            marginBottom: '40px',
-            borderRadius: '24px',
-            background: 'linear-gradient(135deg, #fff5f5 0%, #fff0f3 100%)',
-            border: '1px solid #fde8ec',
-            boxShadow: '0 2px 16px 0 rgba(239,68,68,0.06)'
-          }}
-        >
-          {/* Left: emoji stack + count */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Reaction emoji pills */}
-            <div style={{ display: 'flex', gap: '-4px' }}>
+        {/* Reactions Summary */}
+        <div className="flex items-center justify-between p-6 mb-12 bg-gray-50 rounded-[2rem] border border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-2">
               {['❤️', '👏', '💡'].map((emoji, i) => (
-                <span
-                  key={i}
-                  style={{
-                    width: '30px',
-                    height: '30px',
-                    borderRadius: '50%',
-                    background: '#fff',
-                    border: '2px solid #fde8ec',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '14px',
-                    marginLeft: i === 0 ? 0 : '-8px',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                    position: 'relative',
-                    zIndex: 3 - i
-                  }}
-                >
+                <span key={i} className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-sm shadow-sm border border-gray-100 z-[3-i]">
                   {emoji}
                 </span>
               ))}
             </div>
-            <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#374151' }}>
-              {likeCount.toLocaleString()}
-            </span>
-            <span style={{ fontSize: '0.85rem', color: '#9ca3af', fontWeight: 600 }}>
-              {likeCount === 1 ? 'person loved this' : 'people loved this'}
+            <span className="text-sm font-bold text-gray-600">
+              {likeCount.toLocaleString()} {likeCount === 1 ? 'person' : 'people'} loved this story
             </span>
           </div>
-
-          {/* Right: comment count */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <MessageSquare size={16} style={{ color: '#9ca3af' }} />
-            <span style={{ fontSize: '0.85rem', color: '#9ca3af', fontWeight: 600 }}>
-              {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
-            </span>
+          <div className="flex items-center gap-2 text-gray-400">
+            <MessageSquare size={16} />
+            <span className="text-sm font-bold">{post.comments?.length || 0} comments</span>
           </div>
         </div>
 
@@ -386,7 +349,7 @@ const BlogDetailsPage = () => {
         <div className="border-t border-gray-100 pt-16">
           <div className="flex items-center gap-3 mb-10">
             <MessageSquare size={24} className="text-primary" />
-            <h2 className="text-3xl font-black text-text tracking-tighter">Comments ({comments.length})</h2>
+            <h2 className="text-3xl font-black text-text tracking-tighter">Comments ({post.comments?.length || 0})</h2>
           </div>
 
           <div className="bg-gray-50 rounded-[32px] p-8 mb-12">
@@ -399,7 +362,12 @@ const BlogDetailsPage = () => {
                   className="w-full p-6 bg-white border-transparent rounded-2xl focus:ring-4 focus:ring-primary/10 transition-all text-text font-medium min-h-[120px] resize-none outline-none"
                 />
                 <div className="flex justify-end">
-                  <button type="submit" className="px-8 py-3 bg-primary text-white font-black rounded-xl hover:scale-105 transition-transform shadow-lg shadow-primary/20">
+                  <button 
+                    type="submit" 
+                    disabled={isSubmittingComment || !commentText.trim()}
+                    className="px-8 py-3 bg-primary text-white font-black rounded-xl hover:scale-105 transition-transform shadow-lg shadow-primary/20 disabled:bg-gray-300 disabled:shadow-none flex items-center gap-2"
+                  >
+                    {isSubmittingComment ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                     Post Comment
                   </button>
                 </div>
@@ -413,17 +381,19 @@ const BlogDetailsPage = () => {
           </div>
 
           <div className="space-y-8">
-            {comments.map((comment) => (
+            {post.comments?.map((comment) => (
               <div key={comment.id} className="flex gap-6">
                 <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 shadow-sm bg-gray-200">
-                  <img src={comment.avatar} alt={comment.user} />
+                  <img src={comment.user?.avatar || `https://ui-avatars.com/api/?name=${comment.user?.name}&background=random`} alt={comment.user?.name} />
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
-                    <h4 className="font-black text-text">{comment.user}</h4>
-                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{comment.date}</span>
+                    <h4 className="font-black text-text">{comment.user?.name}</h4>
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                      {new Date(comment.created_at).toLocaleDateString()}
+                    </span>
                   </div>
-                  <p className="text-gray-600 leading-relaxed">{comment.text}</p>
+                  <p className="text-gray-600 leading-relaxed">{comment.content}</p>
                 </div>
               </div>
             ))}
