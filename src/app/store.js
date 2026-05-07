@@ -6,6 +6,7 @@ import favoriteReducer from '../features/favorites/favoriteSlice';
 import blogFavoriteReducer from '../features/favorites/blogFavoriteSlice';
 import reviewReducer from '../features/reviews/reviewSlice';
 import notificationReducer from '../features/notifications/notificationSlice';
+import settingsReducer from '../features/settings/settingsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export const store = configureStore({
     blogFavorites: blogFavoriteReducer,
     reviews: reviewReducer,
     notifications: notificationReducer,
+    settings: settingsReducer,
   },
 });

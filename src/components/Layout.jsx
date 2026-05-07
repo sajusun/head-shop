@@ -156,6 +156,7 @@ const Layout = () => {
   const products = useSelector(state => state.products.items);
   const cartCount = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
   const { user } = useSelector(state => state.auth);
+  const { data: settings } = useSelector(state => state.settings);
   const navigate = useNavigate();
 
   const handleMenuEnter = () => {
@@ -219,10 +220,16 @@ const Layout = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white group-hover:rotate-12 transition-transform">
-                <ShoppingBag size={24} />
-              </div>
-              <span className="text-xl font-black text-text tracking-tighter">HERD SHOP</span>
+              {settings?.site_logo ? (
+                <img src={settings.site_logo} alt={settings.site_name} className="h-10 w-auto object-contain" />
+              ) : (
+                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white group-hover:rotate-12 transition-transform">
+                  <ShoppingBag size={24} />
+                </div>
+              )}
+              <span className="text-xl font-black text-text tracking-tighter uppercase">
+                {settings?.site_name || 'HERD SHOP'}
+              </span>
             </Link>
 
             <nav className="hidden md:flex items-center space-x-8">
@@ -367,10 +374,16 @@ const Layout = () => {
             {/* Column 1: Brand */}
             <div className="space-y-6">
               <Link to="/" className="flex items-center gap-2 group">
-                <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white transition-transform group-hover:rotate-12">
-                  <ShoppingBag size={22} />
-                </div>
-                <span className="text-xl font-black text-text tracking-tighter">HERD SHOP</span>
+                {settings?.site_logo ? (
+                  <img src={settings.site_logo} alt={settings.site_name} className="h-8 w-auto object-contain" />
+                ) : (
+                  <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white transition-transform group-hover:rotate-12">
+                    <ShoppingBag size={22} />
+                  </div>
+                )}
+                <span className="text-xl font-black text-text tracking-tighter uppercase">
+                  {settings?.site_name || 'HERD SHOP'}
+                </span>
               </Link>
               <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
                 Premium lifestyle goods curated for the modern individual. Quality, aesthetic, and purpose in every piece.

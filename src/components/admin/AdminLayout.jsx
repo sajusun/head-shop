@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  FiHome, 
-  FiPackage, 
-  FiShoppingCart, 
-  FiUsers, 
-  FiSettings, 
-  FiLogOut, 
-  FiMenu, 
-  FiX, 
+import {
+  FiHome,
+  FiPackage,
+  FiShoppingCart,
+  FiUsers,
+  FiSettings,
+  FiLogOut,
+  FiMenu,
+  FiX,
   FiBell,
   FiFileText,
   FiMail,
@@ -32,6 +32,7 @@ const AdminLayout = () => {
     { label: 'Journal', icon: FiFileText, path: '/admin/journal' },
     { label: 'Newsletter', icon: FiMail, path: '/admin/newsletter' },
     { label: 'Contact', icon: FiMessageSquare, path: '/admin/contact' },
+    { label: 'Settings', icon: FiSettings, path: '/admin/settings' },
   ];
 
   const handleLogout = () => {
@@ -42,10 +43,9 @@ const AdminLayout = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex font-sans">
       {/* Sidebar */}
-      <aside 
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 transition-transform duration-300 transform ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:relative lg:translate-x-0`}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:relative lg:translate-x-0`}
       >
         <div className="h-full flex flex-col">
           {/* Logo */}
@@ -65,11 +65,10 @@ const AdminLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
-                  location.pathname === item.path 
-                    ? 'bg-black text-white shadow-lg shadow-black/10' 
+                className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 group ${location.pathname === item.path
+                    ? 'bg-black text-white shadow-lg shadow-black/10'
                     : 'text-gray-500 hover:bg-gray-100 hover:text-black'
-                }`}
+                  }`}
               >
                 <item.icon className={`w-5 h-5 ${location.pathname === item.path ? 'text-white' : 'text-gray-400 group-hover:text-black'}`} />
                 <span className="font-semibold text-sm">{item.label}</span>
@@ -88,7 +87,7 @@ const AdminLayout = () => {
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={handleLogout}
               className="mt-2 w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-colors"
             >
@@ -103,7 +102,7 @@ const AdminLayout = () => {
       <div className="flex-1 flex flex-col">
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-40">
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
           >
@@ -116,7 +115,7 @@ const AdminLayout = () => {
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
             <div className="h-8 w-px bg-gray-100 mx-2"></div>
-            <Link to="/settings" className="p-2 text-gray-400 hover:text-black">
+            <Link to="/admin/settings" className="p-2 text-gray-400 hover:text-black">
               <FiSettings size={20} />
             </Link>
           </div>

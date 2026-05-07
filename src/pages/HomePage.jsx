@@ -6,8 +6,10 @@ import Button from '../components/Button';
 import { ArrowRight, Zap, Shield, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useSEO } from '../hooks/useSEO';
 
 const HomePage = () => {
+  useSEO('Home');
   const dispatch = useDispatch();
   const { items: products, loading } = useSelector(state => state.products);
   const scrollRef = useRef(null);

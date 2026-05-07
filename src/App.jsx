@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from './app/store';
 import AppRoutes from './routes/AppRoutes';
 import { setNotifications } from './features/notifications/notificationSlice';
+import { fetchSettings } from './features/settings/settingsSlice';
 import { mockNotifications } from './mock/notifications';
 import './index.css';
 
@@ -11,6 +12,8 @@ function App() {
   useEffect(() => {
     // Initialize mock notifications
     store.dispatch(setNotifications(mockNotifications));
+    // Fetch global site settings
+    store.dispatch(fetchSettings());
   }, []);
 
   return (
