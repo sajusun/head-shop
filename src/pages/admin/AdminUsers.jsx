@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { FiCalendar, FiEdit2, FiMail, FiPhone, FiPlus, FiSearch, FiTrash2, FiUser, FiX } from 'react-icons/fi';
 import api from '../../services/api';
+import SortableHeader from '../../components/admin/SortableHeader';
+import { useMemo } from 'react';
 
 const emptyForm = {
   name: '',
@@ -22,6 +24,27 @@ const AdminUsers = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const sortedUsers = useMemo(() => {
+    const items = [...users];
+    items.sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+
+      if (aVal === bVal) return 0;
+      const result = aVal < bVal ? -1 : 1;
+      return sortConfig.direction === 'asc' ? result : -result;
+    });
+    return items;
+  }, [users, sortConfig]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -159,10 +182,10 @@ const AdminUsers = () => {
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50/50 text-gray-500 text-xs font-semibold uppercase">
               <tr>
-                <th className="px-6 py-4">User</th>
-                <th className="px-6 py-4">Contact Info</th>
-                <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4">Joined Date</th>
+                <SortableHeader label="User" sortKey="name" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Email" sortKey="email" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Role" sortKey="role" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Joined Date" sortKey="created_at" currentSort={sortConfig} onSort={handleSort} />
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -178,7 +201,7 @@ const AdminUsers = () => {
                   <td colSpan="5" className="px-6 py-10 text-center text-gray-500">No users found.</td>
                 </tr>
               ) : (
-                users.map(user => (
+                sortedUsers.map(user => (
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">

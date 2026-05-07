@@ -1,13 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { FiMail, FiCheck, FiX, FiDownload, FiTrash2, FiUserCheck, FiUserX, FiSearch } from 'react-icons/fi';
 import api from '../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import SortableHeader from '../../components/admin/SortableHeader';
 
 const AdminNewsletter = () => {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingId, setDeletingId] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const sortedSubscriptions = useMemo(() => {
+    const items = [...subscriptions];
+    items.sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+
+      if (aVal === bVal) return 0;
+      const result = aVal < bVal ? -1 : 1;
+      return sortConfig.direction === 'asc' ? result : -result;
+    });
+    return items;
+  }, [subscriptions, sortConfig]);
 
   useEffect(() => {
     fetchSubscriptions();
@@ -61,7 +83,7 @@ const AdminNewsletter = () => {
     document.body.removeChild(link);
   };
 
-  const filteredSubscriptions = subscriptions.filter(sub => 
+  const filteredSubscriptions = sortedSubscriptions.filter(sub => 
     sub.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -96,11 +118,11 @@ const AdminNewsletter = () => {
       <div className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead>
+             <thead>
               <tr className="bg-gray-50/50 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-50">
-                <th className="px-8 py-5">Subscriber</th>
-                <th className="px-8 py-5">Status</th>
-                <th className="px-8 py-5">Joined Date</th>
+                <SortableHeader label="Subscriber" sortKey="email" currentSort={sortConfig} onSort={handleSort} className="px-8 py-5" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={handleSort} className="px-8 py-5" />
+                <SortableHeader label="Joined Date" sortKey="created_at" currentSort={sortConfig} onSort={handleSort} className="px-8 py-5" />
                 <th className="px-8 py-5 text-right">Actions</th>
               </tr>
             </thead>

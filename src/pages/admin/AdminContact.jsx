@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { FiMessageSquare, FiMail, FiTrash2, FiSend, FiCheckCircle, FiClock, FiSearch, FiX } from 'react-icons/fi';
 import api from '../../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import SortableHeader from '../../components/admin/SortableHeader';
 
 const AdminContact = () => {
   const [messages, setMessages] = useState([]);
@@ -10,6 +11,27 @@ const AdminContact = () => {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [replying, setReplying] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const sortedMessages = useMemo(() => {
+    const items = [...messages];
+    items.sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+
+      if (aVal === bVal) return 0;
+      const result = aVal < bVal ? -1 : 1;
+      return sortConfig.direction === 'asc' ? result : -result;
+    });
+    return items;
+  }, [messages, sortConfig]);
 
   useEffect(() => {
     fetchMessages();
@@ -66,7 +88,7 @@ const AdminContact = () => {
     }
   };
 
-  const filteredMessages = messages.filter(m => {
+  const filteredMessages = sortedMessages.filter(m => {
     const name = (m.name || '').toLowerCase();
     const email = (m.email || '').toLowerCase();
     const subject = (m.subject || '').toLowerCase();
@@ -98,10 +120,10 @@ const AdminContact = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50/50 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-50">
-                <th className="px-8 py-5">Sender</th>
-                <th className="px-8 py-5">Subject</th>
-                <th className="px-8 py-5">Status</th>
-                <th className="px-8 py-5">Date</th>
+                <SortableHeader label="Sender" sortKey="name" currentSort={sortConfig} onSort={handleSort} className="px-8 py-5" />
+                <SortableHeader label="Subject" sortKey="subject" currentSort={sortConfig} onSort={handleSort} className="px-8 py-5" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={handleSort} className="px-8 py-5" />
+                <SortableHeader label="Date" sortKey="created_at" currentSort={sortConfig} onSort={handleSort} className="px-8 py-5" />
                 <th className="px-8 py-5 text-right">Actions</th>
               </tr>
             </thead>

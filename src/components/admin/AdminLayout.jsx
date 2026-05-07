@@ -12,21 +12,23 @@ import {
   FiBell,
   FiFileText,
   FiMail,
-  FiMessageSquare
+  FiMessageSquare,
+  FiFolder
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../features/auth/authSlice';
+import { adminLogout } from '../../features/auth/adminAuthSlice';
 
 const AdminLayout = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector(state => state.auth);
+  const { user } = useSelector(state => state.adminAuth);
 
   const navItems = [
     { label: 'Dashboard', icon: FiHome, path: '/admin' },
     { label: 'Products', icon: FiPackage, path: '/admin/products' },
+    { label: 'Categories', icon: FiFolder, path: '/admin/categories' },
     { label: 'Orders', icon: FiShoppingCart, path: '/admin/orders' },
     { label: 'Users', icon: FiUsers, path: '/admin/users' },
     { label: 'Journal', icon: FiFileText, path: '/admin/journal' },
@@ -36,8 +38,8 @@ const AdminLayout = () => {
   ];
 
   const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
+    dispatch(adminLogout());
+    navigate('/admin/login');
   };
 
   return (

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FiEdit2, FiFilter, FiPackage, FiPlus, FiSearch, FiTrash2, FiX } from 'react-icons/fi';
 import api from '../../services/api';
+import SortableHeader from '../../components/admin/SortableHeader';
 
 const emptyForm = {
   name: '',
@@ -27,6 +28,33 @@ const AdminProducts = () => {
   const [form, setForm] = useState(emptyForm);
   const [images, setImages] = useState([]);
   const [error, setError] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const sortedProducts = useMemo(() => {
+    const items = [...products];
+    items.sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+
+      if (sortConfig.key.includes('.')) {
+        const parts = sortConfig.key.split('.');
+        aVal = parts.reduce((o, i) => o?.[i], a);
+        bVal = parts.reduce((o, i) => o?.[i], b);
+      }
+
+      if (aVal === bVal) return 0;
+      const result = aVal < bVal ? -1 : 1;
+      return sortConfig.direction === 'asc' ? result : -result;
+    });
+    return items;
+  }, [products, sortConfig]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -202,11 +230,11 @@ const AdminProducts = () => {
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50/50 text-gray-500 text-xs font-semibold uppercase">
               <tr>
-                <th className="px-6 py-4">Product</th>
-                <th className="px-6 py-4">Category</th>
-                <th className="px-6 py-4">Price</th>
-                <th className="px-6 py-4">Stock</th>
-                <th className="px-6 py-4">Status</th>
+                <SortableHeader label="Product" sortKey="name" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Category" sortKey="category.name" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Price" sortKey="price" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Stock" sortKey="stock" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={handleSort} />
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -222,7 +250,7 @@ const AdminProducts = () => {
                   <td colSpan="6" className="px-6 py-10 text-center text-gray-500">No products found.</td>
                 </tr>
               ) : (
-                filteredProducts.map(product => (
+                sortedProducts.map(product => (
                   <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">

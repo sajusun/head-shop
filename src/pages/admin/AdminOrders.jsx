@@ -16,6 +16,8 @@ import {
   FiShoppingBag
 } from 'react-icons/fi';
 import api from '../../services/api';
+import SortableHeader from '../../components/admin/SortableHeader';
+import { useMemo } from 'react';
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -28,6 +30,27 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
+
+  const handleSort = (key) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
+  const sortedOrders = useMemo(() => {
+    const items = [...orders];
+    items.sort((a, b) => {
+      let aVal = a[sortConfig.key];
+      let bVal = b[sortConfig.key];
+
+      if (aVal === bVal) return 0;
+      const result = aVal < bVal ? -1 : 1;
+      return sortConfig.direction === 'asc' ? result : -result;
+    });
+    return items;
+  }, [orders, sortConfig]);
 
   useEffect(() => {
     fetchOrders();
@@ -167,11 +190,11 @@ const AdminOrders = () => {
           <table className="w-full text-left">
             <thead className="bg-gray-50/50 text-gray-500 text-xs font-semibold uppercase">
               <tr>
-                <th className="px-6 py-4">Order Details</th>
-                <th className="px-6 py-4">Customer</th>
-                <th className="px-6 py-4">Amount</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Payment</th>
+                <SortableHeader label="Order Details" sortKey="order_number" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Customer" sortKey="full_name" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Amount" sortKey="total_amount" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={handleSort} />
+                <SortableHeader label="Payment" sortKey="payment_status" currentSort={sortConfig} onSort={handleSort} />
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -189,7 +212,7 @@ const AdminOrders = () => {
                   <td colSpan="6" className="px-6 py-10 text-center text-gray-500">No orders found.</td>
                 </tr>
               ) : (
-                orders.map((order) => (
+                sortedOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-4">
                       <div className="font-mono text-sm font-bold text-gray-900">#{order.order_number}</div>

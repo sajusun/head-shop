@@ -26,6 +26,7 @@ const AdminProducts = lazy(() => import('../pages/admin/AdminProducts'));
 const AdminOrders = lazy(() => import('../pages/admin/AdminOrders'));
 const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
 const AdminBlogs = lazy(() => import('../pages/admin/AdminBlogs'));
+const AdminCategories = lazy(() => import('../pages/admin/AdminCategories'));
 const AdminNewsletter = lazy(() => import('../pages/admin/AdminNewsletter'));
 const AdminContact = lazy(() => import('../pages/admin/AdminContact'));
 const AdminSettings = lazy(() => import('../pages/admin/AdminSettings'));
@@ -50,11 +51,11 @@ const PrivateRoute = ({ children }) => {
 };
 
 const AdminRoute = ({ children }) => {
-  const { user, token } = useSelector(state => state.auth);
+  const { user, token } = useSelector(state => state.adminAuth);
   
   // Robust check: use Redux state or fallback to localStorage
-  const currentUser = user || JSON.parse(localStorage.getItem('user'));
-  const currentToken = token || localStorage.getItem('token');
+  const currentUser = user || JSON.parse(localStorage.getItem('admin_user'));
+  const currentToken = token || localStorage.getItem('admin_token');
 
   if (!currentUser || !currentToken || currentUser.role !== 'admin') {
     return <Navigate to="/admin/login" replace />;
@@ -136,6 +137,7 @@ const AppRoutes = () => {
         >
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
+          <Route path="categories" element={<AdminCategories />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="journal" element={<AdminBlogs />} />

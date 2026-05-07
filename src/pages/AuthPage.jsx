@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, ShoppingBag } from 'lucide-react';
 import { login, logout, register } from '../features/auth/authSlice';
+import { adminLogin, adminLogout } from '../features/auth/adminAuthSlice';
 import Button from '../components/Button';
 import Input from '../components/Input';
 
@@ -15,30 +16,31 @@ const AuthPage = ({ mode = 'user' }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { loading, error } = useSelector(state => state.auth);
+  
+  const authState = useSelector(state => state.auth);
+  const adminAuthState = useSelector(state => state.adminAuth);
+  const { loading, error } = isAdminLogin ? adminAuthState : authState;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setRoleError('');
 
-    const action = isLogin || isAdminLogin ? login : register;
+    if (isAdminLogin) {
+      const resultAction = await dispatch(adminLogin(formData));
+      if (adminLogin.fulfilled.match(resultAction)) {
+        navigate('/admin');
+      }
+      return;
+    }
+
+    const action = isLogin ? login : register;
     const resultAction = await dispatch(action(formData));
 
     if (!action.fulfilled.match(resultAction)) return;
 
     const user = resultAction.payload.user;
-
-    if (isAdminLogin) {
-      if (user?.role === 'admin') {
-        navigate('/admin');
-      } else {
-        dispatch(logout());
-        setRoleError('This account is not allowed to access the admin panel.');
-      }
-      return;
-    }
-
-    // Smart Redirect
+    
+    // Smart Redirect for user
     const from = location.state?.from || (user?.role === 'admin' ? '/admin' : '/profile');
     navigate(from, { replace: true });
   };

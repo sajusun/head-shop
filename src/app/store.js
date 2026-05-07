@@ -7,10 +7,14 @@ import blogFavoriteReducer from '../features/favorites/blogFavoriteSlice';
 import reviewReducer from '../features/reviews/reviewSlice';
 import notificationReducer from '../features/notifications/notificationSlice';
 import settingsReducer from '../features/settings/settingsSlice';
+import adminAuthReducer from '../features/auth/adminAuthSlice';
+import categoryReducer from '../features/categories/categorySlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    adminAuth: adminAuthReducer,
+    categories: categoryReducer,
     products: productReducer,
     cart: cartReducer,
     favorites: favoriteReducer,
