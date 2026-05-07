@@ -21,6 +21,10 @@ const SettingsPage = lazy(() => import('../pages/SettingsPage'));
 // Admin Pages
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
 const AdminProducts = lazy(() => import('../pages/admin/AdminProducts'));
+const AdminOrders = lazy(() => import('../pages/admin/AdminOrders'));
+const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
+const AdminBlogs = lazy(() => import('../pages/admin/AdminBlogs'));
+const AdminNewsletter = lazy(() => import('../pages/admin/AdminNewsletter'));
 const AdminLayout = lazy(() => import('../components/admin/AdminLayout'));
 
 // add public pages for footer
@@ -122,6 +126,10 @@ const AppRoutes = () => {
         >
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="journal" element={<AdminBlogs />} />
+          <Route path="newsletter" element={<AdminNewsletter />} />
           {/* Add other admin sub-routes here */}
         </Route>
       </Routes>
