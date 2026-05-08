@@ -13,7 +13,8 @@ import {
   FiInfo, 
   FiDollarSign,
   FiBox,
-  FiChevronRight
+  FiChevronRight,
+  FiTrash
 } from 'react-icons/fi';
 import api from '../../services/api';
 import SortableHeader from '../../components/admin/SortableHeader';
@@ -53,6 +54,11 @@ const AdminProducts = () => {
   const [galleryPreviews, setGalleryPreviews] = useState([]);
   const [error, setError] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
+  
+  // Delete Modal State
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleSort = (key) => {
     setSortConfig(prev => ({
@@ -102,7 +108,7 @@ const AdminProducts = () => {
 
   const fetchAttributes = async () => {
     try {
-      const response = await api.get('/get-attributes');
+      const response = await api.get('/admin/get-attributes');
       setAttributes(response.data.data);
     } catch (err) {
       console.error('Failed to fetch attributes', err);
@@ -156,19 +162,39 @@ const AdminProducts = () => {
     })) || []);
 
     // Set amenities
-    setSelectedAmenities(product.amenity_items?.map(a => a.id) || []);
+    setSelectedAmenities(product.amenities?.map(a => a.id) || []);
     
     // Set thumbnail preview
     setThumbnailPreview(product.thumbnail);
     
     // Set gallery previews
-    setGalleryPreviews(product.images?.map(img => img.path) || []);
+    setGalleryPreviews(product.images?.map(img => img.url) || []);
     setGalleryImages([]);
     setThumbnail(null);
 
     setError('');
     setActiveTab('general');
     setModalOpen(true);
+  };
+
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/products/${productToDelete.id}`);
+      setDeleteModalOpen(false);
+      setProductToDelete(null);
+      fetchProducts();
+    } catch (err) {
+      setError('Failed to delete product');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   const handleFormChange = (e) => {
@@ -186,13 +212,18 @@ const AdminProducts = () => {
 
   const handleGalleryChange = (e) => {
     const files = Array.from(e.target.files);
-    if (galleryImages.length + files.length > 4) {
-      alert("You can only upload a maximum of 4 gallery images.");
+    const currentTotal = galleryPreviews.length;
+    
+    if (currentTotal + files.length > 4) {
+      alert("You can only upload a maximum of 4 gallery images total.");
       return;
     }
-    const newFiles = [...galleryImages, ...files].slice(0, 4);
+
+    const newFiles = [...galleryImages, ...files];
+    const newPreviews = [...galleryPreviews, ...files.map(file => URL.createObjectURL(file))];
+    
     setGalleryImages(newFiles);
-    setGalleryPreviews(newFiles.map(file => URL.createObjectURL(file)));
+    setGalleryPreviews(newPreviews);
   };
 
   const removeGalleryImage = (index) => {
@@ -284,16 +315,6 @@ const AdminProducts = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) return;
-    try {
-      await api.delete(`/products/${id}`);
-      setProducts(prev => prev.filter(p => p.id !== id));
-    } catch (err) {
-      setError('Failed to delete product');
-    }
-  };
-
   return (
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -370,7 +391,7 @@ const AdminProducts = () => {
                       <div className="flex items-center gap-4">
                         <div className="w-12 h-12 rounded-2xl bg-gray-100 overflow-hidden shrink-0 border border-gray-100">
                           <img 
-                            src={product.thumbnail || (product.primary_image?.path) || 'https://via.placeholder.com/100'} 
+                            src={product.thumbnail || 'https://via.placeholder.com/100'} 
                             alt={product.name} 
                             className="w-full h-full object-cover"
                           />
@@ -413,12 +434,12 @@ const AdminProducts = () => {
                         >
                           <FiEdit2 size={18} />
                         </button>
-                        <button 
-                          onClick={() => handleDelete(product.id)}
-                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
+                          <button 
+                            onClick={() => handleDeleteClick(product)}
+                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                          >
+                            <FiTrash2 size={18} />
+                          </button>
                       </div>
                     </td>
                   </tr>
@@ -852,6 +873,58 @@ const AdminProducts = () => {
           </div>
         )}
       </AnimatePresence>
+      <DeleteConfirmModal 
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        itemName={productToDelete?.name}
+        loading={deleting}
+      />
+    </div>
+  );
+};
+
+const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, itemName, loading }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+      />
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl overflow-hidden p-8 text-center"
+      >
+        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <FiTrash size={36} />
+        </div>
+        <h3 className="text-2xl font-black text-text mb-2">Are you sure?</h3>
+        <p className="text-gray-500 text-sm font-medium mb-8">
+          You are about to delete <span className="text-black font-bold">"{itemName}"</span>. This action cannot be undone and will remove all variants and images.
+        </p>
+        <div className="flex gap-4">
+          <button 
+            onClick={onClose}
+            className="flex-1 h-14 rounded-2xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200 transition-all"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex-1 h-14 rounded-2xl bg-red-500 text-white font-bold shadow-lg shadow-red-200 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+          >
+            {loading ? 'Deleting...' : 'Yes, Delete'}
+          </button>
+        </div>
+      </motion.div>
     </div>
   );
 };
