@@ -5,30 +5,57 @@ import { User, Lock, Bell, Shield, ArrowLeft, Camera, Check } from 'lucide-react
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { motion } from 'framer-motion';
+import { updateProfile } from '../features/auth/authSlice';
 
 const SettingsPage = () => {
-  const { user } = useSelector(state => state.auth);
+  const { user, loading, error } = useSelector(state => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const fileInputRef = React.useRef(null);
+
   const [activeTab, setActiveTab] = useState('profile');
-  const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
+  const [avatarFile, setAvatarFile] = useState(null);
 
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: '+1 (555) 000-0000',
-    bio: 'Passionate about high-end tech and minimalist design.',
+    phone: user?.phone || '',
+    bio: user?.bio || '',
   });
 
-  const handleSave = (e) => {
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setLoading(false);
+
+    // Use FormData for file uploads
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('phone', formData.phone);
+    data.append('bio', formData.bio);
+    if (avatarFile) {
+      data.append('avatar', avatarFile);
+    }
+    console.log(data);
+
+    const resultAction = await dispatch(updateProfile(data));
+    if (updateProfile.fulfilled.match(resultAction)) {
       setSaved(true);
+      setAvatarFile(null);
       setTimeout(() => setSaved(false), 3000);
-    }, 1000);
+    }
   };
 
   const tabs = [
@@ -39,7 +66,7 @@ const SettingsPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <button 
+      <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors mb-8 group"
       >
@@ -56,11 +83,10 @@ const SettingsPage = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-sm transition-all ${
-                  activeTab === tab.id 
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                className={`w-full flex items-center gap-3 p-4 rounded-2xl font-bold text-sm transition-all ${activeTab === tab.id
+                    ? 'bg-primary text-white shadow-lg shadow-primary/20'
                     : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {tab.icon} {tab.label}
               </button>
@@ -70,7 +96,7 @@ const SettingsPage = () => {
 
         {/* Content Area */}
         <div className="lg:col-span-3">
-          <motion.div 
+          <motion.div
             key={activeTab}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -82,13 +108,24 @@ const SettingsPage = () => {
                 <div className="flex flex-col sm:flex-row items-center gap-8 pb-10 border-b border-gray-50">
                   <div className="relative group">
                     <div className="w-32 h-32 rounded-full bg-primary/10 overflow-hidden border-4 border-white shadow-xl">
-                      <img 
-                        src={user?.avatar || "https://i.pravatar.cc/300"} 
-                        alt="Profile" 
+                      <img
+                        src={avatarPreview || "https://i.pravatar.cc/300"}
+                        alt="Profile"
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <button className="absolute bottom-0 right-0 p-2.5 bg-primary text-white rounded-full shadow-lg hover:scale-110 transition-transform">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleAvatarChange}
+                      className="hidden"
+                      accept="image/*"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current.click()}
+                      className="absolute bottom-0 right-0 p-2.5 bg-primary text-white rounded-full shadow-lg hover:scale-110 transition-transform"
+                    >
                       <Camera size={18} />
                     </button>
                   </div>
@@ -96,37 +133,47 @@ const SettingsPage = () => {
                     <h3 className="text-xl font-bold text-text mb-1">Profile Photo</h3>
                     <p className="text-sm text-gray-500 mb-4">Update your avatar to personalize your profile.</p>
                     <div className="flex gap-3">
-                      <Button size="sm" variant="outline" className="rounded-xl">Upload New</Button>
-                      <Button size="sm" variant="ghost" className="text-red-500 hover:bg-red-50 rounded-xl">Remove</Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-xl"
+                        type="button"
+                        onClick={() => fileInputRef.current.click()}
+                      >
+                        Upload New
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-red-500 hover:bg-red-50 rounded-xl" type="button">Remove</Button>
                     </div>
                   </div>
                 </div>
 
                 {/* Form Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <Input 
-                    label="Display Name" 
-                    value={formData.name} 
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  <Input
+                    label="Display Name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   />
-                  <Input 
-                    label="Email Address" 
-                    type="email" 
-                    value={formData.email} 
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  <Input
+                    label="Email Address (Read Only)"
+                    type="email"
+                    value={formData.email}
+                    readOnly
+                    className="bg-gray-50 cursor-not-allowed"
                   />
-                  <Input 
-                    label="Phone Number" 
-                    value={formData.phone} 
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  <Input
+                    label="Phone Number"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-text mb-2">Short Bio</label>
-                    <textarea 
+                    <textarea
                       rows="4"
                       className="w-full rounded-xl border border-gray-200 p-4 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
                       value={formData.bio}
-                      onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                      placeholder="Tell us about yourself..."
                     />
                   </div>
                 </div>
@@ -134,13 +181,16 @@ const SettingsPage = () => {
                 <div className="flex items-center justify-between pt-6">
                   <div className="flex items-center gap-2">
                     {saved && (
-                      <motion.span 
+                      <motion.span
                         initial={{ opacity: 0, scale: 0.5 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="flex items-center gap-1.5 text-green-500 text-sm font-bold"
                       >
                         <Check size={16} /> Profile Updated Successfully
                       </motion.span>
+                    )}
+                    {error && (
+                      <span className="text-red-500 text-sm font-bold">{error}</span>
                     )}
                   </div>
                   <Button type="submit" loading={loading} className="px-12 rounded-2xl h-14">

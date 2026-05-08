@@ -44,6 +44,8 @@ const ReturnsExchangesPage = lazy(() => import('../pages/ReturnsExchangesPage'))
 const ContactPage = lazy(() => import('../pages/ContactPage'));
 const BlogPage = lazy(() => import('../pages/BlogPage'));
 const BlogDetailsPage = lazy(() => import('../pages/BlogDetailsPage'));
+const ForgotPasswordPage = lazy(() => import('../pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('../pages/ResetPasswordPage'));
 
 const PrivateRoute = ({ children }) => {
   const { user } = useSelector(state => state.auth);
@@ -98,6 +100,8 @@ const AppRoutes = () => {
           <Route path="contact" element={<ContactPage />} />
           <Route path="journal" element={<BlogPage />} />
           <Route path="journal/:slug" element={<BlogDetailsPage />} />
+          <Route path="forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="reset-password" element={<ResetPasswordPage />} />
 
           <Route 
             path="profile" 
@@ -126,6 +130,7 @@ const AppRoutes = () => {
         </Route>
 
         <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* Admin Routes */}
         <Route 

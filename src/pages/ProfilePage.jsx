@@ -39,7 +39,12 @@ const ProfilePage = () => {
               {user.avatar ? <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" /> : <User size={40} />}
             </div>
             <h2 className="text-xl font-bold text-text">{user.name}</h2>
-            <p className="text-sm text-gray-500 mb-6">{user.email}</p>
+            <p className="text-sm text-gray-500 mb-2">{user.email}</p>
+            {user.bio && (
+              <p className="text-xs text-gray-400 mb-6 italic leading-relaxed px-2">
+                "{user.bio}"
+              </p>
+            )}
             <Button 
               variant="outline" 
               size="sm" 

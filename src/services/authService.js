@@ -52,6 +52,10 @@ const authService = {
       return Promise.resolve();
     }
     return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/logout`);
+  },
+  
+  updateProfile: async (userData) => {
+    return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/profile`, userData);
   }
 };
 
