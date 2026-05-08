@@ -81,8 +81,8 @@ const AttributeModal = ({ isOpen, onClose, attribute = null, type = 'colors', on
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden"
       >
-        <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-          <h2 className="text-2xl font-black text-text">
+        <div className="p-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
+          <h2 className="text-xl font-bold text-text">
             {attribute ? 'Edit' : 'New'} {type.slice(0, -1)}
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-all">
@@ -181,12 +181,12 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, itemName, type, loadin
         exit={{ opacity: 0, scale: 0.95 }}
         className="relative w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl overflow-hidden p-8 text-center"
       >
-        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <FiTrash size={36} />
+        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <FiTrash size={28} />
         </div>
-        <h3 className="text-2xl font-black text-text mb-2">Are you sure?</h3>
+        <h3 className="text-xl font-bold text-text mb-2">Are you sure?</h3>
         <p className="text-gray-500 text-sm font-medium mb-8">
-          You are about to delete <span className="text-black font-bold">"{itemName}"</span> from {type}. This action cannot be undone.
+          You are about to delete <span className="text-black font-semibold">"{itemName}"</span> from {type}. This action cannot be undone.
         </p>
         <div className="flex gap-4">
           <button 
@@ -291,17 +291,17 @@ const AdminAttributes = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-text mb-2">Attributes</h1>
-          <p className="text-gray-500 font-medium">Manage product variations and special features.</p>
+          <h1 className="text-3xl font-bold text-text mb-2">Attributes</h1>
+          <p className="text-gray-500 font-medium text-sm">Manage product variations and special features.</p>
         </div>
-        <Button onClick={() => { setSelectedItem(null); setIsModalOpen(true); }} className="rounded-2xl h-14 px-8 shadow-xl shadow-primary/20 flex items-center gap-3">
-          <FiPlus size={20} />
+        <Button onClick={() => { setSelectedItem(null); setIsModalOpen(true); }} className="rounded-xl h-11 px-6 shadow-lg shadow-primary/20 flex items-center gap-2 text-sm">
+          <FiPlus size={18} />
           Add {activeTab.slice(0, -1)}
         </Button>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 w-fit">
+        <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100 w-fit">
           {[
             { id: 'colors', label: 'Colors', icon: <FiDroplet /> },
             { id: 'sizes', label: 'Sizes', icon: <FiMaximize /> },
@@ -310,9 +310,9 @@ const AdminAttributes = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-bold text-[10px] uppercase tracking-widest transition-all ${
                 activeTab === tab.id 
-                  ? 'bg-black text-white shadow-lg' 
+                  ? 'bg-black text-white shadow-sm' 
                   : 'text-gray-400 hover:text-text hover:bg-gray-50'
               }`}
             >
@@ -328,13 +328,13 @@ const AdminAttributes = () => {
             placeholder={`Search ${activeTab}...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-14 pl-12 pr-4 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+            className="w-full h-11 pl-10 pr-4 bg-white border border-gray-100 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
           />
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
         </div>
       </div>
 
-      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
@@ -367,8 +367,8 @@ const AdminAttributes = () => {
                       transition={{ delay: index * 0.05 }}
                       className="group hover:bg-gray-50/50 transition-colors"
                     >
-                      <td className="px-8 py-6">
-                        <span className="font-bold text-text">{item.name}</span>
+                      <td className="px-6 py-4">
+                        <span className="font-semibold text-text">{item.name}</span>
                       </td>
                       {activeTab === 'colors' && (
                         <td className="px-8 py-6">
@@ -402,15 +402,15 @@ const AdminAttributes = () => {
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button 
                             onClick={() => handleEdit(item)}
-                            className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
                           >
-                            <FiEdit2 size={18} />
+                            <FiEdit2 size={16} />
                           </button>
                           <button 
                             onClick={() => openDeleteModal(item)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                           >
-                            <FiTrash2 size={18} />
+                            <FiTrash2 size={16} />
                           </button>
                         </div>
                       </td>

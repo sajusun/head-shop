@@ -3,10 +3,12 @@ import api from '../../services/api';
 
 export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
-  async (type = 'product', { rejectWithValue }) => {
+  async ({ type = 'product', page = 1, per_page = 20 } = {}, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/categories?type=${type}`);
-      return response.data.data;
+      const response = await api.get(`/categories`, {
+        params: { type, page, per_page }
+      });
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch categories');
     }
@@ -53,6 +55,7 @@ const categorySlice = createSlice({
   name: 'categories',
   initialState: {
     items: [],
+    pagination: { current_page: 1, last_page: 1, total: 0 },
     loading: false,
     error: null,
     success: false,
@@ -71,7 +74,8 @@ const categorySlice = createSlice({
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+        state.items = action.payload.data;
+        state.pagination = action.payload.pagination || { current_page: 1, last_page: 1, total: 0 };
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false;

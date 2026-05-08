@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiEye, FiMessageSquare, FiX, FiSearch, FiFilter } from 'react-icons/fi';
 import api from '../../services/api';
+import SortableHeader from '../../components/admin/SortableHeader';
+import Pagination from '../../components/admin/Pagination';
 
 const emptyForm = {
   title: '',
@@ -24,19 +26,20 @@ const AdminBlogs = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   useEffect(() => {
     fetchBlogs();
     fetchCategories();
-  }, [page, searchTerm, statusFilter]);
+  }, [page, perPage, searchTerm, statusFilter]);
 
   const fetchBlogs = async () => {
     setLoading(true);
     try {
       const response = await api.get('/admin/blogs', {
         params: {
-          per_page: 12,
-          current_page: page,
+          per_page: perPage,
+          page: page,
           search: searchTerm || undefined,
           status: statusFilter || undefined,
         },
@@ -249,30 +252,11 @@ const AdminBlogs = () => {
         )}
       </div>
 
-      {pagination.last_page > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-500 pt-4">
-          <span>Total {pagination.total} articles</span>
-          <div className="flex gap-2">
-            <button 
-              disabled={page <= 1} 
-              onClick={() => setPage(page - 1)} 
-              className="px-4 py-2 rounded-xl border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
-            >
-              Previous
-            </button>
-            <span className="px-4 py-2 font-bold text-gray-900 bg-gray-50 rounded-xl">
-              Page {pagination.current_page} of {pagination.last_page}
-            </span>
-            <button 
-              disabled={page >= pagination.last_page} 
-              onClick={() => setPage(page + 1)} 
-              className="px-4 py-2 rounded-xl border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
+      <Pagination 
+        pagination={pagination} 
+        onPageChange={setPage} 
+        onPerPageChange={setPerPage}
+      />
 
       {modalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">

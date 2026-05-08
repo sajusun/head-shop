@@ -21,6 +21,7 @@ import {
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import SortableHeader from '../../components/admin/SortableHeader';
+import Pagination from '../../components/admin/Pagination';
 
 const CategoryModal = ({ isOpen, onClose, category = null, type = 'product' }) => {
   const dispatch = useDispatch();
@@ -152,10 +153,12 @@ const CategoryModal = ({ isOpen, onClose, category = null, type = 'product' }) =
 
 const AdminCategories = () => {
   const dispatch = useDispatch();
-  const { items: categories, loading, success, error } = useSelector(state => state.categories);
+  const { items: categories, pagination, loading, success, error } = useSelector(state => state.categories);
   
   const [searchTerm, setSearchTerm] = useState('');
   const [activeType, setActiveType] = useState('product');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
@@ -186,8 +189,8 @@ const AdminCategories = () => {
   }, [categories, sortConfig]);
 
   useEffect(() => {
-    dispatch(fetchCategories(activeType));
-  }, [dispatch, activeType]);
+    dispatch(fetchCategories({ type: activeType, page, per_page: perPage }));
+  }, [dispatch, activeType, page, perPage]);
 
   useEffect(() => {
     if (success) {
@@ -220,27 +223,25 @@ const AdminCategories = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-text mb-2">Categories</h1>
-          <p className="text-gray-500 font-medium">Organize your {activeType}s with beautiful taxonomy.</p>
+          <h1 className="text-3xl font-bold text-text mb-2">Categories</h1>
+          <p className="text-gray-500 font-medium text-sm">Organize your {activeType}s with beautiful taxonomy.</p>
         </div>
-        <Button onClick={handleAddNew} className="rounded-2xl h-14 px-8 shadow-xl shadow-primary/20 flex items-center gap-3 group">
-          <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform">
-            <FiPlus size={18} />
-          </div>
-          Add New Category
+        <Button onClick={handleAddNew} className="rounded-xl h-11 px-6 shadow-lg shadow-primary/20 flex items-center gap-2 text-sm group">
+          <FiPlus size={18} />
+          Add Category
         </Button>
       </div>
 
       {/* Filters & Search */}
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex bg-white p-1.5 rounded-2xl shadow-sm border border-gray-100 w-fit">
+        <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100 w-fit">
           {['product', 'blog'].map(type => (
             <button
               key={type}
               onClick={() => setActiveType(type)}
-              className={`px-8 py-3 rounded-xl font-bold capitalize transition-all ${
+              className={`px-6 py-2 rounded-lg font-bold capitalize text-[10px] uppercase tracking-widest transition-all ${
                 activeType === type 
-                  ? 'bg-black text-white shadow-lg' 
+                  ? 'bg-black text-white shadow-sm' 
                   : 'text-gray-400 hover:text-text hover:bg-gray-50'
               }`}
             >
@@ -255,22 +256,22 @@ const AdminCategories = () => {
             placeholder="Search categories..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full h-14 pl-12 pr-4 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+            className="w-full h-11 pl-10 pr-4 bg-white border border-gray-100 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
           />
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
         </div>
       </div>
 
       {/* Categories Table */}
-      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-gray-50/50 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                <SortableHeader label="Category Info" sortKey="name" currentSort={sortConfig} onSort={handleSort} className="px-8" />
-                <SortableHeader label="Sub-categories" sortKey="children_count" currentSort={sortConfig} onSort={handleSort} className="px-8 text-center" />
-                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={handleSort} className="px-8" />
-                <th className="px-8 py-6 text-right">Actions</th>
+                <SortableHeader label="Category Info" sortKey="name" currentSort={sortConfig} onSort={handleSort} className="px-6 py-4 text-xs font-bold" />
+                <SortableHeader label="Sub-categories" sortKey="children_count" currentSort={sortConfig} onSort={handleSort} className="px-6 py-4 text-center text-xs font-bold" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={handleSort} className="px-6 py-4 text-xs font-bold" />
+                <th className="px-6 py-4 text-right text-xs font-bold">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -315,15 +316,15 @@ const AdminCategories = () => {
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button 
                             onClick={() => handleEdit(cat)}
-                            className="p-2 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
                           >
-                            <FiEdit2 size={18} />
+                            <FiEdit2 size={16} />
                           </button>
                           <button 
                             onClick={() => handleDelete(cat.id)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                           >
-                            <FiTrash2 size={18} />
+                            <FiTrash2 size={16} />
                           </button>
                         </div>
                       </td>
@@ -345,6 +346,11 @@ const AdminCategories = () => {
             </tbody>
           </table>
         </div>
+        <Pagination 
+          pagination={pagination} 
+          onPageChange={setPage} 
+          onPerPageChange={setPerPage}
+        />
       </div>
 
       {error && (

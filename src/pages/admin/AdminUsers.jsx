@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiCalendar, FiEdit2, FiMail, FiPhone, FiPlus, FiSearch, FiTrash2, FiUser, FiX } from 'react-icons/fi';
 import api from '../../services/api';
 import SortableHeader from '../../components/admin/SortableHeader';
+import Pagination from '../../components/admin/Pagination';
 import { useMemo } from 'react';
 
 const emptyForm = {
@@ -20,6 +21,7 @@ const AdminUsers = () => {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [form, setForm] = useState(emptyForm);
@@ -51,7 +53,7 @@ const AdminUsers = () => {
     try {
       const response = await api.get('/admin/users', {
         params: {
-          per_page: 12,
+          per_page: perPage,
           page,
           search: search || undefined,
           role: role || undefined,
@@ -68,7 +70,7 @@ const AdminUsers = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, [page, search, role]);
+  }, [page, perPage, search, role]);
 
   const openCreateModal = () => {
     setEditingUser(null);
@@ -241,10 +243,10 @@ const AdminUsers = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => openEditModal(user)} className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
+                        <button onClick={() => openEditModal(user)} className="p-1.5 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors">
                           <FiEdit2 size={16} />
                         </button>
-                        <button onClick={() => handleDelete(user)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <button onClick={() => handleDelete(user)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                           <FiTrash2 size={16} />
                         </button>
                       </div>
@@ -255,18 +257,13 @@ const AdminUsers = () => {
             </tbody>
           </table>
         </div>
+        <Pagination 
+          pagination={pagination} 
+          onPageChange={setPage} 
+          onPerPageChange={setPerPage}
+        />
       </div>
 
-      {pagination.last_page > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <span>{pagination.total} users</span>
-          <div className="flex gap-2">
-            <button disabled={page <= 1} onClick={() => setPage(page - 1)} className="px-4 py-2 rounded-xl border disabled:opacity-40">Previous</button>
-            <span className="px-4 py-2 font-bold text-gray-900">Page {pagination.current_page} of {pagination.last_page}</span>
-            <button disabled={page >= pagination.last_page} onClick={() => setPage(page + 1)} className="px-4 py-2 rounded-xl border disabled:opacity-40">Next</button>
-          </div>
-        </div>
-      )}
 
       {modalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">

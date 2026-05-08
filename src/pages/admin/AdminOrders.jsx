@@ -17,6 +17,7 @@ import {
 } from 'react-icons/fi';
 import api from '../../services/api';
 import SortableHeader from '../../components/admin/SortableHeader';
+import Pagination from '../../components/admin/Pagination';
 import { useMemo } from 'react';
 
 const AdminOrders = () => {
@@ -26,6 +27,7 @@ const AdminOrders = () => {
   const [paymentStatusFilter, setPaymentStatusFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const [pagination, setPagination] = useState({ current_page: 1, last_page: 1, total: 0 });
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -54,7 +56,7 @@ const AdminOrders = () => {
 
   useEffect(() => {
     fetchOrders();
-  }, [statusFilter, paymentStatusFilter, searchTerm, page]);
+  }, [statusFilter, paymentStatusFilter, searchTerm, page, perPage]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -65,7 +67,7 @@ const AdminOrders = () => {
           payment_status: paymentStatusFilter || undefined,
           search: searchTerm || undefined,
           page: page,
-          per_page: 10
+          per_page: perPage
         }
       });
       setOrders(response.data.data);
@@ -243,10 +245,10 @@ const AdminOrders = () => {
                       <div className="flex items-center justify-end gap-2">
                         <button 
                           onClick={() => fetchOrderDetails(order.id)}
-                          className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
                           title="View Details"
                         >
-                          <FiEye size={18} />
+                          <FiEye size={16} />
                         </button>
                       </div>
                     </td>
@@ -256,33 +258,12 @@ const AdminOrders = () => {
             </tbody>
           </table>
         </div>
+        <Pagination 
+          pagination={pagination} 
+          onPageChange={setPage} 
+          onPerPageChange={setPerPage}
+        />
       </div>
-
-      {/* Pagination */}
-      {pagination.last_page > 1 && (
-        <div className="flex items-center justify-between text-sm text-gray-500 pt-4">
-          <span>Showing {orders.length} of {pagination.total} orders</span>
-          <div className="flex gap-2">
-            <button 
-              disabled={page <= 1} 
-              onClick={() => setPage(page - 1)} 
-              className="px-4 py-2 rounded-xl border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
-            >
-              Previous
-            </button>
-            <span className="px-4 py-2 font-bold text-gray-900 bg-gray-50 rounded-xl">
-              Page {pagination.current_page} of {pagination.last_page}
-            </span>
-            <button 
-              disabled={page >= pagination.last_page} 
-              onClick={() => setPage(page + 1)} 
-              className="px-4 py-2 rounded-xl border border-gray-200 disabled:opacity-40 hover:bg-gray-50 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Order Details Modal */}
       {detailsModalOpen && selectedOrder && (

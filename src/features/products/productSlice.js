@@ -7,9 +7,11 @@ export const fetchProducts = createAsyncThunk(
     try {
       const response = await productService.getAll(params);
 
+      const data = response.data?.data ?? response.data;
+      
       return {
-        items: response.data?.data ?? response.data,
-        pagination: response.data?.pagination ?? null,
+        items: Array.isArray(data) ? data : (data?.data ?? []),
+        pagination: data?.pagination ?? null,
       };
     } catch (error) {
       return rejectWithValue(error.message);

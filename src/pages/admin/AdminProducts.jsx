@@ -17,7 +17,9 @@ import {
   FiTrash
 } from 'react-icons/fi';
 import api from '../../services/api';
+import Button from '../../components/Button';
 import SortableHeader from '../../components/admin/SortableHeader';
+import Pagination from '../../components/admin/Pagination';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const emptyForm = {
@@ -40,6 +42,7 @@ const AdminProducts = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
   const [editingProduct, setEditingProduct] = useState(null);
@@ -92,8 +95,8 @@ const AdminProducts = () => {
     try {
       const response = await api.get('/products', {
         params: {
-          per_page: 10,
-          current_page: page,
+          per_page: perPage,
+          page: page,
           search: searchTerm || undefined,
           status: statusFilter || undefined,
         },
@@ -122,7 +125,7 @@ const AdminProducts = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [page, searchTerm, statusFilter]);
+  }, [page, perPage, searchTerm, statusFilter]);
 
   const openCreateModal = () => {
     setEditingProduct(null);
@@ -346,33 +349,30 @@ const AdminProducts = () => {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-          <h1 className="text-4xl font-black text-text mb-2">Inventory</h1>
-          <p className="text-gray-500 font-medium">Manage your premium product collection.</p>
+          <h1 className="text-3xl font-bold text-text mb-2">Inventory</h1>
+          <p className="text-gray-500 font-medium text-sm">Manage your premium product collection.</p>
         </div>
-        <button 
-          onClick={openCreateModal}
-          className="bg-black text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-3 shadow-xl hover:scale-[1.02] transition-all"
-        >
-          <FiPlus size={20} />
-          Add New Product
-        </button>
+        <Button onClick={openCreateModal} className="rounded-xl h-11 px-6 shadow-lg shadow-primary/20 flex items-center gap-2 text-sm">
+          <FiPlus size={18} />
+          Add Product
+        </Button>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col lg:flex-row gap-4 bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm">
+      <div className="flex flex-col lg:flex-row gap-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
         <div className="relative flex-1">
-          <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input 
             type="text" 
-            placeholder="Search by name or SKU..."
-            className="w-full pl-12 pr-4 h-12 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-black/5 text-sm font-medium"
+            placeholder="Search products..."
+            className="w-full h-11 pl-10 pr-4 bg-white border border-gray-100 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex gap-2">
           <select 
-            className="h-12 px-4 bg-gray-50 border-none rounded-xl text-sm font-bold outline-none"
+            className="h-11 px-4 bg-white border border-gray-100 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20 transition-all text-sm font-medium outline-none"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -384,17 +384,17 @@ const AdminProducts = () => {
       </div>
 
       {/* Products Table */}
-      <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-gray-50/50 text-gray-400 text-[10px] font-black uppercase tracking-widest border-b border-gray-50">
-                <SortableHeader label="Product" sortKey="name" currentSort={sortConfig} onSort={handleSort} className="px-8" />
-                <SortableHeader label="Category" sortKey="category.name" currentSort={sortConfig} onSort={handleSort} className="px-8" />
-                <SortableHeader label="Price" sortKey="price" currentSort={sortConfig} onSort={handleSort} className="px-8" />
-                <SortableHeader label="Stock" sortKey="stock" currentSort={sortConfig} onSort={handleSort} className="px-8" />
-                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={handleSort} className="px-8" />
-                <th className="px-8 py-6 text-right">Actions</th>
+              <tr className="bg-gray-50/50 text-gray-400 text-[10px] font-bold uppercase tracking-widest border-b border-gray-50">
+                <SortableHeader label="Product" sortKey="name" currentSort={sortConfig} onSort={handleSort} className="px-6 py-4 text-xs font-bold" />
+                <SortableHeader label="Category" sortKey="category_id" currentSort={sortConfig} onSort={handleSort} className="px-6 py-4 text-xs font-bold" />
+                <SortableHeader label="Price" sortKey="price" currentSort={sortConfig} onSort={handleSort} className="px-6 py-4 text-xs font-bold" />
+                <SortableHeader label="Stock" sortKey="stock" currentSort={sortConfig} onSort={handleSort} className="px-6 py-4 text-xs font-bold" />
+                <SortableHeader label="Status" sortKey="status" currentSort={sortConfig} onSort={handleSort} className="px-6 py-4 text-xs font-bold" />
+                <th className="px-6 py-4 text-xs font-bold text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -414,9 +414,9 @@ const AdminProducts = () => {
               ) : (
                 sortedProducts.map((product) => (
                   <tr key={product.id} className="group hover:bg-gray-50/50 transition-colors">
-                    <td className="px-8 py-5">
+                    <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-gray-100 overflow-hidden shrink-0 border border-gray-100">
+                        <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-100">
                           <img 
                             src={product.thumbnail || 'https://via.placeholder.com/100'} 
                             alt={product.name} 
@@ -424,13 +424,13 @@ const AdminProducts = () => {
                           />
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-gray-900 leading-tight">{product.name}</p>
-                          <p className="text-[10px] text-gray-400 font-mono mt-1">{product.sku || 'NO-SKU'}</p>
+                          <p className="font-semibold text-text text-sm mb-0.5">{product.name}</p>
+                          <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{product.sku || 'NO-SKU'}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-5">
-                      <span className="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-lg">
+                    <td className="px-6 py-4">
+                      <span className="text-xs font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-md">
                         {product.category?.name || 'Uncategorized'}
                       </span>
                     </td>
@@ -457,15 +457,15 @@ const AdminProducts = () => {
                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={() => openEditModal(product)}
-                          className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-xl transition-all"
+                          className="p-1.5 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-all"
                         >
-                          <FiEdit2 size={18} />
+                          <FiEdit2 size={16} />
                         </button>
                           <button 
                             onClick={() => handleDeleteClick(product)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
                           >
-                            <FiTrash2 size={18} />
+                            <FiTrash2 size={16} />
                           </button>
                       </div>
                     </td>
@@ -475,6 +475,11 @@ const AdminProducts = () => {
             </tbody>
           </table>
         </div>
+        <Pagination 
+          pagination={pagination} 
+          onPageChange={setPage} 
+          onPerPageChange={setPerPage}
+        />
       </div>
 
       {/* Product Form Modal */}
@@ -927,14 +932,14 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, itemName, loading }) =
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-sm bg-white rounded-[2.5rem] shadow-2xl overflow-hidden p-8 text-center"
+        className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden p-8 text-center"
       >
-        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <FiTrash size={36} />
+        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <FiTrash size={28} />
         </div>
-        <h3 className="text-2xl font-black text-text mb-2">Are you sure?</h3>
+        <h3 className="text-xl font-bold text-text mb-2">Are you sure?</h3>
         <p className="text-gray-500 text-sm font-medium mb-8">
-          You are about to delete <span className="text-black font-bold">"{itemName}"</span>. This action cannot be undone and will remove all variants and images.
+          You are about to delete <span className="text-black font-semibold">"{itemName}"</span>. This action cannot be undone.
         </p>
         <div className="flex gap-4">
           <button 
