@@ -52,6 +52,7 @@ const AdminProducts = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
   const [galleryImages, setGalleryImages] = useState([]);
   const [galleryPreviews, setGalleryPreviews] = useState([]);
+  const [deletedImageIds, setDeletedImageIds] = useState([]);
   const [error, setError] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
   
@@ -168,8 +169,9 @@ const AdminProducts = () => {
     setThumbnailPreview(product.thumbnail);
     
     // Set gallery previews
-    setGalleryPreviews(product.images?.map(img => img.url) || []);
+    setGalleryPreviews(product.images?.map(img => ({ id: img.id, url: img.url, isExisting: true })) || []);
     setGalleryImages([]);
+    setDeletedImageIds([]);
     setThumbnail(null);
 
     setError('');
@@ -215,22 +217,43 @@ const AdminProducts = () => {
     const currentTotal = galleryPreviews.length;
     
     if (currentTotal + files.length > 4) {
-      alert("You can only upload a maximum of 4 gallery images total.");
+      alert(`You can only have 4 gallery images total. You already have ${currentTotal}.`);
       return;
     }
 
     const newFiles = [...galleryImages, ...files];
-    const newPreviews = [...galleryPreviews, ...files.map(file => URL.createObjectURL(file))];
+    const newPreviews = [...galleryPreviews, ...files.map(file => ({ 
+      url: URL.createObjectURL(file), 
+      isExisting: false,
+      fileIndex: galleryImages.length + files.indexOf(file) // Track which file in galleryImages this is
+    }))];
     
     setGalleryImages(newFiles);
     setGalleryPreviews(newPreviews);
   };
 
   const removeGalleryImage = (index) => {
-    const newFiles = galleryImages.filter((_, i) => i !== index);
-    const newPreviews = galleryPreviews.filter((_, i) => i !== index);
-    setGalleryImages(newFiles);
-    setGalleryPreviews(newPreviews);
+    const itemToRemove = galleryPreviews[index];
+    
+    if (itemToRemove.isExisting) {
+      setDeletedImageIds(prev => [...prev, itemToRemove.id]);
+    } else {
+      // If it's a new file, we need to remove it from galleryImages too
+      // We need to find its index in galleryImages
+      const fileToRemove = galleryImages.find((_, i) => i === itemToRemove.fileIndex);
+      setGalleryImages(prev => prev.filter((_, i) => i !== itemToRemove.fileIndex));
+      
+      // Update fileIndex for remaining new previews
+      setGalleryPreviews(prev => prev.filter((_, i) => i !== index).map(p => {
+        if (!p.isExisting && p.fileIndex > itemToRemove.fileIndex) {
+          return { ...p, fileIndex: p.fileIndex - 1 };
+        }
+        return p;
+      }));
+      return;
+    }
+
+    setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const addVariant = () => {
@@ -267,6 +290,10 @@ const AdminProducts = () => {
 
     galleryImages.forEach(image => {
       formData.append('images[]', image);
+    });
+
+    deletedImageIds.forEach(id => {
+      formData.append('deleted_images[]', id);
     });
 
     variants.forEach((v, i) => {
@@ -671,7 +698,7 @@ const AdminProducts = () => {
                         <div className="grid grid-cols-4 gap-4">
                           {galleryPreviews.map((preview, i) => (
                             <div key={i} className="relative aspect-square rounded-2xl overflow-hidden border border-gray-100 group">
-                              <img src={preview} className="w-full h-full object-cover" />
+                              <img src={preview.url} className="w-full h-full object-cover" />
                               <button 
                                 type="button"
                                 onClick={() => removeGalleryImage(i)}
