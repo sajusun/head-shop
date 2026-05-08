@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FiCalendar, FiEdit2, FiMail, FiPhone, FiPlus, FiSearch, FiTrash2, FiUser, FiX } from 'react-icons/fi';
 import api from '../../services/api';
 import SortableHeader from '../../components/admin/SortableHeader';
-import Pagination from '../../components/admin/Pagination';
+import Pagination from '../../components/common/Pagination';
 import { useMemo } from 'react';
 
 const emptyForm = {

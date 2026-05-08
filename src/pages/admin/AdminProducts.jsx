@@ -19,7 +19,7 @@ import {
 import api from '../../services/api';
 import Button from '../../components/Button';
 import SortableHeader from '../../components/admin/SortableHeader';
-import Pagination from '../../components/admin/Pagination';
+import Pagination from '../../components/common/Pagination';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const emptyForm = {

@@ -17,7 +17,7 @@ import {
 } from 'react-icons/fi';
 import api from '../../services/api';
 import SortableHeader from '../../components/admin/SortableHeader';
-import Pagination from '../../components/admin/Pagination';
+import Pagination from '../../components/common/Pagination';
 import { useMemo } from 'react';
 
 const AdminOrders = () => {

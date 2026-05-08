@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'react-router-dom';
 import { fetchProducts, setSearchQuery, setCategoryFilter } from '../features/products/productSlice';
+import { fetchCategories } from '../features/categories/categorySlice';
 import ProductCard from '../components/ProductCard';
 import { Search, LayoutGrid, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Pagination from '../components/common/Pagination';
 
 const ProductListingPage = () => {
   const dispatch = useDispatch();
@@ -13,7 +15,7 @@ const ProductListingPage = () => {
   const [sortBy, setSortBy] = useState('Newest');
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(() => Math.max(Number(searchParams.get('page')) || 1, 1));
-  const itemsPerPage = 24;
+  const [perPage, setPerPage] = useState(24);
   const panelRef = useRef(null);
 
   const sortMap = {
@@ -41,14 +43,18 @@ const ProductListingPage = () => {
   }, [setSearchParams]);
 
   useEffect(() => {
+    dispatch(fetchCategories({ type: 'product', per_page: 100 }));
+  }, [dispatch]);
+
+  useEffect(() => {
     dispatch(fetchProducts({
       page: currentPage,
-      per_page: itemsPerPage,
+      per_page: perPage,
       search: searchQuery,
       category: categoryFilter === 'All' ? '' : toSlug(categoryFilter),
       sort: sortMap[sortBy],
     }));
-  }, [dispatch, currentPage, searchQuery, categoryFilter, sortBy]);
+  }, [dispatch, currentPage, perPage, searchQuery, categoryFilter, sortBy]);
 
   useEffect(() => {
     const query = searchParams.get('q');
@@ -76,34 +82,16 @@ const ProductListingPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const getCategoryName = (product) => product.category?.name || product.category || 'Uncategorized';
-  const categories = ['All', ...new Set(products.map(getCategoryName))];
+  const { items: allCategories } = useSelector(state => state.categories);
+  const categories = useMemo(() => ['All', ...allCategories.map(cat => cat.name)], [allCategories]);
 
-  const totalPages = pagination?.last_page || 1;
   const totalProducts = pagination?.total ?? products.length;
   const pageStart = pagination?.from ?? (products.length ? 1 : 0);
   const pageEnd = pagination?.to ?? products.length;
 
-  const visiblePages = useMemo(() => {
-    const pages = new Set([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
-
-    return [...pages]
-      .filter((page) => page >= 1 && page <= totalPages)
-      .sort((a, b) => a - b)
-      .reduce((result, page, index, source) => {
-        if (index > 0 && page - source[index - 1] > 1) {
-          result.push('ellipsis');
-        }
-
-        result.push(page);
-        return result;
-      }, []);
-  }, [currentPage, totalPages]);
-
   const handlePageChange = (page) => {
-    const nextPage = Math.min(Math.max(page, 1), totalPages);
-    setCurrentPage(nextPage);
-    updateSearchParams({ page: String(nextPage) });
+    setCurrentPage(page);
+    updateSearchParams({ page: String(page) });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -213,7 +201,7 @@ const ProductListingPage = () => {
         </div>
 
         <div className="text-center">
-          <p className="text-sm font-medium text-gray-400">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
             Showing <span className="text-text font-black">{pageStart}-{pageEnd}</span> of <span className="text-text font-black">{totalProducts}</span> treasures
           </p>
         </div>
@@ -234,51 +222,12 @@ const ProductListingPage = () => {
             ))}
           </div>
 
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 pt-6 border-t border-gray-100">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="p-2.5 rounded-xl border border-gray-100 hover:border-primary hover:text-primary disabled:opacity-30 transition-all"
-              >
-                <ChevronDown className="rotate-90" size={18} />
-              </button>
-
-              <div className="flex items-center gap-1.5">
-                {visiblePages.map((pageNumber, index) => {
-                  if (pageNumber === 'ellipsis') {
-                    return (
-                      <span key={`ellipsis-${index}`} className="px-2 text-xs font-bold text-gray-300">
-                        ...
-                      </span>
-                    );
-                  }
-
-                  return (
-                    <button
-                      key={pageNumber}
-                      onClick={() => handlePageChange(pageNumber)}
-                      className={`w-10 h-10 rounded-xl font-bold text-xs transition-all ${currentPage === pageNumber
-                          ? 'bg-primary text-white shadow-md shadow-primary/20'
-                          : 'bg-white text-gray-500 border border-gray-100 hover:border-primary hover:text-primary'
-                        }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="p-2.5 rounded-xl border border-gray-100 hover:border-primary hover:text-primary disabled:opacity-30 transition-all"
-              >
-                <ChevronDown className="-rotate-90" size={18} />
-              </button>
-            </div>
-          )}
+          <Pagination 
+            pagination={{ ...pagination, per_page: perPage }} 
+            onPageChange={handlePageChange} 
+            onPerPageChange={setPerPage}
+            variant="public"
+          />
         </>
       ) : (
         <div className="text-center py-20 bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">

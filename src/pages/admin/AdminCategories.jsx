@@ -21,7 +21,7 @@ import {
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import SortableHeader from '../../components/admin/SortableHeader';
-import Pagination from '../../components/admin/Pagination';
+import Pagination from '../../components/common/Pagination';
 
 const CategoryModal = ({ isOpen, onClose, category = null, type = 'product' }) => {
   const dispatch = useDispatch();
