@@ -19,6 +19,7 @@ const ProductListingPage = () => {
   const panelRef = useRef(null);
 
   const sortMap = {
+    'Trending': 'trending',
     'Newest': 'latest',
     'Price: Low to High': 'price_low',
     'Price: High to Low': 'price_high',
@@ -184,13 +185,13 @@ const ProductListingPage = () => {
           </div>
 
           {/* Sort Option */}
-          <div className="flex items-center bg-white border border-gray-100 rounded-2xl p-1 shadow-sm">
-            {['Newest', 'Price: Low to High', 'Price: High to Low'].map((option) => (
+          <div className="flex flex-wrap items-center justify-center bg-white border border-gray-100 rounded-2xl p-1 shadow-sm gap-1">
+            {['Trending', 'Newest', 'Price: Low to High', 'Price: High to Low'].map((option) => (
               <button
                 key={option}
                 onClick={() => setSortBy(option)}
                 className={`px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider transition-all ${sortBy === option
-                    ? 'bg-gray-900 text-white'
+                    ? 'bg-gray-900 text-white shadow-lg'
                     : 'text-gray-400 hover:text-text'
                   }`}
               >

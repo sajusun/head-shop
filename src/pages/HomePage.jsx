@@ -12,12 +12,28 @@ const HomePage = () => {
   useSEO('Home');
   const dispatch = useDispatch();
   const { items: products, loading } = useSelector(state => state.products);
+  const [trendingProducts, setTrendingProducts] = useState([]);
+  const [isTrendingLoading, setIsTrendingLoading] = useState(false);
   const scrollRef = useRef(null);
   const topRatedRef = useRef(null);
   const autoScrollDir = useRef(1); // 1 = forward, -1 = reverse
 
   useEffect(() => {
-    dispatch(fetchProducts());
+    dispatch(fetchProducts({ sort: 'latest', per_page: 12 }));
+    
+    // Fetch Trending/Top Rated Products
+    const fetchTrending = async () => {
+      setIsTrendingLoading(true);
+      try {
+        const response = await dispatch(fetchProducts({ sort: 'trending', per_page: 20 })).unwrap();
+        setTrendingProducts(response.items);
+      } catch (error) {
+        console.error('Failed to fetch trending products:', error);
+      } finally {
+        setIsTrendingLoading(false);
+      }
+    };
+    fetchTrending();
   }, [dispatch]);
 
   // Auto-scroll for Top Rated — bounce forward/reverse every 10s
@@ -44,11 +60,10 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const featuredProducts = products.slice(0, 8);
-  const topRatedProducts = products
-    .filter(p => (p.rating?.average ?? p.rating ?? 0) >= 4)
-    .sort((a, b) => (b.rating?.average ?? b.rating ?? 0) - (a.rating?.average ?? a.rating ?? 0))
-    .slice(0, 20);
+  const featuredProducts = products.filter(p => p.is_featured).slice(0, 8);
+  if (featuredProducts.length === 0) featuredProducts.push(...products.slice(0, 8));
+
+  const topRatedProducts = trendingProducts;
 
   const scroll = (ref, direction) => {
     if (ref.current) {
@@ -118,9 +133,9 @@ const HomePage = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative group/toprated">
         <div className="flex justify-between items-end mb-12">
           <div>
-            <span className="text-accent font-black uppercase tracking-widest text-xs mb-2 block">Customer Favorites</span>
-            <h2 className="text-4xl lg:text-5xl font-black text-text mb-1">Top Rated Collection</h2>
-            <p className="text-gray-500">Our community's most loved pieces, chosen for their exceptional quality and design.</p>
+            <span className="text-accent font-black uppercase tracking-widest text-xs mb-2 block">Hot This Week</span>
+            <h2 className="text-4xl lg:text-5xl font-black text-text mb-1">Trending Treasures</h2>
+            <p className="text-gray-500">The most popular picks from our collection, ranked by our community and sales.</p>
           </div>
           <Link to="/products" className="text-primary font-bold flex items-center gap-2 hover:underline shrink-0 ml-4">
             View All <ArrowRight size={18} />
@@ -143,7 +158,7 @@ const HomePage = () => {
             <ChevronRight size={24} />
           </button>
 
-          {loading ? (
+          {isTrendingLoading ? (
             <div className="flex gap-8 overflow-hidden pb-4">
               {[1, 2, 3, 4].map(n => (
                 <div key={n} className="min-w-[300px] aspect-square bg-gray-100 animate-pulse rounded-2xl"></div>

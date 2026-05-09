@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, ShoppingBag } from 'lucide-react';
 import { login, loginWith2FA, logout, register, socialLogin } from '../features/auth/authSlice';
 import { adminLogin, adminLogout } from '../features/auth/adminAuthSlice';
+import { syncCartWithDB } from '../features/cart/cartSlice';
 import Button from '../components/Button';
 import Input from '../components/Input';
 
@@ -33,6 +34,11 @@ const AuthPage = ({ mode = 'user' }) => {
         code: twoFactorCode
       }));
       if (loginWith2FA.fulfilled.match(resultAction)) {
+        // Sync cart with DB after login
+        const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        if (currentCart.length > 0) {
+          dispatch(syncCartWithDB(currentCart));
+        }
         navigate('/profile', { replace: true });
       }
       return;
@@ -50,6 +56,12 @@ const AuthPage = ({ mode = 'user' }) => {
     const resultAction = await dispatch(action(formData));
 
     if (!action.fulfilled.match(resultAction)) return;
+    
+    // Sync cart with DB after login
+    const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    if (currentCart.length > 0) {
+      dispatch(syncCartWithDB(currentCart));
+    }
 
     // If it was a login and requires 2FA, don't redirect yet
     if (isLogin && resultAction.payload.requires_2fa) return;

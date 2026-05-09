@@ -1,4 +1,39 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../../services/api';
+
+// Async Thunks for DB operations
+export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue }) => {
+  try {
+    const response = await api.get('/cart');
+    return response.data.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || 'Failed to fetch cart');
+  }
+});
+
+export const syncCartWithDB = createAsyncThunk('cart/sync', async (items, { rejectWithValue }) => {
+  try {
+    const response = await api.post('/cart/sync', { items });
+    return response.data.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || 'Failed to sync cart');
+  }
+});
+
+export const addToCartDB = createAsyncThunk('cart/add', async (item, { rejectWithValue }) => {
+  try {
+    const response = await api.post('/cart', {
+      product_id: item.id,
+      product_variant_id: item.product_variant_id,
+      quantity: item.quantity || 1,
+      selectedColor: item.selectedColor,
+      selectedSize: item.selectedSize
+    });
+    return response.data.data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || 'Failed to add to cart');
+  }
+});
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -12,6 +47,8 @@ const cartSlice = createSlice({
         return [];
       }
     })(),
+    loading: false,
+    error: null
   },
   reducers: {
     addToCart: (state, action) => {
@@ -31,19 +68,23 @@ const cartSlice = createSlice({
       localStorage.setItem('cart', JSON.stringify(state.items));
     },
     removeFromCart: (state, action) => {
-      // action.payload could be an object with id and variants, or just id for backward compatibility
       if (typeof action.payload === 'object') {
         const { id, product_variant_id, selectedColor, selectedSize } = action.payload;
         state.items = state.items.filter(item => 
           !(item.id === id && item.product_variant_id === product_variant_id && item.selectedColor === selectedColor && item.selectedSize === selectedSize)
         );
+        
+        // If authenticated, we should also call the delete API
+        if (action.payload.cart_id) {
+          api.delete(`/cart/${action.payload.cart_id}`).catch(err => console.error('DB cart delete failed', err));
+        }
       } else {
         state.items = state.items.filter(item => item.id !== action.payload);
       }
       localStorage.setItem('cart', JSON.stringify(state.items));
     },
     updateQuantity: (state, action) => {
-      const { id, product_variant_id, selectedColor, selectedSize, quantity } = action.payload;
+      const { id, product_variant_id, selectedColor, selectedSize, quantity, cart_id } = action.payload;
       const item = state.items.find(item => 
         item.id === id && 
         item.product_variant_id === product_variant_id &&
@@ -54,15 +95,42 @@ const cartSlice = createSlice({
         item.quantity = quantity;
       }
       localStorage.setItem('cart', JSON.stringify(state.items));
+
+      // If authenticated, update DB
+      if (cart_id) {
+        api.put(`/cart/${cart_id}`, { quantity }).catch(err => console.error('DB cart update failed', err));
+      }
     },
     clearCart: (state) => {
       state.items = [];
       localStorage.removeItem('cart');
+      // If authenticated, clear DB
+      api.delete('/cart/clear').catch(err => console.error('DB cart clear failed', err));
     }
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchCart.fulfilled, (state, action) => {
+        state.items = action.payload;
+        localStorage.setItem('cart', JSON.stringify(state.items));
+        state.loading = false;
+      })
+      .addCase(syncCartWithDB.fulfilled, (state, action) => {
+        state.items = action.payload;
+        localStorage.setItem('cart', JSON.stringify(state.items));
+      })
+      .addCase(fetchCart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCart.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  }
 });
 
 export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
+
 export const selectCartTotal = (state) => 
   state.cart.items.reduce((total, item) => {
     const activePrice = Number(item.offer_price || item.offerPrice || item.effective_price || item.price || 0);

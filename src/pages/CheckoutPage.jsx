@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  CheckCircle2, 
-  CreditCard, 
-  Truck, 
-  MapPin, 
-  ArrowLeft, 
+import {
+  CheckCircle2,
+  CreditCard,
+  Truck,
+  MapPin,
+  ArrowLeft,
   ChevronRight,
   ShieldCheck,
   Package,
@@ -18,20 +18,8 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
-import { loadStripe } from '@stripe/stripe-js';
-import {
-  CardElement,
-  Elements,
-  useStripe,
-  useElements,
-} from '@stripe/react-stripe-js';
-
-// Stripe Public Key - Placeholder
-const stripePromise = loadStripe('pk_test_51Hq7Y2L0Wv2X6y7B6V8Y9Q...'); // Use your real public key
 
 const CheckoutForm = ({ orderData, onSuccess, total, isAuthenticated }) => {
-  const stripe = useStripe();
-  const elements = useElements();
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState(null);
@@ -45,8 +33,6 @@ const CheckoutForm = ({ orderData, onSuccess, total, isAuthenticated }) => {
       return;
     }
 
-    if (!stripe || !elements) return;
-
     setProcessing(true);
     setError(null);
 
@@ -55,45 +41,24 @@ const CheckoutForm = ({ orderData, onSuccess, total, isAuthenticated }) => {
       const orderResponse = await api.post('/orders', orderData);
       const order = orderResponse.data.data;
 
-      if (orderData.payment_method === 'stripe') {
-        // 2. Initiate Stripe Payment
-        const paymentResponse = await api.post('/payments/stripe/initiate', {
-          order_id: order.id
-        });
-        const { client_secret } = paymentResponse.data.data;
-
-        // 3. Confirm Payment
-        const result = await stripe.confirmCardPayment(client_secret, {
-          payment_method: {
-            card: elements.getElement(CardElement),
-            billing_details: {
-              name: orderData.full_name,
-              email: orderData.email,
-            },
-          },
-        });
-
-        if (result.error) {
-          setError(result.error.message);
-          setProcessing(false);
-        } else {
-          if (result.paymentIntent.status === 'succeeded') {
-            onSuccess(order);
-          }
-        }
-      } else if (orderData.payment_method === 'sslcommerz') {
-        // 2. Initiate SSLCommerz Payment
-        const paymentResponse = await api.post('/payments/sslcommerz/initiate', {
-          order_id: order.id
-        });
-        const { redirect_url } = paymentResponse.data.data;
-        window.location.href = redirect_url;
-      } else {
+      if (orderData.payment_method === 'cod') {
         // Cash on Delivery
         onSuccess(order);
+      } else {
+        // 2. Initiate Hosted Payment (Stripe Checkout or SSLCommerz)
+        const paymentResponse = await api.post('/payments/initiate', {
+          order_id: order.id
+        });
+
+        const { redirect_url } = paymentResponse.data.data;
+        if (redirect_url) {
+          window.location.href = redirect_url;
+        } else {
+          throw new Error('Could not initiate payment session.');
+        }
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'An unexpected error occurred.');
+      setError(err.response?.data?.message || err.message || 'An unexpected error occurred.');
       setProcessing(false);
     }
   };
@@ -101,19 +66,25 @@ const CheckoutForm = ({ orderData, onSuccess, total, isAuthenticated }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {orderData.payment_method === 'stripe' && (
-        <div className="p-4 border border-gray-200 rounded-2xl bg-gray-50">
-          <label className="block text-sm font-bold text-gray-700 mb-3">Credit or Debit Card</label>
-          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-            <CardElement options={{
-              style: {
-                base: {
-                  fontSize: '16px',
-                  color: '#1a1a1a',
-                  '::placeholder': { color: '#aab7c4' },
-                },
-                invalid: { color: '#ef4444' },
-              },
-            }} />
+        <div className="p-6 border border-primary/20 rounded-3xl bg-primary/5 flex items-center gap-4">
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+            <CreditCard className="text-primary" size={24} />
+          </div>
+          <div>
+            <p className="font-bold text-sm">Pay with Stripe Checkout</p>
+            <p className="text-[10px] text-gray-500 font-medium">Securely redirecting to Stripe's hosted page.</p>
+          </div>
+        </div>
+      )}
+
+      {orderData.payment_method === 'sslcommerz' && (
+        <div className="p-6 border border-secondary/20 rounded-3xl bg-secondary/5 flex items-center gap-4">
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+            <ShieldCheck className="text-secondary" size={24} />
+          </div>
+          <div>
+            <p className="font-bold text-sm">Pay with SSLCommerz</p>
+            <p className="text-[10px] text-gray-500 font-medium">Safe & secure payment via SSLCommerz gateway.</p>
           </div>
         </div>
       )}
@@ -131,11 +102,11 @@ const CheckoutForm = ({ orderData, onSuccess, total, isAuthenticated }) => {
         </div>
       )}
 
-      <Button 
-        type="submit" 
-        size="lg" 
+      <Button
+        type="submit"
+        size="lg"
         className="w-full rounded-2xl h-14 text-lg font-black shadow-xl shadow-primary/20"
-        disabled={(orderData.payment_method === 'stripe' && !stripe) || processing}
+        disabled={processing}
       >
         {processing ? (
           <span className="flex items-center gap-2">
@@ -144,10 +115,10 @@ const CheckoutForm = ({ orderData, onSuccess, total, isAuthenticated }) => {
         ) : !isAuthenticated ? (
           'Login to Place Order'
         ) : (
-          `Pay $${(total * 1.1).toFixed(2)} & Place Order`
+          orderData.payment_method === 'cod' ? 'Confirm Order' : `Pay $${(total * 1.1).toFixed(2)}`
         )}
       </Button>
-      
+
       <p className="text-center text-xs text-gray-400 flex items-center justify-center gap-2">
         <ShieldCheck size={14} className="text-green-500" />
         Secure SSL Encrypted Payment
@@ -248,7 +219,7 @@ const CheckoutPage = () => {
           <div className="lg:col-span-2 space-y-8">
             <AnimatePresence mode="wait">
               {step === 'shipping' ? (
-                <motion.div 
+                <motion.div
                   key="shipping"
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -268,7 +239,7 @@ const CheckoutPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2 space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
-                      <input 
+                      <input
                         name="full_name"
                         value={formData.full_name}
                         onChange={handleInputChange}
@@ -279,7 +250,7 @@ const CheckoutPage = () => {
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
-                      <input 
+                      <input
                         name="email"
                         type="email"
                         value={formData.email}
@@ -291,7 +262,7 @@ const CheckoutPage = () => {
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-                      <input 
+                      <input
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
@@ -301,7 +272,7 @@ const CheckoutPage = () => {
                     </div>
                     <div className="md:col-span-2 space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Shipping Address</label>
-                      <input 
+                      <input
                         name="address"
                         value={formData.address}
                         onChange={handleInputChange}
@@ -312,7 +283,7 @@ const CheckoutPage = () => {
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">City</label>
-                      <input 
+                      <input
                         name="city"
                         value={formData.city}
                         onChange={handleInputChange}
@@ -323,7 +294,7 @@ const CheckoutPage = () => {
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Postal Code</label>
-                      <input 
+                      <input
                         name="postal_code"
                         value={formData.postal_code}
                         onChange={handleInputChange}
@@ -332,11 +303,22 @@ const CheckoutPage = () => {
                         required
                       />
                     </div>
+                    <div className="md:col-span-2 space-y-2">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Order Notes (Optional)</label>
+                      <textarea
+                        name="notes"
+                        value={formData.notes}
+                        onChange={handleInputChange}
+                        placeholder="Special instructions for delivery..."
+                        rows={4}
+                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-2 focus:ring-primary/20 transition-all font-medium resize-none"
+                      />
+                    </div>
                   </div>
 
                   <div className="mt-10 pt-8 border-t border-gray-50 flex justify-end">
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="rounded-2xl px-12 h-14 font-black"
                       onClick={handleContinueToPayment}
                       disabled={!formData.full_name || !formData.address || !formData.city}
@@ -346,7 +328,7 @@ const CheckoutPage = () => {
                   </div>
                 </motion.div>
               ) : (
-                <motion.div 
+                <motion.div
                   key="payment"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -365,33 +347,30 @@ const CheckoutPage = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                      <button 
-                        onClick={() => setFormData({...formData, payment_method: 'stripe'})}
-                        className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${
-                          formData.payment_method === 'stripe' ? 'border-primary bg-primary/5' : 'border-gray-50 hover:border-gray-200'
-                        }`}
+                      <button
+                        onClick={() => setFormData({ ...formData, payment_method: 'stripe' })}
+                        className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${formData.payment_method === 'stripe' ? 'border-primary bg-primary/5' : 'border-gray-50 hover:border-gray-200'
+                          }`}
                       >
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${formData.payment_method === 'stripe' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'}`}>
                           <CreditCard size={20} />
                         </div>
                         <span className="font-bold text-sm">Stripe Card</span>
                       </button>
-                      <button 
-                        onClick={() => setFormData({...formData, payment_method: 'sslcommerz'})}
-                        className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${
-                          formData.payment_method === 'sslcommerz' ? 'border-primary bg-primary/5' : 'border-gray-50 hover:border-gray-200'
-                        }`}
+                      <button
+                        onClick={() => setFormData({ ...formData, payment_method: 'sslcommerz' })}
+                        className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${formData.payment_method === 'sslcommerz' ? 'border-primary bg-primary/5' : 'border-gray-50 hover:border-gray-200'
+                          }`}
                       >
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${formData.payment_method === 'sslcommerz' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'}`}>
                           <Package size={20} />
                         </div>
                         <span className="font-bold text-sm">SSLCommerz</span>
                       </button>
-                      <button 
-                        onClick={() => setFormData({...formData, payment_method: 'cod'})}
-                        className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${
-                          formData.payment_method === 'cod' ? 'border-primary bg-primary/5' : 'border-gray-50 hover:border-gray-200'
-                        }`}
+                      <button
+                        onClick={() => setFormData({ ...formData, payment_method: 'cod' })}
+                        className={`p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${formData.payment_method === 'cod' ? 'border-primary bg-primary/5' : 'border-gray-50 hover:border-gray-200'
+                          }`}
                       >
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${formData.payment_method === 'cod' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'}`}>
                           <Truck size={20} />
@@ -400,14 +379,12 @@ const CheckoutPage = () => {
                       </button>
                     </div>
 
-                    <Elements stripe={stripePromise}>
-                      <CheckoutForm 
-                        orderData={orderData} 
-                        total={total} 
-                        onSuccess={handleSuccess} 
-                        isAuthenticated={!!user}
-                      />
-                    </Elements>
+                    <CheckoutForm
+                      orderData={orderData}
+                      total={total}
+                      onSuccess={handleSuccess}
+                      isAuthenticated={!!user}
+                    />
                   </div>
                 </motion.div>
               )}
@@ -466,7 +443,7 @@ const CheckoutPage = () => {
                   <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3">
                     <Truck className="text-blue-500 shrink-0" size={20} />
                     <p className="text-[10px] text-blue-700 font-medium leading-relaxed">
-                      Complimentary premium express shipping included. Expected delivery: {new Date(Date.now() + 3*24*60*60*1000).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}.
+                      Complimentary premium express shipping included. Expected delivery: {new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString(undefined, { month: 'long', day: 'numeric' })}.
                     </p>
                   </div>
                 </div>

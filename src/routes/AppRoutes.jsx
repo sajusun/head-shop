@@ -1,8 +1,9 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import ScrollToTop from '../components/ScrollToTop';
+import { fetchCart } from '../features/cart/cartSlice';
 
 // Lazy loading pages
 const HomePage = lazy(() => import('../pages/HomePage'));
@@ -69,6 +70,15 @@ const AdminRoute = ({ children }) => {
 };
 
 const AppRoutes = () => {
+  const dispatch = useDispatch();
+  const { user } = useSelector(state => state.auth);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, user]);
+
   return (
 
     <Suspense fallback={
