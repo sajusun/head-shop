@@ -14,15 +14,16 @@ const ReviewItem = ({ review }) => {
   const location = useLocation();
   const { user } = useSelector(state => state.auth);
   const reviewerName = review.userName || review.user?.name || 'Customer';
+  const userImage = review.avatar || review.user?.avatar || 'user.jpg';
   const reviewDate = review.date || (review.created_at ? new Date(review.created_at).toLocaleDateString() : '');
 
   const handleReply = (e) => {
     e.preventDefault();
     if (!replyText.trim()) return;
-    
-    dispatch(addReply({ 
-      reviewId: review.id, 
-      replyData: { userName: user?.name || 'Guest', comment: replyText } 
+
+    dispatch(addReply({
+      reviewId: review.id,
+      replyData: { userName: user?.name || 'Guest', comment: replyText }
     }));
     setReplyText('');
     setShowReplyForm(false);
@@ -33,7 +34,12 @@ const ReviewItem = ({ review }) => {
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-            <User size={20} />
+            {/* <User size={20} /> */}
+            <img
+              src={userImage}
+              alt={reviewerName}
+              className="w-full h-full object-cover rounded-full"
+            />
           </div>
           <div>
             <h4 className="font-bold text-text">{reviewerName}</h4>
@@ -42,14 +48,14 @@ const ReviewItem = ({ review }) => {
         </div>
         <RatingStars rating={review.rating} size={14} />
       </div>
-      
+
       <p className="text-gray-600 mb-4 ml-13">
         {review.comment}
       </p>
 
       {/* Action Buttons */}
       <div className="flex items-center gap-4 ml-13 mb-4">
-        <button 
+        <button
           onClick={() => {
             if (!user) {
               navigate('/login', { state: { from: location.pathname } });

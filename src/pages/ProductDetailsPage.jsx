@@ -186,7 +186,7 @@ const ProductDetailsPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <button 
+      <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors mb-8 group"
       >
@@ -195,15 +195,15 @@ const ProductDetailsPage = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
         {/* Image Gallery */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="space-y-4"
         >
           <div className="aspect-square bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm">
-            <img 
-              src={primaryImage} 
-              alt={product.name} 
+            <img
+              src={primaryImage}
+              alt={product.name}
               className="w-full h-full object-cover"
             />
           </div>
@@ -213,9 +213,8 @@ const ProductDetailsPage = () => {
                 type="button"
                 key={image.id || image.url || image.path}
                 onClick={() => setSelectedImage(image.url || image.path)}
-                className={`aspect-square bg-gray-100 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all ${
-                  primaryImage === (image.url || image.path) ? 'ring-2 ring-primary' : ''
-                }`}
+                className={`aspect-square bg-gray-100 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all ${primaryImage === (image.url || image.path) ? 'ring-2 ring-primary' : ''
+                  }`}
               >
                 <img src={image.url || image.path} alt="" className="w-full h-full object-cover opacity-70" />
               </button>
@@ -224,7 +223,7 @@ const ProductDetailsPage = () => {
         </motion.div>
 
         {/* Product Info */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="flex flex-col"
@@ -234,13 +233,13 @@ const ProductDetailsPage = () => {
               {categoryName}
             </span>
             <div className="flex gap-2">
-              <button 
+              <button
                 onClick={handleShare}
                 className="p-2.5 bg-white border border-gray-200 rounded-full text-gray-600 hover:text-primary hover:border-primary transition-all"
               >
                 <Share2 size={20} />
               </button>
-              <button 
+              <button
                 onClick={() => {
                   if (!user) {
                     navigate('/login', { state: { from: location.pathname } });
@@ -248,9 +247,8 @@ const ProductDetailsPage = () => {
                   }
                   dispatch(toggleFavorite(product));
                 }}
-                className={`p-2.5 border rounded-full transition-all ${
-                  isFavorite ? 'bg-red-50 border-red-500 text-red-500' : 'bg-white border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-500'
-                }`}
+                className={`p-2.5 border rounded-full transition-all ${isFavorite ? 'bg-red-50 border-red-500 text-red-500' : 'bg-white border-gray-200 text-gray-600 hover:text-red-500 hover:border-red-500'
+                  }`}
               >
                 <Heart size={20} fill={isFavorite ? 'currentColor' : 'none'} />
               </button>
@@ -261,14 +259,14 @@ const ProductDetailsPage = () => {
           <div className="flex items-center gap-2 mb-4">
             <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 bg-gray-50 px-2 py-1 rounded">SKU: {product.sku || 'HERD-MOCK'}</span>
           </div>
-          
+
           <div className="flex items-center gap-4 mb-8">
             <div className="flex items-center gap-1">
               <RatingStars rating={ratingAverage} size={18} />
               <span className="text-sm font-bold text-text ml-1">{Number(ratingAverage).toFixed(1)}</span>
             </div>
             <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
-            <button 
+            <button
               onClick={scrollToReviews}
               className="text-sm text-gray-500 flex items-center gap-1 hover:text-primary transition-colors"
             >
@@ -314,11 +312,10 @@ const ProductDetailsPage = () => {
                       <button
                         key={size.id}
                         onClick={() => setSelectedSize(size.id)}
-                        className={`min-w-[60px] h-12 px-4 rounded-xl font-bold text-sm transition-all border ${
-                          selectedSize === size.id 
-                            ? 'bg-text text-white border-text shadow-lg' 
+                        className={`min-w-[60px] h-12 px-4 rounded-xl font-bold text-sm transition-all border ${selectedSize === size.id
+                            ? 'bg-text text-white border-text shadow-lg'
                             : 'bg-white text-gray-500 border-gray-200 hover:border-primary hover:text-primary'
-                        }`}
+                          }`}
                       >
                         {size.short || size.name}
                       </button>
@@ -339,9 +336,8 @@ const ProductDetailsPage = () => {
                       <button
                         key={color.id}
                         onClick={() => setSelectedColor(color.id)}
-                        className={`group relative w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-                          selectedColor === color.id ? 'ring-2 ring-primary ring-offset-2' : 'hover:ring-2 hover:ring-gray-200 hover:ring-offset-2'
-                        }`}
+                        className={`group relative w-12 h-12 rounded-full flex items-center justify-center transition-all ${selectedColor === color.id ? 'ring-2 ring-primary ring-offset-2' : 'hover:ring-2 hover:ring-gray-200 hover:ring-offset-2'
+                          }`}
                         title={color.name}
                       >
                         <span
@@ -391,18 +387,18 @@ const ProductDetailsPage = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 mt-auto pt-6 border-t border-gray-100 lg:border-none">
             <div className="flex items-center border border-gray-200 rounded-xl p-1 bg-white">
-              <button 
+              <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors"
               >-</button>
               <span className="w-12 text-center font-bold">{quantity}</span>
-              <button 
+              <button
                 onClick={() => setQuantity(quantity + 1)}
                 className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary hover:bg-gray-50 rounded-lg transition-colors"
               >+</button>
             </div>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="outline"
               className="flex-1 gap-2 rounded-xl border-gray-200"
               disabled={stock <= 0}
@@ -412,8 +408,8 @@ const ProductDetailsPage = () => {
             >
               <ShoppingBag size={20} /> Add to Cart
             </Button>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="flex-1 gap-2 rounded-xl bg-accent hover:bg-accent/90"
               disabled={stock <= 0}
               onClick={() => {
@@ -438,7 +434,7 @@ const ProductDetailsPage = () => {
             View All <ArrowRight size={18} />
           </Link>
         </div>
-        
+
         <div className="relative">
           {/* Left Button */}
           <button
@@ -447,7 +443,7 @@ const ProductDetailsPage = () => {
           >
             <ChevronLeft size={24} />
           </button>
-          
+
           {/* Right Button */}
           <button
             onClick={() => scroll(relatedRef, 'right')}
@@ -486,8 +482,8 @@ const ProductDetailsPage = () => {
                   <div key={star} className="flex items-center gap-4">
                     <span className="text-xs font-bold text-gray-500 w-4">{star}</span>
                     <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-accent rounded-full" 
+                      <div
+                        className="h-full bg-accent rounded-full"
                         style={{ width: `${star === 5 ? 70 : star === 4 ? 20 : 5}%` }}
                       ></div>
                     </div>

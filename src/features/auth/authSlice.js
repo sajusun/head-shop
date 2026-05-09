@@ -9,6 +9,12 @@ export const login = createAsyncThunk(
     try {
       const response = await authService.login(credentials);
       const payload = response.data?.data ?? response.data;
+
+      // Handle 2FA Requirement
+      if (payload.requires_2fa) {
+        return { requires_2fa: true, email: credentials.email };
+      }
+
       const token = payload.access_token ?? payload.token;
       const user = payload.user ?? payload;
 
@@ -21,6 +27,28 @@ export const login = createAsyncThunk(
       return { ...payload, access_token: token, user };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.response?.data?.error || 'Login failed');
+    }
+  }
+);
+
+export const loginWith2FA = createAsyncThunk(
+  'auth/loginWith2FA',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await authService.loginWith2FA(credentials);
+      const payload = response.data?.data ?? response.data;
+      const token = payload.access_token ?? payload.token;
+      const user = payload.user ?? payload;
+
+      if (!token || !user) {
+        return rejectWithValue('Invalid 2FA verification');
+      }
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return { ...payload, access_token: token, user };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '2FA verification failed');
     }
   }
 );
@@ -83,6 +111,8 @@ const authSlice = createSlice({
     token: localStorage.getItem('token') || null,
     loading: false,
     error: null,
+    requires2FA: false,
+    tempEmail: null,
   },
   reducers: {
     logout: (state) => {
@@ -100,10 +130,32 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.access_token;
+        if (action.payload.requires_2fa) {
+          state.requires2FA = true;
+          state.tempEmail = action.payload.email;
+        } else {
+          state.user = action.payload.user;
+          state.token = action.payload.access_token;
+          state.requires2FA = false;
+          state.tempEmail = null;
+        }
       })
       .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(loginWith2FA.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginWith2FA.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.access_token;
+        state.requires2FA = false;
+        state.tempEmail = null;
+      })
+      .addCase(loginWith2FA.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

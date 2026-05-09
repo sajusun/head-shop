@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { User, Lock, Bell, Shield, ArrowLeft, Camera, Check } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { motion } from 'framer-motion';
+import Modal from '../components/Modal';
+import { motion, AnimatePresence } from 'framer-motion';
 import { updateProfile } from '../features/auth/authSlice';
+import authService from '../services/authService';
 
 const SettingsPage = () => {
-  const { user, loading, error } = useSelector(state => state.auth);
+  const { user, loading: profileLoading, error: profileError } = useSelector(state => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const fileInputRef = React.useRef(null);
@@ -24,6 +26,35 @@ const SettingsPage = () => {
     phone: user?.phone || '',
     bio: user?.bio || '',
   });
+
+  // Security Form State
+  const [securityData, setSecurityData] = useState({
+    current_password: '',
+    password: '',
+    password_confirmation: '',
+  });
+  const [securityLoading, setSecurityLoading] = useState(false);
+  const [securityError, setSecurityError] = useState(null);
+  const [securitySuccess, setSecuritySuccess] = useState(false);
+
+  // 2FA State
+  const [show2FAModal, setShow2FAModal] = useState(false);
+  const [qrCode, setQrCode] = useState(null);
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [recoveryCodes, setRecoveryCodes] = useState([]);
+  const [tfaStep, setTfaStep] = useState('off'); // off, setup, confirmed
+  const [tfaLoading, setTfaLoading] = useState(false);
+  const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [disablePassword, setDisablePassword] = useState('');
+
+  React.useEffect(() => {
+    if (user?.two_factor_confirmed_at) {
+      setTfaStep('confirmed');
+    } else {
+      setTfaStep('off');
+    }
+  }, [user]);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -55,6 +86,74 @@ const SettingsPage = () => {
       setSaved(true);
       setAvatarFile(null);
       setTimeout(() => setSaved(false), 3000);
+    }
+  };
+
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setSecurityLoading(true);
+    setSecurityError(null);
+    setSecuritySuccess(false);
+
+    try {
+      await authService.changePassword(securityData);
+      setSecuritySuccess(true);
+      setSecurityData({ current_password: '', password: '', password_confirmation: '' });
+      setIsPasswordModalOpen(false);
+      setTimeout(() => setSecuritySuccess(false), 5000);
+    } catch (err) {
+      setSecurityError(err.response?.data?.message || 'Failed to change password. Please check your current password.');
+    } finally {
+      setSecurityLoading(false);
+    }
+  };
+
+  const handleEnable2FA = async () => {
+    setTfaLoading(true);
+    try {
+      const response = await authService.get2FAQRCode();
+      setQrCode(response.data.data.qr_code);
+      setTfaStep('setup');
+    } catch (err) {
+      setSecurityError('Failed to generate 2FA QR code.');
+    } finally {
+      setTfaLoading(false);
+    }
+  };
+
+  const handleConfirm2FA = async (e) => {
+    e.preventDefault();
+    setTfaLoading(true);
+    try {
+      const response = await authService.confirm2FA(twoFactorCode);
+      setRecoveryCodes(response.data.data.recovery_codes);
+      setTfaStep('confirmed');
+      // Update local user state if needed, or just let the next profile fetch handle it
+    } catch (err) {
+      setSecurityError('Invalid 2FA code. Please try again.');
+    } finally {
+      setTfaLoading(false);
+    }
+  };
+
+  const handleDisable2FA = async (e) => {
+    e.preventDefault();
+    if (!disablePassword) return;
+
+    setTfaLoading(true);
+    try {
+      await authService.disable2FA(disablePassword);
+      setTfaStep('off');
+      setQrCode(null);
+      setRecoveryCodes([]);
+      setIsDisableModalOpen(false);
+      setDisablePassword('');
+      setSecuritySuccess(true);
+      setTimeout(() => setSecuritySuccess(false), 5000);
+    } catch (err) {
+      alert('Failed to disable 2FA. Incorrect password.');
+    } finally {
+      setTfaLoading(false);
     }
   };
 
@@ -189,11 +288,11 @@ const SettingsPage = () => {
                         <Check size={16} /> Profile Updated Successfully
                       </motion.span>
                     )}
-                    {error && (
-                      <span className="text-red-500 text-sm font-bold">{error}</span>
+                    {profileError && (
+                      <span className="text-red-500 text-sm font-bold">{profileError}</span>
                     )}
                   </div>
-                  <Button type="submit" loading={loading} className="px-12 rounded-2xl h-14">
+                  <Button type="submit" loading={profileLoading} className="px-12 rounded-2xl h-14">
                     Save Changes
                   </Button>
                 </div>
@@ -201,15 +300,231 @@ const SettingsPage = () => {
             )}
 
             {activeTab === 'security' && (
-              <div className="space-y-10 text-center py-10">
-                <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <Shield size={40} />
+              <div className="space-y-12">
+                <div>
+                  <h3 className="text-2xl font-black text-text mb-2">Security Settings</h3>
+                  <p className="text-gray-500 text-sm">Manage your account security and authentication methods.</p>
                 </div>
-                <h3 className="text-2xl font-black text-text">Security Settings</h3>
-                <p className="text-gray-500 max-w-sm mx-auto">Manage your password and two-factor authentication to keep your account safe.</p>
-                <div className="max-w-md mx-auto space-y-4">
-                  <Button variant="outline" className="w-full h-14 rounded-2xl">Change Password</Button>
-                  <Button variant="outline" className="w-full h-14 rounded-2xl">Enable 2FA</Button>
+
+                <div className="space-y-4">
+                  {/* Password Row */}
+                  <div className="flex items-center justify-between p-6 bg-gray-50 rounded-3xl border border-transparent hover:border-gray-200 transition-all group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-gray-400 group-hover:text-primary transition-colors">
+                        <Lock size={22} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-text">Password</h4>
+                        <p className="text-xs text-gray-500">Last updated recently</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="rounded-xl px-6"
+                      onClick={() => setIsPasswordModalOpen(true)}
+                    >
+                      Change
+                    </Button>
+                  </div>
+
+                  {/* 2FA Row */}
+                  <div className="flex items-center justify-between p-6 bg-gray-50 rounded-3xl border border-transparent hover:border-gray-200 transition-all group">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm text-gray-400 group-hover:text-primary transition-colors">
+                        <Shield size={22} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-text">Two-Factor Authentication</h4>
+                        <p className="text-xs text-gray-500">
+                          {tfaStep === 'confirmed' ? 'Enabled and securing your account' : 'Add an extra layer of security'}
+                        </p>
+                      </div>
+                    </div>
+                    {tfaStep === 'off' && (
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-xl px-6"
+                        onClick={handleEnable2FA}
+                        loading={tfaLoading}
+                      >
+                        Enable
+                      </Button>
+                    )}
+                    {tfaStep === 'confirmed' && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="rounded-xl text-red-500 hover:bg-red-50 px-6"
+                        onClick={() => setIsDisableModalOpen(true)}
+                        loading={tfaLoading}
+                      >
+                        Disable
+                      </Button>
+                    )}
+                  </div>
+
+                {/* Change Password Modal */}
+                <Modal
+                  isOpen={isPasswordModalOpen}
+                  onClose={() => setIsPasswordModalOpen(false)}
+                  title="Update Password"
+                >
+                  <form onSubmit={handlePasswordChange} className="space-y-6">
+                    <Input 
+                      label="Current Password" 
+                      type="password"
+                      placeholder="••••••••"
+                      value={securityData.current_password}
+                      onChange={(e) => setSecurityData({...securityData, current_password: e.target.value})}
+                      required
+                    />
+                    <div className="space-y-4">
+                      <Input 
+                        label="New Password" 
+                        type="password"
+                        placeholder="••••••••"
+                        value={securityData.password}
+                        onChange={(e) => setSecurityData({...securityData, password: e.target.value})}
+                        required
+                      />
+                      <Input 
+                        label="Confirm New Password" 
+                        type="password"
+                        placeholder="••••••••"
+                        value={securityData.password_confirmation}
+                        onChange={(e) => setSecurityData({...securityData, password_confirmation: e.target.value})}
+                        required
+                      />
+                    </div>
+
+                    {securityError && (
+                      <div className="p-4 rounded-xl text-xs font-medium bg-red-50 text-red-600 border border-red-100">
+                        {securityError}
+                      </div>
+                    )}
+
+                    <Button 
+                      type="submit" 
+                      loading={securityLoading} 
+                      className="w-full h-14 rounded-2xl bg-gray-900 hover:bg-gray-800"
+                    >
+                      Update Password
+                    </Button>
+                  </form>
+                </Modal>
+
+                {/* Global Success Message for Security Actions */}
+                {securitySuccess && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 rounded-2xl bg-green-50 text-green-600 border border-green-100 text-sm font-bold flex items-center gap-2"
+                  >
+                    <Check size={18} /> Action completed successfully!
+                  </motion.div>
+                )}
+
+                  {/* Disable 2FA Modal */}
+                  <Modal
+                    isOpen={isDisableModalOpen}
+                    onClose={() => setIsDisableModalOpen(false)}
+                    title="Disable 2FA"
+                  >
+                    <form onSubmit={handleDisable2FA} className="space-y-6">
+                      <p className="text-sm text-gray-500">For security reasons, please enter your password to disable two-factor authentication.</p>
+                      <Input 
+                        label="Your Password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={disablePassword}
+                        onChange={(e) => setDisablePassword(e.target.value)}
+                        required
+                        autoFocus
+                      />
+                      <div className="flex gap-3 pt-2">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="flex-1 rounded-xl"
+                          onClick={() => setIsDisableModalOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button 
+                          type="submit" 
+                          variant="primary" 
+                          className="flex-1 rounded-xl bg-red-600 hover:bg-red-700"
+                          loading={tfaLoading}
+                        >
+                          Disable Now
+                        </Button>
+                      </div>
+                    </form>
+                  </Modal>
+
+                  {/* 2FA Setup Flow */}
+                  {tfaStep === 'setup' && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="mt-8 p-8 border-2 border-primary/20 rounded-[32px] bg-primary/5"
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div className="bg-white p-4 rounded-2xl shadow-sm inline-block mx-auto md:mx-0">
+                          <img src={qrCode} alt="2FA QR Code" className="w-48 h-48" />
+                        </div>
+                        <div className="space-y-4">
+                          <h4 className="text-lg font-bold text-text">Scan this QR Code</h4>
+                          <p className="text-sm text-gray-500">Use an authenticator app (like Google Authenticator) to scan the code, then enter the 6-digit verification code below.</p>
+                          <form onSubmit={handleConfirm2FA} className="flex gap-2">
+                            <Input 
+                              placeholder="000000"
+                              value={twoFactorCode}
+                              onChange={(e) => setTwoFactorCode(e.target.value)}
+                              className="max-w-[150px]"
+                              required
+                            />
+                            <Button type="submit" loading={tfaLoading} className="rounded-xl">Verify & Enable</Button>
+                          </form>
+                          <button 
+                            onClick={() => setTfaStep('off')}
+                            className="text-xs text-gray-400 hover:text-gray-600 underline"
+                          >
+                            Cancel Setup
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Recovery Codes Display */}
+                  {recoveryCodes.length > 0 && (
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="mt-8 p-8 bg-gray-900 text-white rounded-[32px] shadow-xl"
+                    >
+                      <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
+                        <Shield size={20} className="text-primary" /> Recovery Codes
+                      </h4>
+                      <p className="text-sm text-gray-400 mb-6">Store these codes securely. They can be used to access your account if you lose your 2FA device.</p>
+                      <div className="grid grid-cols-2 gap-3 mb-8">
+                        {recoveryCodes.map((code, idx) => (
+                          <code key={idx} className="bg-white/10 p-2 rounded-lg text-xs font-mono tracking-wider">{code}</code>
+                        ))}
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full border-white/20 text-white hover:bg-white/10"
+                        onClick={() => setRecoveryCodes([])}
+                      >
+                        I've Saved These Codes
+                      </Button>
+                    </motion.div>
+                  )}
                 </div>
               </div>
             )}

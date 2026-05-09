@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, ShoppingBag } from 'lucide-react';
-import { login, logout, register } from '../features/auth/authSlice';
+import { login, loginWith2FA, logout, register } from '../features/auth/authSlice';
 import { adminLogin, adminLogout } from '../features/auth/adminAuthSlice';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -12,18 +12,31 @@ const AuthPage = ({ mode = 'user' }) => {
   const canRegister = !isAdminLogin;
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ email: '', password: '', name: '' });
+  const [twoFactorCode, setTwoFactorCode] = useState('');
   const [roleError, setRoleError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const authState = useSelector(state => state.auth);
   const adminAuthState = useSelector(state => state.adminAuth);
-  const { loading, error } = isAdminLogin ? adminAuthState : authState;
+  const { loading, error, requires2FA, tempEmail } = isAdminLogin ? adminAuthState : authState;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setRoleError('');
+
+    if (requires2FA) {
+      const resultAction = await dispatch(loginWith2FA({
+        email: tempEmail || formData.email,
+        password: formData.password,
+        code: twoFactorCode
+      }));
+      if (loginWith2FA.fulfilled.match(resultAction)) {
+        navigate('/profile', { replace: true });
+      }
+      return;
+    }
 
     if (isAdminLogin) {
       const resultAction = await dispatch(adminLogin(formData));
@@ -38,8 +51,11 @@ const AuthPage = ({ mode = 'user' }) => {
 
     if (!action.fulfilled.match(resultAction)) return;
 
+    // If it was a login and requires 2FA, don't redirect yet
+    if (isLogin && resultAction.payload.requires_2fa) return;
+
     const user = resultAction.payload.user;
-    
+
     // Smart Redirect for user
     const from = location.state?.from || (user?.role === 'admin' ? '/admin' : '/profile');
     navigate(from, { replace: true });
@@ -65,77 +81,106 @@ const AuthPage = ({ mode = 'user' }) => {
             {isAdminLogin ? 'Admin Portal' : isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
           <p className="text-sm text-gray-400">
-            {isAdminLogin 
-              ? 'Secure administrator access' 
+            {isAdminLogin
+              ? 'Secure administrator access'
               : isLogin ? 'Sign in to your account' : 'Join the Herd community'}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {!isLogin && canRegister && (
-            <Input
-              label="Full Name"
-              name="name"
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          )}
-
-          <Input
-            label="Email Address"
-            name="email"
-            type="email"
-            placeholder="email@example.com"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-
-          <div>
-            <Input
-              label="Password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            {isLogin && (
-              <div className="flex justify-end mt-2">
-                <Link 
-                  to={isAdminLogin ? "/admin/forgot-password" : "/forgot-password"} 
-                  className="text-xs font-semibold text-gray-400 hover:text-primary transition-colors"
-                >
-                  Forgot password?
-                </Link>
+          {requires2FA ? (
+            <div className="space-y-5">
+              <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 text-center mb-6">
+                <p className="text-sm text-gray-600">Please enter the 6-digit code from your authenticator app to continue.</p>
               </div>
-            )}
-          </div>
+              <Input
+                label="Verification Code"
+                name="code"
+                placeholder="000000"
+                value={twoFactorCode}
+                onChange={(e) => setTwoFactorCode(e.target.value)}
+                required
+                autoFocus
+              />
+              <Button type="submit" size="lg" className="w-full rounded-xl h-12 bg-gray-900 hover:bg-gray-800" loading={loading}>
+                Verify & Sign In
+              </Button>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="w-full text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Back to Login
+              </button>
+            </div>
+          ) : (
+            <>
+              {!isLogin && canRegister && (
+                <Input
+                  label="Full Name"
+                  name="name"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                />
+              )}
 
-          {(error || roleError) && (
-            <p className="text-xs text-red-500 font-medium text-center bg-red-50 py-2 rounded-lg">
-              {error || roleError}
-            </p>
+              <Input
+                label="Email Address"
+                name="email"
+                type="email"
+                placeholder="email@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+
+              <div>
+                <Input
+                  label="Password"
+                  name="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                {isLogin && (
+                  <div className="flex justify-end mt-2">
+                    <Link
+                      to={isAdminLogin ? "/admin/forgot-password" : "/forgot-password"}
+                      className="text-xs font-semibold text-gray-400 hover:text-primary transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {(error || roleError) && (
+                <p className="text-xs text-red-500 font-medium text-center bg-red-50 py-2 rounded-lg">
+                  {error || roleError}
+                </p>
+              )}
+
+              <div className="space-y-3 pt-2">
+                <Button type="submit" size="lg" className="w-full rounded-xl h-12 bg-gray-900 hover:bg-gray-800" loading={loading}>
+                  {isAdminLogin ? 'Sign In' : isLogin ? 'Sign In' : 'Sign Up'}
+                </Button>
+
+                {/* <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  className="w-full rounded-xl h-12 border-gray-200 text-gray-500 font-medium"
+                  onClick={fillDemoCredentials}
+                >
+                  Demo Account
+                </Button> */}
+              </div>
+            </>
           )}
-
-          <div className="space-y-3 pt-2">
-            <Button type="submit" size="lg" className="w-full rounded-xl h-12 bg-gray-900 hover:bg-gray-800" loading={loading}>
-              {isAdminLogin ? 'Sign In' : isLogin ? 'Sign In' : 'Sign Up'}
-            </Button>
-
-            <Button
-              type="button"
-              variant="outline"
-              size="lg"
-              className="w-full rounded-xl h-12 border-gray-200 text-gray-500 font-medium"
-              onClick={fillDemoCredentials}
-            >
-              Demo Account
-            </Button>
-          </div>
         </form>
 
         <div className="mt-8 pt-6 border-t border-gray-50">

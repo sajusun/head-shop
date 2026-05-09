@@ -29,6 +29,13 @@ const authService = {
     return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/login`, credentials);
   },
 
+  loginWith2FA: async (credentials) => {
+    if (!API_CONFIG.USE_API) {
+      return authService.login(credentials); // Mock just logs in normally
+    }
+    return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/login-2fa`, credentials);
+  },
+
   register: async (userData) => {
     if (!API_CONFIG.USE_API) {
       return new Promise((resolve) => {
@@ -56,6 +63,22 @@ const authService = {
   
   updateProfile: async (userData) => {
     return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/profile`, userData);
+  },
+
+  changePassword: async (passwordData) => {
+    return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/change-password`, passwordData);
+  },
+
+  get2FAQRCode: async () => {
+    return api.get(`${API_CONFIG.ENDPOINTS.AUTH}/two-factor-qr`);
+  },
+
+  confirm2FA: async (code) => {
+    return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/two-factor-confirm`, { code });
+  },
+
+  disable2FA: async (current_password) => {
+    return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/two-factor-disable`, { current_password });
   }
 };
 
