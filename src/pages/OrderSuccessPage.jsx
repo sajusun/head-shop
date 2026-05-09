@@ -1,12 +1,42 @@
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { CheckCircle2, ArrowRight, Package, Calendar, MapPin } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { clearCart } from '../features/cart/cartSlice';
+import api from '../services/api';
+import { CheckCircle2, ArrowRight, Package, Calendar, MapPin, Loader2 } from 'lucide-react';
 import Button from '../components/Button';
 import { motion } from 'framer-motion';
 
 const OrderSuccessPage = () => {
+  const dispatch = useDispatch();
   const location = useLocation();
-  const { order } = location.state || {};
+  const [searchParams] = useSearchParams();
+  const [order, setOrder] = React.useState(location.state?.order || null);
+  const [loading, setLoading] = React.useState(!order);
+  const orderId = searchParams.get('order_id');
+
+  useEffect(() => {
+    // 1. Clear the cart immediately
+    dispatch(clearCart());
+
+    // 2. If no order in state but we have ID in URL, fetch it
+    if (!order && orderId) {
+      api.get(`/orders/${orderId}`)
+        .then(res => setOrder(res.data.data))
+        .catch(err => console.error('Failed to fetch order', err))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [dispatch, orderId, order]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50/50 min-h-screen py-20 px-4">
