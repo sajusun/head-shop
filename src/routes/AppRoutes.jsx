@@ -46,6 +46,7 @@ const BlogPage = lazy(() => import('../pages/BlogPage'));
 const BlogDetailsPage = lazy(() => import('../pages/BlogDetailsPage'));
 const ForgotPasswordPage = lazy(() => import('../pages/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('../pages/ResetPasswordPage'));
+const SocialCallbackPage = lazy(() => import('../pages/SocialCallbackPage'));
 
 const PrivateRoute = ({ children }) => {
   const { user } = useSelector(state => state.auth);
@@ -89,6 +90,7 @@ const AppRoutes = () => {
           <Route path="order/success" element={<OrderSuccessPage />} />
           <Route path="order/fail" element={<OrderFailPage />} />
           <Route path="login" element={<UserLoginPage />} />
+          <Route path="auth/:provider/callback" element={<SocialCallbackPage />} />
 
   {/* Public Legal & Settings Pages */}
           <Route path="accessibility" element={<AccessibilityPage />} />

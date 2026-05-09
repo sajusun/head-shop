@@ -104,6 +104,44 @@ export const updateProfile = createAsyncThunk(
   }
 );
 
+export const socialLogin = createAsyncThunk(
+  'auth/socialLogin',
+  async (provider, { rejectWithValue }) => {
+    try {
+      const response = await authService.getSocialRedirect(provider);
+      const url = response.data?.data?.url ?? response.data?.url;
+      if (url) {
+        window.location.href = url;
+      }
+      return url;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Social login failed');
+    }
+  }
+);
+
+export const handleSocialCallback = createAsyncThunk(
+  'auth/handleSocialCallback',
+  async ({ provider, params }, { rejectWithValue }) => {
+    try {
+      const response = await authService.handleSocialCallback(provider, params);
+      const payload = response.data?.data ?? response.data;
+      const token = payload.access_token ?? payload.token;
+      const user = payload.user ?? payload;
+
+      if (!token || !user) {
+        return rejectWithValue('Invalid social login response');
+      }
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return { ...payload, access_token: token, user };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Social login failed');
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -181,6 +219,27 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(socialLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(socialLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(handleSocialCallback.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(handleSocialCallback.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.access_token;
+      })
+      .addCase(handleSocialCallback.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
