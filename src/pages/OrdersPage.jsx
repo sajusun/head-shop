@@ -408,7 +408,7 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <AnimatePresence mode="wait">
         {view === 'list' ? (
           <motion.div
@@ -426,7 +426,7 @@ const OrdersPage = () => {
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
               <div>
-                <h1 className="text-4xl font-black text-text mb-2">My Orders</h1>
+                <h1 className="text-2xl md:text-3xl font-black text-text mb-1">My Orders</h1>
                 <p className="text-gray-500">Track and manage your recent purchases</p>
               </div>
             </div>

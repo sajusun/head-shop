@@ -37,6 +37,7 @@ const productSlice = createSlice({
     items: [],
     currentProduct: null,
     loading: false,
+    currentListRequestId: undefined,
     error: null,
     searchQuery: '',
     categoryFilter: 'All',
@@ -62,11 +63,15 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProducts.pending, (state) => {
+      .addCase(fetchProducts.pending, (state, action) => {
         state.loading = true;
         state.error = null;
+        state.currentListRequestId = action.meta.requestId;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
+        if (state.currentListRequestId && state.currentListRequestId !== action.meta.requestId) {
+          return;
+        }
         state.loading = false;
         state.items = action.payload.items;
         if (action.payload.pagination) {
@@ -81,10 +86,15 @@ const productSlice = createSlice({
             to: action.payload.items.length || null,
           };
         }
+        state.currentListRequestId = undefined;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
+        if (state.currentListRequestId && state.currentListRequestId !== action.meta.requestId) {
+          return;
+        }
         state.loading = false;
         state.error = action.payload;
+        state.currentListRequestId = undefined;
       })
       .addCase(fetchProductBySlug.pending, (state) => {
         state.loading = true;

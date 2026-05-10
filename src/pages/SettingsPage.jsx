@@ -217,7 +217,7 @@ const SettingsPage = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors mb-8 group"
@@ -225,7 +225,7 @@ const SettingsPage = () => {
         <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Back
       </button>
 
-      <h1 className="text-4xl font-black text-text mb-12">Settings</h1>
+      <h1 className="text-2xl md:text-3xl font-black text-text mb-8">Settings</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
         {/* Sidebar Tabs */}
