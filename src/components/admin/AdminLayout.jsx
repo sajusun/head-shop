@@ -18,6 +18,8 @@ import {
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { adminLogout } from '../../features/auth/adminAuthSlice';
+import AdminNotificationCenter from './AdminNotificationCenter';
+import useAdminNotificationPolling from '../../hooks/useAdminNotificationPolling';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -25,6 +27,9 @@ const AdminLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector(state => state.adminAuth);
+
+  // Enable polling for admin notifications
+  useAdminNotificationPolling();
 
   const navItems = [
     { label: 'Dashboard', icon: FiHome, path: '/admin' },
@@ -113,11 +118,8 @@ const AdminLayout = () => {
             {isSidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
 
-          <div className="flex items-center space-x-4">
-            <button className="p-2 text-gray-400 hover:text-black relative">
-              <FiBell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
+          <div className="flex items-center space-x-4 ml-auto">
+            <AdminNotificationCenter />
             <div className="h-8 w-px bg-gray-100 mx-2"></div>
             <Link to="/admin/settings" className="p-2 text-gray-400 hover:text-black">
               <FiSettings size={20} />

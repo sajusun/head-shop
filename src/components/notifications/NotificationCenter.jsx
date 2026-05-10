@@ -12,7 +12,6 @@ import {
 
 const NotificationCenter = () => {
   const [isOpen, setIsOpen]       = useState(false);
-  const [fetched, setFetched]     = useState(false);
   const dropdownRef               = useRef(null);
   const dispatch                  = useDispatch();
   const navigate                  = useNavigate();
@@ -29,13 +28,12 @@ const NotificationCenter = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Fetch full list when bell is opened (only once per session, or manually refreshed)
+  // Fetch full list when bell is opened
   useEffect(() => {
-    if (isOpen && !fetched) {
+    if (isOpen) {
       dispatch(fetchNotificationsThunk());
-      setFetched(true);
     }
-  }, [isOpen, fetched, dispatch]);
+  }, [isOpen, dispatch]);
 
   const handleRefresh = () => {
     dispatch(fetchNotificationsThunk());
@@ -105,13 +103,13 @@ const NotificationCenter = () => {
       >
         <Bell size={20} className="text-text group-hover:text-primary transition-colors" />
         <AnimatePresence>
-          {unreadCount > 0 && (
+          {Number(unreadCount) > 0 && (
             <motion.span
               key="badge"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              className="absolute top-1 right-1 min-w-[18px] h-[18px] bg-primary text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 border-2 border-white"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              className="absolute -top-1 -right-1 min-w-[20px] h-[20px] bg-primary text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 border-2 border-white shadow-lg shadow-primary/20"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </motion.span>
@@ -208,12 +206,18 @@ const NotificationCenter = () => {
                   </motion.div>
                 ))
               ) : (
-                <div className="py-14 text-center">
-                  <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Bell className="text-gray-200" size={22} />
+                <div className="py-20 text-center px-10">
+                  <div className="relative w-20 h-20 mx-auto mb-6">
+                    <div className="absolute inset-0 bg-primary/5 rounded-[2rem] rotate-6 animate-pulse" />
+                    <div className="absolute inset-0 bg-primary/10 rounded-[2rem] -rotate-6" />
+                    <div className="relative w-full h-full bg-white rounded-[2rem] shadow-xl border border-primary/10 flex items-center justify-center text-primary/40">
+                      <Bell size={32} strokeWidth={1.5} />
+                    </div>
                   </div>
-                  <p className="text-sm font-bold text-gray-400">All caught up!</p>
-                  <p className="text-xs text-gray-300 mt-1">No new notifications</p>
+                  <h4 className="text-base font-black text-text mb-2 uppercase tracking-tight">Stay Tuned!</h4>
+                  <p className="text-xs text-gray-400 font-medium leading-relaxed">
+                    You're all caught up for now. We'll notify you when something important happens.
+                  </p>
                 </div>
               )}
             </div>

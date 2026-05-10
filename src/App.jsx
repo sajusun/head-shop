@@ -11,7 +11,6 @@ import './index.css';
 function App() {
   useEffect(() => {
     // Initialize mock notifications
-    store.dispatch(setNotifications(mockNotifications));
     // Fetch global site settings
     store.dispatch(fetchSettings());
   }, []);

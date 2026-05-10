@@ -9,6 +9,7 @@ import notificationReducer from '../features/notifications/notificationSlice';
 import settingsReducer from '../features/settings/settingsSlice';
 import adminAuthReducer from '../features/auth/adminAuthSlice';
 import categoryReducer from '../features/categories/categorySlice';
+import adminNotificationReducer from '../features/notifications/adminNotificationSlice';
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +22,7 @@ export const store = configureStore({
     blogFavorites: blogFavoriteReducer,
     reviews: reviewReducer,
     notifications: notificationReducer,
+    adminNotifications: adminNotificationReducer,
     settings: settingsReducer,
   },
 });

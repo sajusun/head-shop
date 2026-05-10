@@ -31,6 +31,7 @@ const settingsSlice = createSlice({
   initialState: {
     data: {},
     loading: false,
+    fetched: false,
     error: null,
     updateLoading: false,
     updateSuccess: false,
@@ -48,10 +49,12 @@ const settingsSlice = createSlice({
       })
       .addCase(fetchSettings.fulfilled, (state, action) => {
         state.loading = false;
+        state.fetched = true;
         state.data = action.payload;
       })
       .addCase(fetchSettings.rejected, (state, action) => {
         state.loading = false;
+        state.fetched = true;
         state.error = action.payload;
       })
       .addCase(updateSettings.pending, (state) => {

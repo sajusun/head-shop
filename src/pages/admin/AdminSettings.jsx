@@ -22,8 +22,9 @@ const AdminSettings = () => {
   // Defensive selector
   const settingsState = useSelector(state => state.settings || {});
   const { 
-    data: settings = {}, 
+    data: settings, 
     loading = false, 
+    fetched = false,
     updateLoading = false, 
     updateSuccess = false, 
     error = null 
@@ -32,12 +33,12 @@ const AdminSettings = () => {
   const [activeTab, setActiveTab] = useState('general');
   const [formData, setFormData] = useState({});
 
-  // Fetch settings if not already loaded
+  // Fetch settings if not already loaded and not currently loading
   useEffect(() => {
-    if (!settings || Object.keys(settings).length === 0) {
+    if (!loading && !fetched) {
       dispatch(fetchSettings());
     }
-  }, [dispatch, settings]);
+  }, [dispatch, fetched, loading]);
 
   useEffect(() => {
     if (settings && Object.keys(settings).length > 0) {
@@ -72,7 +73,7 @@ const AdminSettings = () => {
     { id: 'terms', label: 'Terms of Use', icon: <FileText size={18} /> },
   ];
 
-  if (loading && (!settings || Object.keys(settings).length === 0)) {
+  if (loading && !fetched) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <Loader2 className="w-12 h-12 text-primary animate-spin" />

@@ -80,7 +80,7 @@ const notificationSlice = createSlice({
   reducers: {
     // Used by the polling hook to update badge count efficiently
     setUnreadCount: (state, action) => {
-      state.unreadCount = action.payload;
+      state.unreadCount = Number(action.payload ?? 0);
     },
 
     // Legacy local-only actions (still supported)

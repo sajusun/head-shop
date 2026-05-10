@@ -300,11 +300,15 @@ const Layout = () => {
               </div>
 
               <div className="flex items-center border-l border-gray-200 pl-2 sm:pl-4 gap-1 sm:gap-2">
-                <Link to="/favorites" className="p-2 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
-                  <Heart size={20} />
-                </Link>
-                
-                <NotificationCenter />
+                {user && (
+                  <>
+                    <Link to="/favorites" className="p-2 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
+                      <Heart size={20} />
+                    </Link>
+                    
+                    <NotificationCenter />
+                  </>
+                )}
                 
                 <Link to="/cart" className="p-2 text-gray-600 hover:text-primary hover:bg-primary/5 rounded-full transition-all relative">
                   <ShoppingBag size={20} />
