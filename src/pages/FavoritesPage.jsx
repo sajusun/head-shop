@@ -1,13 +1,14 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Heart, ArrowLeft, ShoppingBag } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Button from '../components/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const FavoritesPage = () => {
   const { items } = useSelector(state => state.favorites);
+  const navigate = useNavigate();
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -17,11 +18,20 @@ const FavoritesPage = () => {
           <p className="text-gray-500">You have {items.length} items saved in your wishlist</p>
         </div>
         
-        <Link to="/products">
-          <Button variant="outline" className="rounded-xl flex items-center gap-2">
-            <ArrowLeft size={18} /> Back to Shop
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            className="rounded-xl flex items-center gap-2"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft size={18} /> Back
           </Button>
-        </Link>
+          <Link to="/products">
+            <Button variant="outline" className="rounded-xl flex items-center gap-2">
+              <ShoppingBag size={18} /> Back to Shop
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {items.length > 0 ? (
