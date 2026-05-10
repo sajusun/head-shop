@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import NotificationCenter from './notifications/NotificationCenter';
 import ToastContainer from './notifications/ToastContainer';
 import api from '../services/api';
+import useNotificationPolling from '../hooks/useNotificationPolling';
 
 const NewsletterModal = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState('');
@@ -169,6 +170,8 @@ const Layout = () => {
       setShowUserMenu(false);
     }, 300);
   };
+
+  useNotificationPolling(); // 🔔 Start live polling when user is logged in
 
   useEffect(() => {
     dispatch(fetchProducts());

@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Bell, Shield, ArrowLeft, Camera, Check } from 'lucide-react';
+import { User, Lock, Bell, Shield, ArrowLeft, Camera, Check, Save } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Modal from '../components/Modal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { updateProfile } from '../features/auth/authSlice';
 import authService from '../services/authService';
+import notificationService from '../services/notificationService';
 
 const SettingsPage = () => {
   const { user, loading: profileLoading, error: profileError } = useSelector(state => state.auth);
@@ -48,6 +49,17 @@ const SettingsPage = () => {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [disablePassword, setDisablePassword] = useState('');
 
+  // Notification preferences state
+  const [notifPrefs, setNotifPrefs] = useState({
+    order_updates: true,
+    promotions: true,
+    newsletter: true,
+  });
+  const [notifLoading, setNotifLoading] = useState(false);
+  const [notifSaved, setNotifSaved]     = useState(false);
+  const [notifError, setNotifError]     = useState(null);
+  const [notifFetched, setNotifFetched] = useState(false);
+
   React.useEffect(() => {
     if (user?.two_factor_confirmed_at) {
       setTfaStep('confirmed');
@@ -55,6 +67,16 @@ const SettingsPage = () => {
       setTfaStep('off');
     }
   }, [user]);
+
+  // Load notification preferences when Notifications tab becomes active
+  React.useEffect(() => {
+    if (activeTab === 'notifications' && !notifFetched) {
+      notificationService.getPreferences().then(res => {
+        if (res?.data?.data) setNotifPrefs(res.data.data);
+        setNotifFetched(true);
+      }).catch(() => setNotifFetched(true));
+    }
+  }, [activeTab, notifFetched]);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
