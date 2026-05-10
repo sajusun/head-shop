@@ -1,8 +1,9 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import ScrollToTop from '../components/ScrollToTop';
+import { fetchCart } from '../features/cart/cartSlice';
 
 // Lazy loading pages
 const HomePage = lazy(() => import('../pages/HomePage'));
@@ -46,6 +47,7 @@ const BlogPage = lazy(() => import('../pages/BlogPage'));
 const BlogDetailsPage = lazy(() => import('../pages/BlogDetailsPage'));
 const ForgotPasswordPage = lazy(() => import('../pages/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('../pages/ResetPasswordPage'));
+const SocialCallbackPage = lazy(() => import('../pages/SocialCallbackPage'));
 
 const PrivateRoute = ({ children }) => {
   const { user } = useSelector(state => state.auth);
@@ -68,6 +70,15 @@ const AdminRoute = ({ children }) => {
 };
 
 const AppRoutes = () => {
+  const dispatch = useDispatch();
+  const { user } = useSelector(state => state.auth);
+
+  useEffect(() => {
+    if (user) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, user]);
+
   return (
 
     <Suspense fallback={
@@ -89,6 +100,7 @@ const AppRoutes = () => {
           <Route path="order/success" element={<OrderSuccessPage />} />
           <Route path="order/fail" element={<OrderFailPage />} />
           <Route path="login" element={<UserLoginPage />} />
+          <Route path="auth/:provider/callback" element={<SocialCallbackPage />} />
 
   {/* Public Legal & Settings Pages */}
           <Route path="accessibility" element={<AccessibilityPage />} />

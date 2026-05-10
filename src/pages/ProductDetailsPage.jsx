@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductBySlug, clearCurrentProduct } from '../features/products/productSlice';
 import { fetchReviews } from '../features/reviews/reviewSlice';
-import { addToCart } from '../features/cart/cartSlice';
+import { addToCart, addToCartDB } from '../features/cart/cartSlice';
 import { toggleFavorite } from '../features/favorites/favoriteSlice';
 import { Heart, ShoppingBag, Share2, ArrowLeft, MessageSquare, ChevronLeft, ChevronRight, ArrowRight, Zap } from 'lucide-react';
 import Button from '../components/Button';
@@ -19,6 +19,8 @@ const ProductDetailsPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { items: allProducts, currentProduct: product, loading, error } = useSelector(state => state.products);
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [isRelatedLoading, setIsRelatedLoading] = useState(false);
   const { user } = useSelector(state => state.auth);
   const { items: reviews, loading: reviewsLoading } = useSelector(state => state.reviews);
   const favorites = useSelector(state => state.favorites.items);
@@ -77,12 +79,7 @@ const ProductDetailsPage = () => {
     : backendRatingAverage;
   const ratingCount = Math.max(product?.rating?.count ?? 0, displayedReviews.length);
 
-  const relatedProducts = useMemo(() => {
-    if (!product || !allProducts.length) return [];
-    return allProducts
-      .filter(item => item.id !== product.id && (item.category?.id === product.category?.id || item.category === product.category))
-      .slice(0, 10);
-  }, [product, allProducts]);
+  // Related products fetching logic moved to useEffect
 
   // Related Products Auto-scroll
   useEffect(() => {
@@ -130,6 +127,27 @@ const ProductDetailsPage = () => {
   useEffect(() => {
     if (product) {
       dispatch(fetchReviews(product.id));
+      
+      // Fetch Related Products via Ranking System
+      const fetchRelated = async () => {
+        setIsRelatedLoading(true);
+        try {
+          const categorySlug = product.category?.slug || (typeof product.category === 'string' ? product.category.toLowerCase().replace(/\s+/g, '-') : '');
+          const response = await dispatch(fetchProducts({ 
+            category: categorySlug,
+            sort: 'trending',
+            per_page: 10 
+          })).unwrap();
+          
+          setRelatedProducts(response.items.filter(item => item.id !== product.id));
+        } catch (error) {
+          console.error('Failed to fetch related products:', error);
+        } finally {
+          setIsRelatedLoading(false);
+        }
+      };
+      fetchRelated();
+
       const firstVariant = Array.isArray(product.variants) ? product.variants[0] : null;
       setSelectedSize(firstVariant?.size?.id || null);
       setSelectedColor(firstVariant?.color?.id || null);
@@ -403,7 +421,11 @@ const ProductDetailsPage = () => {
               className="flex-1 gap-2 rounded-xl border-gray-200"
               disabled={stock <= 0}
               onClick={() => {
-                dispatch(addToCart(cartPayload()));
+                const payload = cartPayload();
+                dispatch(addToCart(payload));
+                if (user) {
+                  dispatch(addToCartDB(payload));
+                }
               }}
             >
               <ShoppingBag size={20} /> Add to Cart
@@ -457,11 +479,19 @@ const ProductDetailsPage = () => {
             className="flex gap-8 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide no-scrollbar"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {relatedProducts.map(item => (
-              <div key={item.id} className="min-w-[280px] sm:min-w-[320px] snap-start">
-                <ProductCard product={item} />
-              </div>
-            ))}
+            {isRelatedLoading ? (
+               [...Array(4)].map((_, i) => (
+                <div key={i} className="min-w-[280px] sm:min-w-[320px] aspect-square bg-gray-100 animate-pulse rounded-2xl"></div>
+              ))
+            ) : relatedProducts.length > 0 ? (
+              relatedProducts.map(item => (
+                <div key={item.id} className="min-w-[280px] sm:min-w-[320px] snap-start">
+                  <ProductCard product={item} />
+                </div>
+              ))
+            ) : (
+              <div className="w-full text-center py-10 text-gray-400 italic">No related products found</div>
+            )}
           </div>
         </div>
       </section>

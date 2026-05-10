@@ -79,6 +79,14 @@ const authService = {
 
   disable2FA: async (current_password) => {
     return api.post(`${API_CONFIG.ENDPOINTS.AUTH}/two-factor-disable`, { current_password });
+  },
+
+  getSocialRedirect: async (provider) => {
+    return api.get(`/auth/${provider}/redirect`);
+  },
+
+  handleSocialCallback: async (provider, params) => {
+    return api.get(`/auth/${provider}/callback`, { params });
   }
 };
 

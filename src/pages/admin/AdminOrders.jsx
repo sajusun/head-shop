@@ -217,7 +217,12 @@ const AdminOrders = () => {
                 sortedOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 transition-colors group">
                     <td className="px-6 py-4">
-                      <div className="font-mono text-sm font-bold text-gray-900">#{order.order_number}</div>
+                      <div className="font-mono text-sm font-bold text-gray-900 flex items-center gap-2">
+                        #{order.order_number}
+                        {order.notes && (
+                          <div className="w-2 h-2 rounded-full bg-amber-500" title="Customer provided a note"></div>
+                        )}
+                      </div>
                       <div className="text-[10px] text-gray-500 flex items-center gap-1 mt-1">
                         <FiClock size={10} />
                         {new Date(order.created_at).toLocaleString()}
@@ -298,7 +303,7 @@ const AdminOrders = () => {
                         <div key={item.id} className="flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-100">
                           <div className="w-16 h-16 rounded-xl bg-gray-50 overflow-hidden shrink-0 border border-gray-100">
                             <img 
-                              src={item.product?.primary_image?.image_path || 'https://via.placeholder.com/100'} 
+                              src={item.product?.thumbnail || 'https://via.placeholder.com/100'} 
                               alt={item.product?.name} 
                               className="w-full h-full object-cover"
                             />
@@ -372,9 +377,19 @@ const AdminOrders = () => {
                       <FiMapPin />
                       Shipping Address
                     </h3>
-                    <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-1 shadow-sm">
+                    <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-2 shadow-sm">
                       <p className="text-sm text-gray-700 leading-relaxed">{selectedOrder.address}</p>
                       <p className="text-sm text-gray-700 font-medium">{selectedOrder.city}, {selectedOrder.postal_code}</p>
+                      <div className="pt-2 border-t border-gray-50 mt-2 space-y-1">
+                        <p className="text-xs text-gray-500 flex items-center gap-2">
+                          <FiPhone size={12} className="text-gray-400" />
+                          {selectedOrder.phone}
+                        </p>
+                        <p className="text-xs text-gray-500 flex items-center gap-2">
+                          <FiMail size={12} className="text-gray-400" />
+                          {selectedOrder.email}
+                        </p>
+                      </div>
                     </div>
                   </div>
 

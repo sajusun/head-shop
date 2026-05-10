@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Heart, ShoppingCart, Share2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleFavorite } from '../features/favorites/favoriteSlice';
-import { addToCart } from '../features/cart/cartSlice';
+import { addToCart, addToCartDB } from '../features/cart/cartSlice';
 import Button from './Button';
 import RatingStars from './RatingStars';
 import { motion } from 'framer-motion';
@@ -63,6 +63,18 @@ const ProductCard = ({ product }) => {
             </div>
           )}
 
+          {/* Ranking/Sales Badges */}
+          {!offerPrice && product.ranking_score > 50 && (
+            <div className="absolute top-3 left-3 bg-accent text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg z-10">
+              TRENDING
+            </div>
+          )}
+          {!offerPrice && product.ranking_score <= 50 && product.sales_count > 10 && (
+            <div className="absolute top-3 left-3 bg-primary text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg z-10">
+              BEST SELLER
+            </div>
+          )}
+
           <div className="absolute top-3 right-3 flex flex-col gap-2">
             <button
               onClick={(e) => {
@@ -114,7 +126,23 @@ const ProductCard = ({ product }) => {
               size="sm"
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(addToCart(product));
+                const variants = product.variants || [];
+                const defaultVariant = variants.length > 0 ? variants[0] : null;
+                
+                const cartPayload = {
+                  ...product,
+                  product_variant_id: defaultVariant?.id,
+                  selectedColor: defaultVariant?.color?.name || null,
+                  selectedSize: defaultVariant?.size?.short || defaultVariant?.size?.name || null,
+                  price: defaultVariant?.price || product.price,
+                  offer_price: defaultVariant?.offer_price || product.offer_price,
+                  effective_price: defaultVariant ? (defaultVariant.offer_price ?? defaultVariant.price) : (product.offer_price ?? product.price)
+                };
+                
+                dispatch(addToCart(cartPayload));
+                if (user) {
+                  dispatch(addToCartDB(cartPayload));
+                }
               }}
               className="rounded-full w-10 h-10 p-0 shadow-lg shadow-primary/20"
             >
