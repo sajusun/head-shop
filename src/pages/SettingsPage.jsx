@@ -55,6 +55,7 @@ const SettingsPage = () => {
     promotions: true,
     newsletter: true,
   });
+  const [notifInitialPrefs, setNotifInitialPrefs] = useState(null);
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifSaved, setNotifSaved]     = useState(false);
   const [notifError, setNotifError]     = useState(null);
@@ -71,12 +72,43 @@ const SettingsPage = () => {
   // Load notification preferences when Notifications tab becomes active
   React.useEffect(() => {
     if (activeTab === 'notifications' && !notifFetched) {
+      setNotifLoading(true);
+      setNotifError(null);
       notificationService.getPreferences().then(res => {
-        if (res?.data?.data) setNotifPrefs(res.data.data);
+        const prefs = res?.data?.data;
+        if (prefs) {
+          setNotifPrefs(prefs);
+          setNotifInitialPrefs(prefs);
+        }
         setNotifFetched(true);
-      }).catch(() => setNotifFetched(true));
+      }).catch((err) => {
+        setNotifError(err?.response?.data?.message || 'Failed to load notification preferences.');
+        setNotifFetched(true);
+      }).finally(() => setNotifLoading(false));
     }
   }, [activeTab, notifFetched]);
+
+  const handleToggleNotifPref = (key) => {
+    setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }));
+    setNotifSaved(false);
+    setNotifError(null);
+  };
+
+  const handleSaveNotifPrefs = async () => {
+    setNotifLoading(true);
+    setNotifError(null);
+    setNotifSaved(false);
+    try {
+      await notificationService.updatePreferences(notifPrefs);
+      setNotifInitialPrefs(notifPrefs);
+      setNotifSaved(true);
+      setTimeout(() => setNotifSaved(false), 3000);
+    } catch (err) {
+      setNotifError(err?.response?.data?.message || 'Failed to save notification preferences.');
+    } finally {
+      setNotifLoading(false);
+    }
+  };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -553,22 +585,70 @@ const SettingsPage = () => {
 
             {activeTab === 'notifications' && (
               <div className="space-y-8">
-                <h3 className="text-2xl font-black text-text mb-8">Notification Preferences</h3>
-                {[
-                  { title: "Order Updates", desc: "Receive alerts about your order status and shipping." },
-                  { title: "New Arrivals", desc: "Be the first to know about new premium releases." },
-                  { title: "Newsletter", desc: "Weekly digest of the best design and tech stories." }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between p-6 bg-gray-50 rounded-3xl">
-                    <div>
-                      <h4 className="font-bold text-text">{item.title}</h4>
-                      <p className="text-sm text-gray-500">{item.desc}</p>
-                    </div>
-                    <div className="w-12 h-6 bg-primary rounded-full relative cursor-pointer shadow-inner">
-                      <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow-md"></div>
-                    </div>
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-2xl font-black text-text">Notification Preferences</h3>
+                    <p className="text-sm text-gray-500 mt-1">Choose what you want to be notified about.</p>
                   </div>
-                ))}
+
+                  <div className="flex items-center gap-3">
+                    {notifSaved && (
+                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-green-700 bg-green-50 px-3 py-2 rounded-2xl">
+                        <Check size={16} /> Saved
+                      </span>
+                    )}
+                    <Button
+                      onClick={handleSaveNotifPrefs}
+                      loading={notifLoading}
+                      disabled={!notifInitialPrefs || JSON.stringify(notifPrefs) === JSON.stringify(notifInitialPrefs)}
+                      className="rounded-2xl"
+                    >
+                      <Save size={16} className="mr-2" /> Save Changes
+                    </Button>
+                  </div>
+                </div>
+
+                {notifError && (
+                  <div className="p-4 bg-red-50 text-red-700 rounded-2xl text-sm font-semibold">
+                    {notifError}
+                  </div>
+                )}
+
+                {[
+                  { key: 'order_updates', title: 'Order Updates', desc: 'Receive alerts about your order status and shipping.' },
+                  { key: 'promotions', title: 'New Arrivals', desc: 'Be the first to know about new premium releases.' },
+                  { key: 'newsletter', title: 'Newsletter', desc: 'Weekly digest of the best design and tech stories.' },
+                ].map((item) => {
+                  const enabled = !!notifPrefs?.[item.key];
+                  return (
+                    <div key={item.key} className="flex items-center justify-between p-6 bg-gray-50 rounded-3xl">
+                      <div>
+                        <h4 className="font-bold text-text">{item.title}</h4>
+                        <p className="text-sm text-gray-500">{item.desc}</p>
+                      </div>
+
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={enabled}
+                        disabled={notifLoading}
+                        onClick={() => handleToggleNotifPref(item.key)}
+                        className={[
+                          'w-12 h-6 rounded-full relative cursor-pointer shadow-inner transition-colors flex-shrink-0',
+                          enabled ? 'bg-primary' : 'bg-gray-300',
+                          notifLoading ? 'opacity-60 cursor-not-allowed' : '',
+                        ].join(' ')}
+                      >
+                        <span
+                          className={[
+                            'absolute left-1 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-md transition-transform',
+                            enabled ? 'translate-x-6' : 'translate-x-0',
+                          ].join(' ')}
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </motion.div>
