@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, Bell, Shield, ArrowLeft, Camera, Check, Save } from 'lucide-react';
+import { User, Lock, Bell, Shield, ArrowLeft, Camera, Check } from 'lucide-react';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Modal from '../components/Modal';
@@ -55,7 +55,6 @@ const SettingsPage = () => {
     promotions: true,
     newsletter: true,
   });
-  const [notifInitialPrefs, setNotifInitialPrefs] = useState(null);
   const [notifLoading, setNotifLoading] = useState(false);
   const [notifSaved, setNotifSaved]     = useState(false);
   const [notifError, setNotifError]     = useState(null);
@@ -78,7 +77,6 @@ const SettingsPage = () => {
         const prefs = res?.data?.data;
         if (prefs) {
           setNotifPrefs(prefs);
-          setNotifInitialPrefs(prefs);
         }
         setNotifFetched(true);
       }).catch((err) => {
@@ -88,22 +86,23 @@ const SettingsPage = () => {
     }
   }, [activeTab, notifFetched]);
 
-  const handleToggleNotifPref = (key) => {
-    setNotifPrefs(prev => ({ ...prev, [key]: !prev[key] }));
-    setNotifSaved(false);
-    setNotifError(null);
-  };
+  const handleToggleNotifPref = async (key) => {
+    if (notifLoading) return;
 
-  const handleSaveNotifPrefs = async () => {
-    setNotifLoading(true);
-    setNotifError(null);
+    const prevPrefs = notifPrefs;
+    const nextPrefs = { ...notifPrefs, [key]: !notifPrefs?.[key] };
+
+    setNotifPrefs(nextPrefs);
     setNotifSaved(false);
+    setNotifError(null);
+    setNotifLoading(true);
+
     try {
-      await notificationService.updatePreferences(notifPrefs);
-      setNotifInitialPrefs(notifPrefs);
+      await notificationService.updatePreferences(nextPrefs);
       setNotifSaved(true);
-      setTimeout(() => setNotifSaved(false), 3000);
+      setTimeout(() => setNotifSaved(false), 2000);
     } catch (err) {
+      setNotifPrefs(prevPrefs);
       setNotifError(err?.response?.data?.message || 'Failed to save notification preferences.');
     } finally {
       setNotifLoading(false);
@@ -592,19 +591,14 @@ const SettingsPage = () => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {notifSaved && (
+                    {notifLoading && (
+                      <span className="text-sm font-semibold text-gray-500">Saving…</span>
+                    )}
+                    {notifSaved && !notifLoading && (
                       <span className="inline-flex items-center gap-2 text-sm font-semibold text-green-700 bg-green-50 px-3 py-2 rounded-2xl">
                         <Check size={16} /> Saved
                       </span>
                     )}
-                    <Button
-                      onClick={handleSaveNotifPrefs}
-                      loading={notifLoading}
-                      disabled={!notifInitialPrefs || JSON.stringify(notifPrefs) === JSON.stringify(notifInitialPrefs)}
-                      className="rounded-2xl"
-                    >
-                      <Save size={16} className="mr-2" /> Save Changes
-                    </Button>
                   </div>
                 </div>
 
