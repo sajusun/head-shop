@@ -10,6 +10,7 @@ import settingsReducer from '../features/settings/settingsSlice';
 import adminAuthReducer from '../features/auth/adminAuthSlice';
 import categoryReducer from '../features/categories/categorySlice';
 import adminNotificationReducer from '../features/notifications/adminNotificationSlice';
+import promotionReducer from '../features/promotions/promotionSlice';
 
 export const store = configureStore({
   reducer: {
@@ -24,5 +25,6 @@ export const store = configureStore({
     notifications: notificationReducer,
     adminNotifications: adminNotificationReducer,
     settings: settingsReducer,
+    promotions: promotionReducer,
   },
 });

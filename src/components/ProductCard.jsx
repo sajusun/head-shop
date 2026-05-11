@@ -63,8 +63,12 @@ const ProductCard = ({ product }) => {
             </div>
           )}
 
-          {/* Ranking/Sales Badges */}
-          {!offerPrice && product.ranking_score > 50 && (
+          {!offerPrice && product.is_promo && (
+            <div className="absolute top-3 left-3 bg-black text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg z-10 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></span> PROMO
+            </div>
+          )}
+          {!offerPrice && !product.is_promo && product.ranking_score > 50 && (
             <div className="absolute top-3 left-3 bg-accent text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg z-10">
               TRENDING
             </div>

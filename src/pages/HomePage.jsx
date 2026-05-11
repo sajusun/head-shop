@@ -7,6 +7,7 @@ import { ArrowRight, Zap, Shield, Truck, ChevronLeft, ChevronRight } from 'lucid
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSEO } from '../hooks/useSEO';
+import PromotionSlider from '../components/PromotionSlider';
 
 const HomePage = () => {
   useSEO('Home');
@@ -63,6 +64,12 @@ const HomePage = () => {
   const featuredProducts = products.filter(p => p.is_featured).slice(0, 8);
   if (featuredProducts.length === 0) featuredProducts.push(...products.slice(0, 8));
 
+  const { active: activePromotions = [] } = useSelector(state => state.promotions || {});
+  const flashSalePromotions = (activePromotions || []).filter(p => p.type === 'flash_sale');
+  const flashSaleProducts = flashSalePromotions.length > 0 
+    ? flashSalePromotions.flatMap(p => p.products || []).slice(0, 4)
+    : products.filter(p => (p.offer_price ?? p.offerPrice) !== null).slice(0, 4);
+
   const topRatedProducts = trendingProducts;
 
   const scroll = (ref, direction) => {
@@ -77,56 +84,9 @@ const HomePage = () => {
 
   return (
     <div className="space-y-20 pb-20">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-white pt-4 lg:pt-12 pb-12 lg:pb-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center max-w-3xl mx-auto">
-            <motion.span
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-6"
-            >
-              New Collection 2024
-            </motion.span>
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-5xl lg:text-7xl font-black text-text leading-tight mb-8"
-            >
-              Elevate Your <span className="text-primary italic">Lifestyle</span> With Premium Goods.
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="text-lg text-gray-500 mb-10 leading-relaxed"
-            >
-              Discover our curated collection of high-quality products designed for the modern individual. Quality meets aesthetic.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
-            >
-              <Link to="/products">
-                <Button size="lg" className="rounded-full px-10">
-                  Shop Now <ArrowRight className="ml-2" size={20} />
-                </Button>
-              </Link>
-              <Link to="/gallery">
-                <Button size="lg" variant="outline" className="rounded-full px-10">
-                  View Gallery
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Decorative Elements */}
-        <div className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-0"></div>
-        <div className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl -z-0"></div>
+      {/* Dynamic Hero Promotion Slider */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <PromotionSlider />
       </section>
 
       {/* Top Rated Products — Auto Slider */}
@@ -197,10 +157,7 @@ const HomePage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products
-              .filter(p => (p.offer_price ?? p.offerPrice) !== null)
-              .slice(0, 4)
-              .map((product, i) => (
+            {flashSaleProducts.map((product, i) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, scale: 0.95 }}

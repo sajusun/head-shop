@@ -14,7 +14,8 @@ import {
   FiMail,
   FiMessageSquare,
   FiFolder,
-  FiLayers
+  FiLayers,
+  FiTrendingUp
 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { adminLogout } from '../../features/auth/adminAuthSlice';
@@ -40,6 +41,7 @@ const AdminLayout = () => {
     { label: 'Users', icon: FiUsers, path: '/admin/users' },
     { label: 'Journal', icon: FiFileText, path: '/admin/journal' },
     { label: 'Newsletter', icon: FiMail, path: '/admin/newsletter' },
+    { label: 'Promotions', icon: FiTrendingUp, path: '/admin/promotions' },
     { label: 'Contact', icon: FiMessageSquare, path: '/admin/contact' },
     { label: 'Settings', icon: FiSettings, path: '/admin/settings' },
   ];
