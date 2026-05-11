@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShieldCheck, ShoppingBag } from 'lucide-react';
 import { login, loginWith2FA, logout, register, socialLogin } from '../features/auth/authSlice';
-import { adminLogin, adminLogout } from '../features/auth/adminAuthSlice';
+import { adminLogin, adminLogout, adminLoginWith2FA } from '../features/auth/adminAuthSlice';
 import { syncCartWithDB } from '../features/cart/cartSlice';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -28,18 +28,23 @@ const AuthPage = ({ mode = 'user' }) => {
     setRoleError('');
 
     if (requires2FA) {
-      const resultAction = await dispatch(loginWith2FA({
+      const action = isAdminLogin ? adminLoginWith2FA : loginWith2FA;
+      const resultAction = await dispatch(action({
         email: tempEmail || formData.email,
         password: formData.password,
         code: twoFactorCode
       }));
-      if (loginWith2FA.fulfilled.match(resultAction)) {
-        // Sync cart with DB after login
-        const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        if (currentCart.length > 0) {
-          dispatch(syncCartWithDB(currentCart));
+      if (action.fulfilled.match(resultAction)) {
+        if (isAdminLogin) {
+          navigate('/admin');
+        } else {
+          // Sync cart with DB after login
+          const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+          if (currentCart.length > 0) {
+            dispatch(syncCartWithDB(currentCart));
+          }
+          navigate('/profile', { replace: true });
         }
-        navigate('/profile', { replace: true });
       }
       return;
     }

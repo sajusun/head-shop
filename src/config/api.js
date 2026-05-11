@@ -5,7 +5,8 @@ export const API_CONFIG = {
   ENDPOINTS: {
     PRODUCTS: import.meta.env.VITE_API_PRODUCTS,
     CART: import.meta.env.VITE_API_CART,
-    AUTH: import.meta.env.VITE_API_AUTH,
+    AUTH: import.meta.env.VITE_API_AUTH || '/auth',
+    ADMIN_AUTH: '/admin/auth',
     REVIEWS: import.meta.env.VITE_API_REVIEWS,
   },
   USE_API,

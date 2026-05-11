@@ -12,6 +12,36 @@ const mockAdmin = {
 };
 
 const authService = {
+  // Admin Methods
+  adminLogin: async (credentials) => {
+    return api.post(`${API_CONFIG.ENDPOINTS.ADMIN_AUTH}/login`, credentials);
+  },
+
+  adminLoginWith2FA: async (credentials) => {
+    return api.post(`${API_CONFIG.ENDPOINTS.ADMIN_AUTH}/login-2fa`, credentials);
+  },
+
+  adminLogout: async () => {
+    return api.post(`${API_CONFIG.ENDPOINTS.ADMIN_AUTH}/logout`);
+  },
+
+  adminGetProfile: async () => {
+    return api.get(`${API_CONFIG.ENDPOINTS.ADMIN_AUTH}/profile`);
+  },
+
+  adminGet2FAQRCode: async () => {
+    return api.get(`${API_CONFIG.ENDPOINTS.ADMIN_AUTH}/two-factor-qr`);
+  },
+
+  adminConfirm2FA: async (code) => {
+    return api.post(`${API_CONFIG.ENDPOINTS.ADMIN_AUTH}/two-factor-confirm`, { code });
+  },
+
+  adminDisable2FA: async (current_password) => {
+    return api.post(`${API_CONFIG.ENDPOINTS.ADMIN_AUTH}/two-factor-disable`, { current_password });
+  },
+
+  // User Methods
   login: async (credentials) => {
     if (!API_CONFIG.USE_API) {
       return new Promise((resolve, reject) => {

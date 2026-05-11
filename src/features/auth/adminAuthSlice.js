@@ -5,7 +5,7 @@ export const adminLogin = createAsyncThunk(
   'adminAuth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await authService.login(credentials);
+      const response = await authService.adminLogin(credentials);
       const payload = response.data?.data ?? response.data;
       const token = payload.access_token ?? payload.token;
       const user = payload.user ?? payload;
@@ -27,17 +27,66 @@ export const adminLogin = createAsyncThunk(
   }
 );
 
+export const adminLoginWith2FA = createAsyncThunk(
+  'adminAuth/loginWith2FA',
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await authService.adminLoginWith2FA(credentials);
+      const payload = response.data?.data ?? response.data;
+      const token = payload.access_token ?? payload.token;
+      const user = payload.user ?? payload;
+
+      if (!token || !user) {
+        return rejectWithValue('Invalid 2FA verification');
+      }
+
+      localStorage.setItem('admin_token', token);
+      localStorage.setItem('admin_user', JSON.stringify(user));
+      return { ...payload, access_token: token, user };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '2FA verification failed');
+    }
+  }
+);
+
 export const adminLogout = createAsyncThunk(
   'adminAuth/logout',
   async (_, { dispatch }) => {
     try {
-      await authService.logout();
+      await authService.adminLogout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('admin_token');
       localStorage.removeItem('admin_user');
       dispatch(clearAdminAuth());
+    }
+  }
+);
+
+export const adminGetProfile = createAsyncThunk(
+  'adminAuth/getProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await authService.adminGetProfile();
+      const user = response.data?.data || response.data;
+      localStorage.setItem('admin_user', JSON.stringify(user));
+      return user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch profile');
+    }
+  }
+);
+
+export const adminDisable2FA = createAsyncThunk(
+  'adminAuth/disable2FA',
+  async (password, { dispatch, rejectWithValue }) => {
+    try {
+      await authService.adminDisable2FA(password);
+      await dispatch(adminGetProfile());
+      return true;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to disable 2FA');
     }
   }
 );
@@ -72,6 +121,22 @@ const adminAuthSlice = createSlice({
       .addCase(adminLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(adminLoginWith2FA.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(adminLoginWith2FA.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.access_token;
+      })
+      .addCase(adminLoginWith2FA.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(adminGetProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
       });
   },
 });
