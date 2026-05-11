@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MessageSquare, Phone, MapPin, Send, CheckCircle, Loader2 } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import api from '../services/api';
 
 const ContactPage = () => {
   const location = useLocation();
+  const { data: settings } = useSelector(state => state.settings);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -77,7 +79,7 @@ const ContactPage = () => {
                 </div>
                 <div>
                   <h4 className="text-lg font-bold text-text mb-1">Email Us</h4>
-                  <p className="text-gray-500">support@herdshop.com</p>
+                  <p className="text-gray-500">{settings?.site_email || 'support@herdshop.com'}</p>
                   <p className="text-xs text-primary font-bold mt-2 uppercase tracking-widest">Responds in 24h</p>
                 </div>
               </div>
@@ -95,11 +97,21 @@ const ContactPage = () => {
 
               <div className="flex gap-6 items-start group">
                 <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-text shrink-0 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
+                  <Phone size={24} />
+                </div>
+                <div>
+                  <h4 className="text-lg font-bold text-text mb-1">Call Us</h4>
+                  <p className="text-gray-500">{settings?.site_phone || '+1 (555) 123-4567'}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-6 items-start group">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-text shrink-0 shadow-sm border border-gray-100 group-hover:scale-110 transition-transform">
                   <MapPin size={24} />
                 </div>
                 <div>
                   <h4 className="text-lg font-bold text-text mb-1">Office</h4>
-                  <p className="text-gray-500">123 Design District, Suite 400<br/>New York, NY 10013</p>
+                  <p className="text-gray-500 whitespace-pre-line">{settings?.site_address || '123 Design District, Suite 400\nNew York, NY 10013'}</p>
                 </div>
               </div>
             </div>

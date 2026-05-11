@@ -12,6 +12,7 @@ import ReviewItem from '../features/reviews/ReviewItem';
 import ReviewForm from '../features/reviews/ReviewForm';
 import ProductCard from '../components/ProductCard';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSEO } from '../hooks/useSEO';
 
 const ProductDetailsPage = () => {
   const { slug } = useParams();
@@ -19,6 +20,8 @@ const ProductDetailsPage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { items: allProducts, currentProduct: product, loading, error } = useSelector(state => state.products);
+  
+  useSEO(product?.name, product?.description?.substring(0, 160));
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [isRelatedLoading, setIsRelatedLoading] = useState(false);
   const { user } = useSelector(state => state.auth);

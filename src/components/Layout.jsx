@@ -428,6 +428,18 @@ const Layout = () => {
                 <li><Link to="/returns-exchanges" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">Returns & Exchanges</Link></li>
                 <li><Link to="/contact" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">Contact Us</Link></li>
               </ul>
+              <div className="mt-8 pt-8 border-t border-gray-50 space-y-4">
+                {settings?.site_phone && (
+                  <div className="flex items-center gap-3 text-gray-500 text-xs font-bold uppercase tracking-wider">
+                    <span className="text-primary font-black">P:</span> {settings.site_phone}
+                  </div>
+                )}
+                {settings?.site_email && (
+                  <div className="flex items-center gap-3 text-gray-500 text-xs font-bold uppercase tracking-wider">
+                    <span className="text-primary font-black">E:</span> {settings.site_email}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Column 4: Legal */}
@@ -439,11 +451,33 @@ const Layout = () => {
                 <li><Link to="/cookie-settings" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">Cookie Settings</Link></li>
                 <li><Link to="/accessibility" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">Accessibility</Link></li>
               </ul>
+              <div className="mt-8 flex gap-4">
+                {settings?.social_facebook && (
+                  <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all">
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                  </a>
+                )}
+                {settings?.social_instagram && (
+                  <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all">
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0122 7.75v8.5A5.75 5.75 0 0116.25 22h-8.5A5.75 5.75 0 012 16.25v-8.5A5.75 5.75 0 017.75 2zm0 1.5a4.25 4.25 0 00-4.25 4.25v8.5a4.25 4.25 0 004.25 4.25h8.5a4.25 4.25 0 004.25-4.25v-8.5a4.25 4.25 0 00-4.25-4.25h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm0 1.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zm5.25-.25a1.25 1.25 0 110 2.5 1.25 1.25 0 010-2.5z"/></svg>
+                  </a>
+                )}
+                {settings?.social_twitter && (
+                  <a href={settings.social_twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all">
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                  </a>
+                )}
+                {settings?.social_linkedin && (
+                  <a href={settings.social_linkedin} target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 hover:bg-primary hover:text-white transition-all">
+                    <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 3a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14m-.5 15.5v-5.3a2.7 2.7 0 00-2.7-2.7c-.8 0-1.5.4-2 1v-1h-3.3v8h3.3v-4.2c0-.6.5-1.1 1.1-1.1.6 0 1.1.5 1.1 1.1v4.2h3.5zM7 8a1 1 0 100-2 1 1 0 000 2zm1.7 10.5v-8h-3.4v8h3.4z"/></svg>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest italic">© 2026 Herd Shop. Designed for Excellence.</p>
+            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest italic">© 2026 {settings?.site_name || 'Herd Shop'}. Designed for Excellence.</p>
             <div className="flex items-center gap-8 opacity-40 grayscale">
               <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4" />
               <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3" />

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { useSEO } from '../hooks/useSEO';
 import { 
   ArrowLeft, Share2, MessageSquare, Heart, Check, X, Link2, Loader2, Send
 } from 'lucide-react';
@@ -26,6 +27,9 @@ const BlogDetailsPage = () => {
   const shareRef = useRef(null);
 
   const auth = useSelector(state => state.auth);
+  
+  useSEO(post?.title, post?.summary || post?.excerpt);
+  
   const user = auth?.user;
   const token = auth?.token;
   

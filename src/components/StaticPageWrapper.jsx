@@ -2,8 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { Shield, FileText, Truck, RefreshCw, AlertCircle } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 const StaticPageWrapper = ({ title, settingKey, icon: Icon, defaultContent }) => {
+  useSEO(title);
   const { data: settings, loading } = useSelector(state => state.settings);
   const dynamicContent = settings?.[settingKey];
 
