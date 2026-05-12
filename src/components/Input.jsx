@@ -19,7 +19,7 @@ const Input = ({
       <input
         id={id}
         className={twMerge(
-          'w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-text transition-all duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:bg-gray-50 disabled:text-gray-500',
+          'w-full rounded-button border border-gray-300 bg-white px-4 py-2.5 text-text transition-all duration-300 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 disabled:bg-gray-50 disabled:text-gray-500',
           error && 'border-red-500 focus:border-red-500 focus:ring-red-200',
           className
         )}

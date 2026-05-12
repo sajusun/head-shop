@@ -7,11 +7,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#4F46E5",
-        secondary: "#06B6D4",
-        accent: "#F59E0B",
-        background: "#F9FAFB",
-        text: "#111827",
+        primary: "var(--color-primary)",
+        secondary: "var(--color-secondary)",
+        accent: "var(--color-accent)",
+        background: "var(--color-background)",
+        text: "var(--color-text)",
+      },
+      boxShadow: {
+        'premium': 'var(--shadow-premium)',
+        'soft': 'var(--shadow-soft)',
+        'aura-primary': 'var(--shadow-aura-primary)',
+        'aura-accent': 'var(--shadow-aura-accent)',
+      },
+      borderRadius: {
+        'button': 'var(--radius-button)',
+        'card': 'var(--radius-card)',
+        'section': 'var(--radius-section)',
       },
     },
   },

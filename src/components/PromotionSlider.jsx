@@ -57,7 +57,7 @@ const PromotionSlider = () => {
   const current = displayPromotions[currentIndex] || defaultHero;
 
   return (
-    <div className="relative group bg-white rounded-[1rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-700">
+    <div className="relative group bg-white rounded-card border border-gray-100 overflow-hidden shadow-soft hover:shadow-premium transition-shadow duration-700">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIndex}
@@ -113,7 +113,7 @@ const PromotionSlider = () => {
               className="flex flex-wrap items-center gap-6"
             >
               <Link to="/products">
-                <Button size="lg" className="rounded-2xl px-10 h-14 bg-black text-white hover:bg-primary transition-all shadow-xl shadow-black/10 text-sm font-black uppercase tracking-widest">
+                <Button size="lg" className="rounded-button px-10 h-14 bg-black text-white hover:bg-primary transition-all shadow-xl shadow-black/10 text-sm font-black uppercase tracking-widest">
                   Explore Now <ArrowRight size={18} className="ml-2" />
                 </Button>
               </Link>
@@ -136,7 +136,7 @@ const PromotionSlider = () => {
           {/* Image Section */}
           <div className="flex-1 h-64 md:h-auto relative order-1 md:order-2 overflow-hidden">
             <div className="absolute inset-0 p-4 md:p-8">
-              <div className="w-full h-full rounded-[1rem] overflow-hidden bg-gray-50 border border-gray-100/50 relative group-hover:scale-[1.02] transition-transform duration-1000 ease-out">
+              <div className="w-full h-full rounded-card overflow-hidden bg-gray-50 border border-gray-100/50 relative group-hover:scale-[1.02] transition-transform duration-1000 ease-out">
                 {current.banner ? (
                   <img src={current.banner} alt={current.title} className="w-full h-full object-cover" />
                 ) : (

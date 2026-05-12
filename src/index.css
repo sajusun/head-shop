@@ -4,19 +4,88 @@
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
   font-weight: 400;
-
   color-scheme: light;
-  color: #111827;
-  background-color: #F9FAFB;
-
-  font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
-  scroll-padding-top: 100px; /* Enhanced offset for sticky header */
+  scroll-padding-top: 100px;
+
+  /* Standard Theme */
+  --color-primary: #4F46E5;
+  --color-secondary: #06B6D4;
+  --color-accent: #F59E0B;
+  --color-background: #fcfcfd;
+  --color-text: #111827;
+  --shadow-premium: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+  --shadow-aura-primary: 0 0 20px rgba(79, 70, 229, 0.15);
+  --shadow-aura-accent: 0 0 20px rgba(245, 158, 11, 0.15);
+  --radius-button: 0.75rem;
+  --radius-card: 1.5rem;
+  --radius-section: 2.5rem;
+}
+
+[data-theme='robust'] {
+  --color-primary: #1e293b;
+  --color-secondary: #475569;
+  --color-accent: #ef4444;
+  --color-background: #f1f5f9;
+  --color-text: #0f172a;
+  --shadow-premium: 0 20px 0px -5px rgba(15, 23, 42, 0.1);
+  --shadow-soft: 4px 4px 0px 0px rgba(15, 23, 42, 0.05);
+  --shadow-aura-primary: 0 0 0px rgba(0,0,0,0);
+  --shadow-aura-accent: 0 0 0px rgba(0,0,0,0);
+  --radius-button: 0.25rem;
+  --radius-card: 0.5rem;
+  --radius-section: 0.75rem;
+}
+
+[data-theme='premium'] {
+  --color-primary: #7c3aed;
+  --color-secondary: #db2777;
+  --color-accent: #fbbf24;
+  --color-background: #ffffff;
+  --color-text: #1e1b4b;
+  --shadow-premium: 0 25px 50px -12px rgba(124, 58, 237, 0.15);
+  --shadow-soft: 0 10px 15px -3px rgba(124, 58, 237, 0.05);
+  --shadow-aura-primary: 0 0 40px rgba(124, 58, 237, 0.2);
+  --shadow-aura-accent: 0 0 40px rgba(251, 191, 36, 0.2);
+  --radius-button: 9999px;
+  --radius-card: 2rem;
+  --radius-section: 4rem;
+}
+
+[data-theme='simple'] {
+  --color-primary: #000000;
+  --color-secondary: #4b5563;
+  --color-accent: #374151;
+  --color-background: #ffffff;
+  --color-text: #000000;
+  --shadow-premium: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-soft: none;
+  --shadow-aura-primary: none;
+  --shadow-aura-accent: none;
+  --radius-button: 0px;
+  --radius-card: 0px;
+  --radius-section: 0px;
+}
+
+[data-theme='combine'] {
+  --color-primary: #0891b2;
+  --color-secondary: #7e22ce;
+  --color-accent: #f43f5e;
+  --color-background: #f8fafc;
+  --color-text: #1e293b;
+  --shadow-premium: 10px 10px 0px #0891b2;
+  --shadow-soft: 5px 5px 0px #7e22ce;
+  --shadow-aura-primary: 0 0 20px rgba(8, 145, 178, 0.3);
+  --shadow-aura-accent: 0 0 20px rgba(244, 63, 94, 0.3);
+  --radius-button: 1rem;
+  --radius-card: 1.5rem;
+  --radius-section: 3rem;
 }
 
 html {
@@ -27,6 +96,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 /* Custom Scrollbar - Premium Aesthetic */

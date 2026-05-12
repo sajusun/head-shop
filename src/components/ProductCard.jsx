@@ -45,8 +45,8 @@ const ProductCard = ({ product }) => {
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
+      whileHover={{ y: -8, scale: 1.01 }}
+      className="group relative bg-white rounded-card overflow-hidden shadow-soft hover:shadow-premium transition-all duration-500 border border-gray-100/50"
     >
       <Link to={`/product/${product.slug}`} className="block">
         <div className="aspect-square overflow-hidden bg-gray-100 relative">

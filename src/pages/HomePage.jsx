@@ -241,7 +241,7 @@ const HomePage = () => {
                 <div className="absolute inset-0 bg-gray-50 rounded-full scale-105 group-hover:scale-110 transition-transform duration-500"></div>
 
                 {/* Icon Container */}
-                <div className="relative w-full h-full rounded-full bg-white flex items-center justify-center border-4 border-white shadow-xl group-hover:shadow-2xl transition-all duration-500 overflow-hidden">
+                <div className="relative w-full h-full rounded-full bg-white flex items-center justify-center border-4 border-white shadow-premium group-hover:shadow-2xl transition-all duration-500 overflow-hidden">
                   <div className="group-hover:scale-110 transition-transform duration-500">
                     {feature.icon}
                   </div>
