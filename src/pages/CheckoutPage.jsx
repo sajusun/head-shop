@@ -13,7 +13,7 @@ import {
   Loader2,
   Lock
 } from 'lucide-react';
-import { clearCart, selectCartTotal } from '../features/cart/cartSlice';
+import { clearCart, clearBuyNowItem, selectCartTotal } from '../features/cart/cartSlice';
 import Button from '../components/Button';
 import Input from '../components/Input';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -129,7 +129,8 @@ const CheckoutForm = ({ orderData, onSuccess, total, isAuthenticated }) => {
 
 const CheckoutPage = () => {
   const [step, setStep] = useState('shipping'); // shipping, payment
-  const { items } = useSelector(state => state.cart);
+  const { items, buyNowItem } = useSelector(state => state.cart);
+  const checkoutItems = buyNowItem ? [buyNowItem] : items;
   const { user } = useSelector(state => state.auth);
   const total = useSelector(selectCartTotal);
   const dispatch = useDispatch();
@@ -164,7 +165,7 @@ const CheckoutPage = () => {
 
   const orderData = {
     ...formData,
-    items: items.map(item => ({
+    items: checkoutItems.map(item => ({
       product_id: item.id,
       product_variant_id: item.product_variant_id,
       quantity: item.quantity,
@@ -174,7 +175,11 @@ const CheckoutPage = () => {
   };
 
   const handleSuccess = (order) => {
-    dispatch(clearCart());
+    if (buyNowItem) {
+      dispatch(clearBuyNowItem());
+    } else {
+      dispatch(clearCart());
+    }
     navigate('/order/success', { state: { order } });
   };
 
@@ -186,7 +191,7 @@ const CheckoutPage = () => {
     }
   };
 
-  if (items.length === 0 && step !== 'success') {
+  if (checkoutItems.length === 0 && step !== 'success') {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center px-4">
         <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
@@ -396,7 +401,7 @@ const CheckoutPage = () => {
             <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm sticky top-24">
               <h2 className="text-xl font-bold mb-8">Order Summary</h2>
               <div className="space-y-6 mb-8 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                {items.map((item, idx) => (
+                {checkoutItems.map((item, idx) => (
                   <div key={`${item.id}-${idx}`} className="flex gap-4">
                     <div className="w-16 h-16 bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 shrink-0">
                       <img src={item.image || item.thumbnail} alt="" className="w-full h-full object-cover" />

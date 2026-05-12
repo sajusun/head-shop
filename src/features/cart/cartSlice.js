@@ -47,10 +47,26 @@ const cartSlice = createSlice({
         return [];
       }
     })(),
+    buyNowItem: (() => {
+      try {
+        const savedBuyNow = localStorage.getItem('buyNowItem');
+        return savedBuyNow ? JSON.parse(savedBuyNow) : null;
+      } catch (e) {
+        return null;
+      }
+    })(),
     loading: false,
     error: null
   },
   reducers: {
+    setBuyNowItem: (state, action) => {
+      state.buyNowItem = action.payload;
+      localStorage.setItem('buyNowItem', JSON.stringify(action.payload));
+    },
+    clearBuyNowItem: (state) => {
+      state.buyNowItem = null;
+      localStorage.removeItem('buyNowItem');
+    },
     addToCart: (state, action) => {
       const { id, product_variant_id, selectedColor, selectedSize } = action.payload;
       const existingItem = state.items.find(item => 
@@ -129,13 +145,22 @@ const cartSlice = createSlice({
   }
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
+export const { 
+  addToCart, 
+  removeFromCart, 
+  updateQuantity, 
+  clearCart, 
+  setBuyNowItem, 
+  clearBuyNowItem 
+} = cartSlice.actions;
 
-export const selectCartTotal = (state) => 
-  state.cart.items.reduce((total, item) => {
+export const selectCartTotal = (state) => {
+  const targetItems = state.cart.buyNowItem ? [state.cart.buyNowItem] : state.cart.items;
+  return targetItems.reduce((total, item) => {
     const activePrice = Number(item.offer_price || item.offerPrice || item.effective_price || item.price || 0);
     const quantity = Number(item.quantity || 0);
     return total + (activePrice * quantity);
   }, 0);
+};
 
 export default cartSlice.reducer;

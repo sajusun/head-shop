@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductBySlug, clearCurrentProduct } from '../features/products/productSlice';
 import { fetchReviews } from '../features/reviews/reviewSlice';
-import { addToCart, addToCartDB } from '../features/cart/cartSlice';
+import { addToCart, addToCartDB, setBuyNowItem, clearBuyNowItem } from '../features/cart/cartSlice';
 import { toggleFavorite } from '../features/favorites/favoriteSlice';
 import { Heart, ShoppingBag, Share2, ArrowLeft, MessageSquare, ChevronLeft, ChevronRight, ArrowRight, Zap } from 'lucide-react';
 import Button from '../components/Button';
@@ -180,7 +180,7 @@ const ProductDetailsPage = () => {
   });
 
   const handleBuyNow = () => {
-    dispatch(addToCart(cartPayload()));
+    dispatch(setBuyNowItem(cartPayload()));
     navigate('/checkout');
   };
 
@@ -425,6 +425,7 @@ const ProductDetailsPage = () => {
               disabled={stock <= 0}
               onClick={() => {
                 const payload = cartPayload();
+                dispatch(clearBuyNowItem());
                 dispatch(addToCart(payload));
                 if (user) {
                   dispatch(addToCartDB(payload));

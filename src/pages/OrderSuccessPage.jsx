@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { clearCart } from '../features/cart/cartSlice';
+import { clearCart, clearBuyNowItem } from '../features/cart/cartSlice';
 import api from '../services/api';
 import { CheckCircle2, ArrowRight, Package, Calendar, MapPin, Loader2 } from 'lucide-react';
 import Button from '../components/Button';
@@ -16,8 +16,13 @@ const OrderSuccessPage = () => {
   const orderId = searchParams.get('order_id');
 
   useEffect(() => {
-    // 1. Clear the cart immediately
-    dispatch(clearCart());
+    // 1. Clear the correct cart state immediately
+    const savedBuyNow = localStorage.getItem('buyNowItem');
+    if (savedBuyNow) {
+      dispatch(clearBuyNowItem());
+    } else {
+      dispatch(clearCart());
+    }
 
     // 2. If no order in state but we have ID in URL, fetch it
     if (!order && orderId) {

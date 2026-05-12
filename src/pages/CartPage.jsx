@@ -1,14 +1,18 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, ShieldCheck, AlertCircle } from 'lucide-react';
-import { removeFromCart, updateQuantity, selectCartTotal } from '../features/cart/cartSlice';
+import { removeFromCart, updateQuantity, selectCartTotal, clearBuyNowItem } from '../features/cart/cartSlice';
 import Button from '../components/Button';
 
 const CartPage = () => {
   const { items } = useSelector(state => state.cart);
   const total = useSelector(selectCartTotal);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(clearBuyNowItem());
+  }, [dispatch]);
 
   // Defensive check for items
   const cartItems = useMemo(() => Array.isArray(items) ? items : [], [items]);
