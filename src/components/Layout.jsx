@@ -375,9 +375,9 @@ const Layout = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-100 pt-24 pb-12">
+      <footer className="bg-white border-t border-gray-100 pt-12 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8">
             {/* Column 1: Brand */}
             <div className="space-y-6">
               <Link to="/" className="flex items-center gap-2 group">
@@ -428,7 +428,7 @@ const Layout = () => {
                 <li><Link to="/returns-exchanges" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">Returns & Exchanges</Link></li>
                 <li><Link to="/contact" className="text-gray-500 hover:text-primary transition-colors text-sm font-medium">Contact Us</Link></li>
               </ul>
-              <div className="mt-8 pt-8 border-t border-gray-50 space-y-4">
+              {/* <div className="mt-8 pt-8 border-t border-gray-50 space-y-4">
                 {settings?.site_phone && (
                   <div className="flex items-center gap-3 text-gray-500 text-xs font-bold uppercase tracking-wider">
                     <span className="text-primary font-black">P:</span> {settings.site_phone}
@@ -439,7 +439,7 @@ const Layout = () => {
                     <span className="text-primary font-black">E:</span> {settings.site_email}
                   </div>
                 )}
-              </div>
+              </div> */}
             </div>
 
             {/* Column 4: Legal */}
@@ -478,9 +478,10 @@ const Layout = () => {
 
           <div className="pt-10 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest italic">© 2026 {settings?.site_name || 'Herd Shop'}. Designed for Excellence.</p>
-            <div className="flex items-center gap-8 opacity-40 grayscale">
+            <div className="flex items-center gap-8 opacity-60">
+              <img src="https://icon2.cleanpng.com/20180419/ile/avu920jgz.webp" alt="Stripe" className="h-6" />
               <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4" />
-              <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3" />
+              <img src="https://www.logo.wine/a/logo/Visa_Inc./Visa_Inc.-Logo.wine.svg" alt="Visa" className="h-6" />
               <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MasterCard" className="h-6" />
             </div>
           </div>
