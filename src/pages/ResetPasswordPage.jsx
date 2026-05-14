@@ -40,7 +40,7 @@ const ResetPasswordPage = () => {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/reset-password`, formData);
       setSuccess(true);
       setTimeout(() => {
-        navigate(isInternalAdmin ? '/admin/login' : '/auth');
+        navigate(isInternalAdmin ? '/admin/login' : '/login');
       }, 3000);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to reset password. The link may have expired.');
@@ -77,7 +77,7 @@ const ResetPasswordPage = () => {
               <p className="text-gray-500 text-sm mb-6">
                 Your password has been updated. Redirecting you to login...
               </p>
-              <Link to={isInternalAdmin ? "/admin/login" : "/auth"} className="text-primary font-bold hover:underline">
+              <Link to={isInternalAdmin ? "/admin/login" : "/login"} className="text-primary font-bold hover:underline">
                 Go to Login now
               </Link>
             </motion.div>
@@ -152,7 +152,7 @@ const ResetPasswordPage = () => {
 
           {!success && (
             <div className="mt-8 pt-6 border-t border-gray-50 text-center">
-              <Link to={isInternalAdmin ? "/admin/login" : "/auth"} className="inline-flex items-center gap-2 text-xs text-gray-400 hover:text-gray-900 transition-colors">
+              <Link to={isInternalAdmin ? "/admin/login" : "/login"} className="inline-flex items-center gap-2 text-xs text-gray-400 hover:text-gray-900 transition-colors">
                 <ArrowLeft size={12} />
                 Back to Login
               </Link>

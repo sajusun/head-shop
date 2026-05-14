@@ -89,6 +89,10 @@ const AppRoutes = () => {
     }>
       <ScrollToTop />
       <Routes>
+        <Route path="/login" element={<UserLoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/auth/:provider/callback" element={<SocialCallbackPage />} />
+
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="products" element={<ProductListingPage />} />
@@ -100,8 +104,6 @@ const AppRoutes = () => {
           <Route path="checkout" element={<CheckoutPage />} />
           <Route path="order/success" element={<OrderSuccessPage />} />
           <Route path="order/fail" element={<OrderFailPage />} />
-          <Route path="login" element={<UserLoginPage />} />
-          <Route path="auth/:provider/callback" element={<SocialCallbackPage />} />
 
   {/* Public Legal & Settings Pages */}
           <Route path="accessibility" element={<AccessibilityPage />} />
@@ -113,7 +115,6 @@ const AppRoutes = () => {
           <Route path="contact" element={<ContactPage />} />
           <Route path="journal" element={<BlogPage />} />
           <Route path="journal/:slug" element={<BlogDetailsPage />} />
-          <Route path="forgot-password" element={<ForgotPasswordPage />} />
           <Route path="reset-password" element={<ResetPasswordPage />} />
 
           <Route 
