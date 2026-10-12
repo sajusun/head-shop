@@ -1,76 +1,149 @@
-# Herd Shop Frontend
+# 🎛️ Herd Shop — Modern React Admin Dashboard
 
-A modern, high-performance e-commerce frontend built with React, Vite, and TailwindCSS.
+> **Enterprise-grade Single Page Application (SPA)** built with React 19, Vite, and Tailwind CSS for apparel catalog control, inventory management, dynamic coupon engines, order processing, and media management.
 
-## 🌟 Features
+---
 
-- **Premium UI/UX:** Built with Framer Motion for smooth transitions and a high-end feel.
-- **Dynamic Catalog:** Advanced product filtering, search, and categorization.
-- **Journal/Blog:** Fully integrated reading experience with categories, likes, and comments.
-- **Security Dashboard:** User settings for password changes and 2FA management with modal-based flows.
-- **State Management:** Powered by Redux Toolkit for consistent data flow across the app.
-- **Responsive Design:** Optimized for mobile, tablet, and desktop experiences.
+## 🏗️ Architecture & Flowchart
 
-## 🛠 Tech Stack
+```mermaid
+flowchart TD
+    AdminUser[Store Administrator] --> ReactSPA[React 19 + Vite SPA]
+    
+    subgraph Admin Client
+        ReactSPA --> Router[React Router DOM v6]
+        Router --> Dashboard[Analytics Dashboard]
+        Router --> Products[Product & Variant Manager]
+        Router --> Categories[Department & Category Manager]
+        Router --> Coupons[Coupon Discount Engine]
+        Router --> Orders[Order Processing & Status]
+        Router --> Media[Centralized WebP Media Gallery]
+    end
 
-- **Framework:** React 18
-- **Build Tool:** Vite
-- **Styling:** TailwindCSS
-- **State Management:** Redux Toolkit
-- **Animations:** Framer Motion
-- **Icons:** Lucide React
-- **Routing:** React Router 6
-
-## 📁 Project Structure
-
-```text
-src/
-├── api/            # API services and axios configuration
-├── assets/         # Images, fonts, and static files
-├── components/     # Reusable UI components (Button, Modal, Input, etc.)
-├── features/       # Redux slices and feature-specific logic (auth, cart, products)
-├── hooks/          # Custom React hooks
-├── layouts/        # Layout wrappers (MainLayout, AdminLayout)
-├── pages/          # Page-level components
-├── store/          # Redux store configuration
-└── utils/          # Helper functions and constants
+    subgraph API Integration
+        Products -->|GET /api/admin/get-attributes| HerdAPI[Laravel Herd: http://head_shop.test/api]
+        Categories -->|REST CRUD| HerdAPI
+        Coupons -->|REST CRUD| HerdAPI
+        Orders -->|Status Updates| HerdAPI
+        Media -->|POST /api/media/upload| HerdAPI
+    end
 ```
 
-## 🚀 Getting Started
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technology | Details |
+|---|---|---|
+| **Core Framework** | React 19 | Fast declarative UI components |
+| **Build Tool** | Vite 6 | Lightning-fast HMR & optimized Rollup bundles |
+| **Styling** | Tailwind CSS v3 | Utility-first responsive design & custom theme |
+| **Icons** | Lucide React & React Icons (Fi) | Clean, lightweight SVG vector icons |
+| **Animations** | Framer Motion | Smooth modal transitions, tabs, and notifications |
+| **HTTP Client** | Axios | Interceptors with Bearer JWT tokens & auto-refresh |
+| **Backend Integration** | Laravel Herd | Direct communication with `http://head_shop.test/api` |
+
+---
+
+## ✨ Key Capabilities
+
+### 1. 100% Dynamic Attribute-Driven Cataloging
+- **No Hardcoded Options**: Categories, Departments, Sizes, Colors, and Fit types are loaded dynamically via `/api/admin/get-attributes`.
+- **Apparel Specialization**:
+  - Department classification (`men`, `women`, `kids`, `baby`, `unisex`).
+  - Interactive Size Chart selector for garments.
+  - Multi-variant matrix (Color hex picker + Size pills + SKU + Stock count).
+  - Garment fabric specs (GSM, Composition, Care instructions).
+
+### 2. Coupon & Promotion Engine (`AdminCoupons.jsx`)
+- Create percentage, fixed amount, and free shipping discount codes.
+- Set minimum purchase limits, maximum discount caps, and usage quotas.
+- 1-Click modal to toggle active/inactive status without page reload.
+
+### 3. Order Management & Delivery Tracking
+- Real-time customer order pipeline (`pending`, `processing`, `shipped`, `delivered`, `cancelled`).
+- Order item breakdown showing selected size, color, customer phone, and dynamic delivery zone.
+
+### 4. Centralized WebP Media Uploader
+- Uploads images directly to `/api/media/upload`.
+- Instant preview of WebP responsive sizes (`thumbnail`, `medium 3:4`, `large`).
+
+---
+
+## 🚀 Getting Started & Local Setup
 
 ### Prerequisites
 - Node.js (v18 or higher)
-- npm or yarn
+- npm / pnpm / yarn
+- Laravel Herd running the backend at `http://head_shop.test`
 
-### Installation
+### Installation Steps
 
-1. **Install dependencies:**
+1. **Navigate to the Admin directory:**
+   ```bash
+   cd head_shop/admin_ui
+   ```
+
+2. **Install Dependencies:**
    ```bash
    npm install
    ```
 
-2. **Environment Configuration:**
-   Create a `.env` file in the root directory:
+3. **Configure Environment:**
+   Create or verify `.env`:
    ```env
-   VITE_API_BASE_URL=http://localhost:8000/api
+   VITE_API_BASE_URL=http://head_shop.test/api
+   VITE_USE_API=true
+   VITE_APP_THEME=standard
    ```
 
-3. **Run Development Server:**
+4. **Start Vite Development Server:**
    ```bash
    npm run dev
    ```
+   *Dashboard will be available at: `http://localhost:5173`*
 
-4. **Build for Production:**
+5. **Build for Production:**
    ```bash
    npm run build
    ```
-
-## 💡 How It Works
-
-1. **Data Fetching:** All external data is handled through the `src/api` layer, which communicates with the Laravel backend.
-2. **Global State:** The `cart`, `auth`, and `settings` are managed via Redux, ensuring that user actions (like adding to cart) are reflected instantly across all pages.
-3. **Authentication:** Uses JWT/Sanctum tokens stored securely. Protected routes handle authorization for the user dashboard and admin area.
-4. **Theme & Styling:** Uses a centralized `tailwind.config.js` for consistent branding, colors, and typography.
+   *Outputs optimized production bundle into `dist/` directory in ~12 seconds.*
 
 ---
-© 2026 Herd Shop. Premium Lifestyle & Journal.
+
+## 📁 Project Directory Structure
+
+```text
+admin_ui/
+├── public/                 # Static assets & brand icons
+├── src/
+│   ├── components/         # Reusable UI widgets
+│   │   ├── admin/          # Admin-specific tables, sortable headers, stat cards
+│   │   └── common/         # Modals, Pagination, Buttons, Form inputs
+│   ├── pages/
+│   │   └── admin/
+│   │       ├── AdminDashboard.jsx    # Revenue & KPI analytics
+│   │       ├── AdminProducts.jsx     # Garment & variant manager
+│   │       ├── AdminCategories.jsx   # Department & category CRUD
+│   │       ├── AdminCoupons.jsx      # Discount engine CRUD
+│   │       ├── AdminOrders.jsx       # Order lifecycle & fulfillment
+│   │       └── AdminSettings.jsx     # Site configs & WhatsApp number
+│   ├── routes/             # AppRoutes.jsx with protected route guards
+│   ├── services/           # api.js with Axios interceptors
+│   └── styles/             # Tailwind & CSS custom utility layers
+├── index.html
+├── package.json
+└── vite.config.js
+```
+
+---
+
+## 👨‍💻 Developer & Author Credit
+
+Developed & Maintained by:
+- **Developer:** **Sakhawat Hossain**
+- **GitHub Username:** [@sajusun](https://github.com/sajusun)
+- **Profile:** [https://github.com/sajusun](https://github.com/sajusun)
+
+---
+*© 2026 Herd Shop Admin UI. High-Performance React Dashboard.*
