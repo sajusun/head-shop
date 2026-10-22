@@ -27,6 +27,7 @@ const CategoryModal = ({ isOpen, onClose, category = null, type = 'product' }) =
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     name: '',
+    department: 'unisex',
     description: '',
     type: 'product',
     status: 'active'
@@ -36,6 +37,7 @@ const CategoryModal = ({ isOpen, onClose, category = null, type = 'product' }) =
     if (category) {
       setFormData({
         name: category.name || '',
+        department: category.department || 'unisex',
         description: category.description || '',
         type: category.type || type,
         status: category.status || 'active'
@@ -43,6 +45,7 @@ const CategoryModal = ({ isOpen, onClose, category = null, type = 'product' }) =
     } else {
       setFormData({
         name: '',
+        department: 'unisex',
         description: '',
         type: type,
         status: 'active'
@@ -103,6 +106,21 @@ const CategoryModal = ({ isOpen, onClose, category = null, type = 'product' }) =
             >
               <option value="product">Product</option>
               <option value="blog">Blog</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-widest">Department</label>
+            <select 
+              value={formData.department}
+              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              className="w-full p-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+            >
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+              <option value="kids">Kids (2-14Y)</option>
+              <option value="baby">Baby (0-24M)</option>
+              <option value="unisex">Unisex / General</option>
             </select>
           </div>
 
@@ -292,7 +310,12 @@ const AdminCategories = () => {
                             <FiFolder size={24} />
                           </div>
                           <div>
-                            <p className="font-bold text-text mb-0.5">{cat.name}</p>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <p className="font-bold text-text">{cat.name}</p>
+                              <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider bg-black text-white">
+                                {cat.department || 'unisex'}
+                              </span>
+                            </div>
                             <p className="text-xs text-gray-400 font-medium truncate max-w-xs">{cat.description || 'No description provided.'}</p>
                           </div>
                         </div>
